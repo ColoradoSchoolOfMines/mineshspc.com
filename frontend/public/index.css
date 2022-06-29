@@ -1,3 +1,15 @@
+@font-face {
+    font-family: 'Gotham';
+    src: url('./media/fonts/subset-GothamBold.woff2') format('woff2'),
+    url('./media/fonts/subset-GothamBold.woff') format('woff');
+    font-weight: 700;
+    font-style: bold;
+}
+
+body {
+    background-color: rgba(105, 88, 130, 0.15);
+}
+
 #logo {
     background-color: transparent;
     text-align: center;
@@ -8,17 +20,12 @@
     margin-right: auto;
 }
 
-.jumbotron {
-    margin-bottom: 0;
-    padding-bottom: 20px;
+.container {
+    max-width: 85%;
 }
 
 #main-nav {
-    max-width: 1140px; 
-    margin-left: auto; 
-    margin-right: auto; 
     background-color: #8E44AD; 
-    padding: 20px;
 }
 
 .nav-link {
@@ -26,32 +33,15 @@
     font-size: 25px;
 }
 
-/* end of new stuff */
-
-@font-face {
-    font-family: 'Gotham';
-    src: url('./media/fonts/subset-GothamBold.woff2') format('woff2'),
-        url('./media/fonts/subset-GothamBold.woff') format('woff');
-    font-weight: 700;
-    font-style: bold;
-}
-
-body {
-    background-image: url("./media/csm.jpg");
-    background-repeat: repeat-y;
-    background-size: cover;
-    background-position: top;
-}
-
 .content {
     background-color: #ffffff;
     font-size: 18px;
-    padding: 30px;
+    padding: 25px;
+    height: 100%;
 }
 
 .logoblock {
     color: #ffffff;
-    /* margin-top: 30px; */
     margin-bottom: 0px;
     padding: 30px;
     display: block;
@@ -84,10 +74,20 @@ h1, h2, h3 {
     font-weight: 700;
 }
 
+.list-group-item {
+    background-color: transparent;
+    border: none;
+}
+
+.image {
+    width: 100%;
+    display: flex;
+}
+
 .footer {
     margin-top: 20px;
     margin-bottom: 20px;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0,0,0,0.2);
     padding: 20px;
     color: #ffffff;
     font-size: 15px;

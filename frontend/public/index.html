@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="icon" href="%PUBLIC_URL%/media/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <meta
@@ -18,46 +18,134 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>CS@Mines High School Programming Competition</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    <title>CS@Mines HSPC</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="./index.css" media="screen" />
   </head>
   <body>
-    <div class="container logoblock">
-      <div class="row">
-        <div class="col-md-8">
-          <img src="./media/csmines-wh.svg" class="logo" alt="CS@Mines" />
-          <h1>High School Programming Competition</h1>
+    <nav class="navbar sticky-top navbar-expand-lg" id="main-nav">
+      <div class="container-fluid">
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent" style="justify-content: center;">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#"
+              >Rules</a
+              >
+            </li>
+            <!-- day of schedule -->
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#"
+                >Schedule</a
+              >
+            </li>
+            <!-- timeline for registration + forms etc -->
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#"
+                >Registration</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#"
+                >FAQ</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#"
+                >Sponsors</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#"
+                >Previous Competitions</a
+              >
+            </li>
+            <!-- alternatively, put contact info in footer -->
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#"
+                >Contact</a
+              >
+            </li>
+          </ul>
         </div>
-        <div class="col-md-4 logoblock-right">
-          <h2>Spring 2023</h2>
-          <p>
-            F2F or online via Zoom
-          </p>
+      </div>
+    </nav>
+
+    <div class="px-4 pt-5 text-center border-bottom" style="background-color: white; margin-bottom: 20px;">
+      <h1 class="display-4 fw-bold">CS@Mines HSPC</h1>
+      <div class="col-lg-6 mx-auto">
+        <p class="lead mb-4">
+          Engage in exciting problems at the Mines High School Programming Competition (HSPC)!
+          <br>Registration is now open for the Spring 2023 competition (F2F or online via Zoom)
+        </p>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mb-5">
+          <button type="button" class="btn btn-primary btn-lg px-4 me-sm-3">Register Now</button>
         </div>
       </div>
     </div>
-    <div class="signup-link container">
-      <noscript>
-        You must enable JavaScript to register your interest for the competition.
-      </noscript>
-      <div id="InterestForm" class="__react-root"></div>
+
+    <div class="container" style="margin-bottom: 2%;">
+      <div class="row">
+        <div class="col">
+          <div class="content">
+            <h1>Engage in Exciting Problems</h1>
+            <p>
+              The CS@Mines High School Programming Competition is a competition
+              for high school students to write programs that solve problems.
+            </p>
+            <p>
+              We model our programming competition off well-known college-level
+              competitions such as <a href="https://icpc.global">ICPC</a>, but bring an
+              inviting set of problems to the table suitable for high school
+              students.
+              <br><br><button type="button" class="btn btn-primary">Register Now</button>
+            </p>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <img class="image-fluid shadow w-100" src="./media/competition1.jpg" alt="Problem solution presentation at the 2022 competition">
+        </div>
+      </div>
     </div>
+  
+    <div class="container" style="margin-bottom: 2%;">
+      <div class="row">
+        <div class="col-lg-5">
+          <img class="image-fluid shadow w-100" src="./media/competition2.jpg" alt="HSPC volunteers at the 2022 competition">
+        </div>
+        <div class="col">
+          <div class="content">
+            <h1>Plans for 2022:</h1>
+            <p>
+              There will be FOUR tracks in the competition this year, all of which
+              will compete the same day/time. Two tracks will be on Mines campus
+              and two tracks will be virtual. One track will be for students with
+              significant prior computing experience and one track will be for
+              students with basic prior computing experience. Registration is now
+              open and will close March 17th, 2022.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <div class="container content">
       <div class="row">
         <div class="col-md-7">
-          <h1>Engage in Exciting Problems</h1>
-          <p>
-            The CS@Mines High School Programming Competition is a competition
-            for high school students to write programs that solve problems.
-          </p>
-          <p>
-            We model our programming competition off well-known college-level
-            competitions such as the
-            <a href="https://icpc.baylor.edu/">ACM ICPC</a>, but bring an
-            inviting set of problems to the table suitable for high school
-            students.
-          </p>
+
           <h2>How many people can be on my team?</h2>
           <p>
             We recommend a team size of three, but will allow teams of two or
@@ -145,22 +233,33 @@
             <li>Prize for each person in the second place team</li>
             <li>Certificate of completion for everyone!</li>
           </ul>
-          <h1>Plans for 2022:</h1>
-          <p>
-            There will be FOUR tracks in the competition this year, all of which
-            will compete the same day/time. Two tracks will be on Mines campus
-            and two tracks will be virtual. One track will be for students with
-            significant prior computing experience and one track will be for
-            students with basic prior computing experience. Registration is now
-            open and will close March 17th, 2022.
-          </p>
         </div>
       </div>
     </div>
-    <div class="text-center footer container">
-      <a href="https://www.mines.edu" target="_blank">Mines Home</a>
-      | <a href="http://cs.mines.edu" target="_blank">CS@Mines Home</a> |
-      <a href="https://tech.mines.edu" target="_blank">DECtech Home</a>
-    </div>
+
+    <footer class="py-3">
+      <!-- TODO fix image scaling, align items to center -->
+      <a href="https://www.mines.edu" target="_blank">
+        <img class="image" src="./media/mines.png">
+      </a>
+
+      <ul class="list-group list-group-horizontal">
+        <li class="list-group-item flex-fill">
+          <a href="https://acm.mines.edu" target="_blank">
+            <img class="image" src="./media/acm.png">
+          </a>
+        </li>
+        <li class="list-group-item flex-fill">
+          <a href="https://tech.mines.edu" target="_blank">
+            <img class="image" src="./media/dectech.png">
+          </a>
+        </li>
+        <li class="list-group-item flex-fill">
+          <a href="http://cs.mines.edu" target="_blank">
+            <img class="image" src="./media/csmines-wh.svg">  
+          </a>
+        </li>
+      </ul>
+    </footer>
   </body>
 </html>
