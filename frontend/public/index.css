@@ -1,3 +1,33 @@
+#logo {
+    background-color: transparent;
+    text-align: center;
+}
+
+#logo-image {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.jumbotron {
+    margin-bottom: 0;
+    padding-bottom: 20px;
+}
+
+#main-nav {
+    max-width: 1140px; 
+    margin-left: auto; 
+    margin-right: auto; 
+    background-color: #8E44AD; 
+    padding: 20px;
+}
+
+.nav-link {
+    color: white;
+    font-size: 25px;
+}
+
+/* end of new stuff */
+
 @font-face {
     font-family: 'Gotham';
     src: url('./media/fonts/subset-GothamBold.woff2') format('woff2'),
@@ -21,7 +51,7 @@ body {
 
 .logoblock {
     color: #ffffff;
-    margin-top: 30px;
+    /* margin-top: 30px; */
     margin-bottom: 0px;
     padding: 30px;
     display: block;
