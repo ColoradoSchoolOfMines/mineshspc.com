@@ -31,27 +31,17 @@ body {
     height: 100%;
 }
 
-/* .logoblock {
-    color: #ffffff;
-    margin-bottom: 0px;
-    padding: 30px;
+.header {
     display: block;
+    color: #ffffff;
     background-color: #8E44AD;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    padding: 10px;
+    width: 85%;
 }
-
-.logo {
-  display: block;
-  height: 60px;
-}
-
-.logoblock-right {
-    text-align: right;
-    font-size: 20px;
-}
-
-.logoblock-right > h2 {
-    padding: 0px;
-} */
 
 .content h1, h2 {
     display: block;
