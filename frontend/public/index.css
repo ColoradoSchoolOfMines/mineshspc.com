@@ -10,22 +10,13 @@ body {
     background-color: rgba(105, 88, 130, 0.15);
 }
 
-#logo {
-    background-color: transparent;
-    text-align: center;
-}
-
-#logo-image {
-    margin-left: auto;
-    margin-right: auto;
-}
-
 .container {
     max-width: 85%;
 }
 
 #main-nav {
     background-color: #8E44AD; 
+    font-family: 'Gotham';
 }
 
 .nav-link {
@@ -35,12 +26,12 @@ body {
 
 .content {
     background-color: #ffffff;
-    font-size: 18px;
+    font-size: 20px;
     padding: 25px;
     height: 100%;
 }
 
-.logoblock {
+/* .logoblock {
     color: #ffffff;
     margin-bottom: 0px;
     padding: 30px;
@@ -60,7 +51,7 @@ body {
 
 .logoblock-right > h2 {
     padding: 0px;
-}
+} */
 
 .content h1, h2 {
     display: block;
@@ -74,31 +65,15 @@ h1, h2, h3 {
     font-weight: 700;
 }
 
-.list-group-item {
-    background-color: transparent;
-    border: none;
-}
-
-.image {
-    width: 100%;
-    display: flex;
+.center-image {
+    margin-left: auto; 
+    margin-right: auto; 
+    display: block;
 }
 
 .footer {
-    margin-top: 20px;
     margin-bottom: 20px;
-    background-color: rgba(0,0,0,0.2);
     padding: 20px;
-    color: #ffffff;
-    font-size: 15px;
-}
-
-.footer a:link {
-    color: #ffffff;
-}
-
-.footer a:visited {
-    color: #ffffff;
 }
 
 .signup-link {
