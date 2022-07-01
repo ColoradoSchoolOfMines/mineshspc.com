@@ -22,15 +22,10 @@ jobs:
           --arg forCI true
           --command "echo nix-shell environment is cached"
 
-      - name: npm install
+      - name: hugo
         run: nix-shell
           --arg forCI true
-          --command "cd frontend && npm install"
-
-      - name: npm run build
-        run: nix-shell
-          --arg forCI true
-          --command "cd frontend && npm run build"
+          --command "cd frontend && hugo"
 
       - name: go build
         run: nix-shell
@@ -43,6 +38,6 @@ jobs:
         env:
           HOST: morak.sumnerevans.com
           KEY: ${{ secrets.DEPLOY_SSH_KEY }}
-          SOURCE: ./frontend/build/
+          SOURCE: ./frontend/public/
           TARGET: /var/www/mineshspc.com
           VERBOSE: true
