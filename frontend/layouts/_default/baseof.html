@@ -24,3 +24,8 @@
     <link rel="stylesheet" type="text/css" href="index.css" media="screen" />
   </head>
   <body>
+    {{ partial "navbar.html" . }}
+    {{ block "main" . }}{{ end }}
+    {{ partial "footer" . }}
+  </body>
+</html>
