@@ -6,7 +6,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 	google.golang.org/api v0.74.0
-	gopkg.in/yaml.v2 v2.2.3
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
