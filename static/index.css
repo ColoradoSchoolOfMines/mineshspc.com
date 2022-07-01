@@ -1,7 +1,7 @@
 @font-face {
     font-family: 'Gotham';
-    src: url('./media/fonts/subset-GothamBold.woff2') format('woff2'),
-    url('./media/fonts/subset-GothamBold.woff') format('woff');
+    src: url('./fonts/subset-GothamBold.woff2') format('woff2'),
+    url('./fonts/subset-GothamBold.woff') format('woff');
     font-weight: 700;
     font-style: bold;
 }
