@@ -1,45 +1,46 @@
 @font-face {
     font-family: 'Gotham';
-    src: url('./media/fonts/subset-GothamBold.woff2') format('woff2'),
-        url('./media/fonts/subset-GothamBold.woff') format('woff');
+    src: url('./fonts/subset-GothamBold.woff2') format('woff2'),
+    url('./fonts/subset-GothamBold.woff') format('woff');
     font-weight: 700;
     font-style: bold;
 }
 
 body {
-    background-image: url("./media/csm.jpg");
-    background-repeat: repeat-y;
-    background-size: cover;
-    background-position: top;
+    background-color: rgba(105, 88, 130, 0.15);
+}
+
+.container {
+    max-width: 85%;
+}
+
+#main-nav {
+    background-color: #8E44AD; 
+    font-family: 'Gotham';
+}
+
+.nav-link {
+    color: white;
+    font-size: 25px;
 }
 
 .content {
     background-color: #ffffff;
-    font-size: 18px;
-    padding: 30px;
-}
-
-.logoblock {
-    color: #ffffff;
-    margin-top: 30px;
-    margin-bottom: 0px;
-    padding: 30px;
-    display: block;
-    background-color: #8E44AD;
-}
-
-.logo {
-  display: block;
-  height: 60px;
-}
-
-.logoblock-right {
-    text-align: right;
     font-size: 20px;
+    padding: 25px;
+    height: 100%;
 }
 
-.logoblock-right > h2 {
-    padding: 0px;
+.header {
+    display: block;
+    color: #ffffff;
+    background-color: #8E44AD;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    padding: 10px;
+    width: 85%;
 }
 
 .content h1, h2 {
@@ -54,21 +55,15 @@ h1, h2, h3 {
     font-weight: 700;
 }
 
+.center-image {
+    margin-left: auto; 
+    margin-right: auto; 
+    display: block;
+}
+
 .footer {
-    margin-top: 20px;
     margin-bottom: 20px;
-    background-color: rgba(0,0,0,0.5);
     padding: 20px;
-    color: #ffffff;
-    font-size: 15px;
-}
-
-.footer a:link {
-    color: #ffffff;
-}
-
-.footer a:visited {
-    color: #ffffff;
 }
 
 .signup-link {

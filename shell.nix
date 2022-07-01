@@ -6,7 +6,7 @@ with pkgs;
 mkShell {
   buildInputs = [
     go
-    nodejs
+    hugo
   ] ++ lib.lists.optional (!forCI) [
     gotools
     gopls
