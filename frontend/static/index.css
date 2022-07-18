@@ -14,14 +14,57 @@ body {
     max-width: 85%;
 }
 
-#main-nav {
-    background-color: #8E44AD; 
-    font-family: 'Gotham';
+.navbar {
+    padding: 0;
+    background-color: white; 
+}
+
+.container-fluid {
+    padding-top: .75rem;
+}
+
+.navbar-brand {
+    color: #24314b;
+    padding-bottom: .75rem;
+    padding-top: 0;
+    font-size: 25px;
+    line-height: 50px;
+    vertical-align: auto;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.logo-text {
+    margin-top: auto;
+    margin-bottom: 0;
+    display: inline-block;
 }
 
 .nav-link {
-    color: white;
+    color: #24314b;
     font-size: 25px;
+    height: 100%;
+    line-height: 75px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+#rules-link:hover {
+    color: #f367f4;
+    border-bottom: 5px solid #f367f4;
+}
+
+#registration-link:hover {
+    color: #78f358;
+    border-bottom: 5px solid #78f358;
+}
+
+#faq-link:hover {
+    color: #8ff9fc;
+    border-bottom: 5px solid #8ff9fc;
+}
+
+#archive-link:hover {
+    color: #f0a147;
+    border-bottom: 5px solid #f0a147;
 }
 
 .content {

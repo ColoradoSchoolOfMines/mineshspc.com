@@ -1,4 +1,4 @@
-<nav class="navbar sticky-top navbar-expand-lg" id="main-nav">
+<nav class="navbar sticky-top navbar-expand-lg shadow-sm">
     <div class="container-fluid">
         <button
         class="navbar-toggler"
@@ -13,23 +13,25 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent" style="justify-content: center;">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <a class="navbar-brand" href="#">
+                <img src="hspc_transparent.png" width="90" height="90" class="d-inline-block align-top" alt="">
+            </a>
+            <a class="navbar-brand" href="#">
+                <img src="csmines.svg" width="140" height="95" alt="">
+                <p style="margin-left: 1%; font-size: 25px; display: inline-block;">HSPC</p>
+            </a>
+            <!-- TODO add active coloring for which page you're on -->
             <li class="nav-item">
-            <a class="nav-link" href="index.html">Home</a>
+            <a class="nav-link" id="rules-link" aria-current="page" href="/rules">Rules</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/rules">Rules</a>
+            <a class="nav-link" id="registration-link" aria-current="page" href="/registration">Registration</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/registration">Registration</a>
+            <a class="nav-link" id="faq-link" aria-current="page" href="/faq">FAQ</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/faq">FAQ</a>
-            </li>
-            <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/sponsors">Sponsors</a>
-            </li>
-            <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/archive">Previous Competitions</a>
+            <a class="nav-link" id="archive-link" aria-current="page" href="/archive">Previous Competitions</a>
             </li>
         </ul>
         </div>

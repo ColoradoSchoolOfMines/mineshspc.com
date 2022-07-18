@@ -1,14 +1,22 @@
 {{ define "main" }}
 
-<div class="pt-5 text-center border-bottom" style="background-color: white; margin-bottom: 20px;">
-  <h1 class="display-4 fw-bold">CS@Mines HSPC</h1>
+<!-- TODO don't use inline styling -->
+<div class="pt-5 text-center border-bottom" style="background-color: white; margin-bottom: 20px; margin-top: 1%;">
+  <img src="csmines.svg" width="400" height="95" alt="">
+  <h1 class="display-4 fw-bold">High School</h1>
+  <h1 class="display-4 fw-bold">Programming Competition</h1>
   <div class="col-lg-6 mx-auto">
     <p class="lead mb-4">
       Engage in exciting problems at the Mines High School Programming Competition (HSPC)!
       <br>Registration is now open for the Spring 2023 competition (F2F or online via Zoom)
     </p>
     <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mb-5">
-      <button type="button" class="btn btn-primary btn-lg px-4 me-sm-3">Register Now</button>
+      <form>
+        <div class="form-group">
+          <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Email address">
+          <button type="button" class="btn btn-primary btn-lg px-4 me-sm-3">Register Now</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
