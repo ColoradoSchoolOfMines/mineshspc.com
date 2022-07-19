@@ -86,9 +86,13 @@ body {
     width: 85%;
 }
 
+.content p {
+    padding: 5px;
+}
+
 .content h1, h2 {
     display: block;
-    background-color: #8E44AD;
+    background-color: #24314b;
     color: #ffffff;
     padding: 10px;
 }
