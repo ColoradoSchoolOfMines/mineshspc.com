@@ -23,6 +23,10 @@ body {
     padding-top: .75rem;
 }
 
+.navbar-light .navbar-nav .nav-link {
+    color: #24314b;
+}
+
 .navbar-brand {
     color: #24314b;
     padding-bottom: .75rem;
@@ -40,7 +44,6 @@ body {
 }
 
 .nav-link {
-    color: #24314b;
     font-size: 25px;
     height: 100%;
     line-height: 75px;
