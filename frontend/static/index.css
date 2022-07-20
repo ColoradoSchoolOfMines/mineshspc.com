@@ -1,3 +1,4 @@
+/* Page formatting */
 @font-face {
     font-family: 'Gotham';
     src: url('./fonts/subset-GothamBold.woff2') format('woff2'),
@@ -10,17 +11,10 @@ body {
     background-color: rgba(105, 88, 130, 0.15);
 }
 
-.container {
-    max-width: 85%;
-}
-
+/* Navigation */
 .navbar {
     padding: 0;
     background-color: white; 
-}
-
-.container-fluid {
-    padding-top: .75rem;
 }
 
 .navbar-light .navbar-nav .nav-link {
@@ -70,6 +64,16 @@ body {
     border-bottom: 5px solid #f0a147;
 }
 
+/* Containers */
+.container {
+    max-width: 85%;
+}
+
+.container-fluid {
+    padding-top: .75rem;
+}
+
+/* Content, Headers, Footers */
 .content {
     background-color: #ffffff;
     font-size: 20px;
@@ -77,43 +81,8 @@ body {
     height: 100%;
 }
 
-.header {
-    display: block;
-    color: #ffffff;
-    background-color: #8E44AD;
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 20px;
-    padding: 10px;
-    width: 85%;
-}
-
 .content p {
     padding: 5px;
-}
-
-.content h1, h2 {
-    display: block;
-    background-color: #24314b;
-    color: #ffffff;
-    padding: 10px;
-}
-
-h1, h2, h3 {
-    font-family: Gotham, sans-serif;
-    font-weight: 700;
-}
-
-.center-image {
-    margin-left: auto; 
-    margin-right: auto; 
-    display: block;
-}
-
-.footer {
-    margin-bottom: 20px;
-    padding: 20px;
 }
 
 .signup-link {
@@ -122,27 +91,37 @@ h1, h2, h3 {
     border-bottom: 30px solid #8E44AD;
 }
 
+.header {
+    text-align: center;
+    color: #24314b;
+    margin-top: 20px;
+    padding: 20px;
+}
+
+.footer {
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+/* Text & Utilities */
+.content h1, h2 {
+    display: block;
+    background-color: #24314b;
+    color: #ffffff;
+    padding: 10px;
+}
+
+.center-image {
+    margin-left: auto; 
+    margin-right: auto; 
+    display: block;
+}
+
+h1, h2 {
+    font-family: Gotham, sans-serif;
+    font-weight: 700;
+}
+
 .btn-lg {
     font-size: 18px;
-}
-
-.btn-ol {
-    border: 3px solid white;
-    border-radius: 0.3rem;
-    color: white;
-    background-color: #8e44ad;
-    display: table-cell;
-    vertical-align: middle;
-    padding-left: auto;
-    padding-right: auto;
-}
-
-.btn-ol-container {
-    display: inline-block;
-    margin-bottom: 20px;
-}
-
-.btn-ol:hover {
-    background-color: white;
-    color: #8e44ad;
 }
