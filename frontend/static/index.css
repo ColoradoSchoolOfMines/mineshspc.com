@@ -125,3 +125,12 @@ h1, h2 {
 .btn-lg {
     font-size: 18px;
 }
+
+.form-control {
+    display: inline;
+    width: 15%;
+}
+
+#submitInterest {
+    vertical-align: top;
+}

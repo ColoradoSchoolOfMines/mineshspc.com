@@ -1,6 +1,6 @@
 {{ define "main" }}
 
-<div class="text-center bg-white mt-4 mb-4 pt-5 pb-1">
+<div class="text-center bg-white mt-4 mb-4 pt-5 pb-5">
   <div class="container">
     <a href="https://cs.mines.edu" target="_blank">
       <img class="center-image" style="width: 25%; display: inline;" src="csmines.svg" alt="CS@Mines">
@@ -12,12 +12,10 @@
     <p class="lead mb-4">
       Engage in exciting problems at the Mines HSPC! Registration is now open for the Spring 2023 competition (F2F or online via Zoom)
     </p>
-    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mb-5">
-      <form class="form-inline">
-        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Email address">
-        <button type="button" class="btn btn-primary btn-lg px-4 me-sm-3">Register</button>
-      </form>
-    </div>
+    <form class="form-inline">
+      <input type="email" class="form-control" id="emailInterestInput" aria-describedby="emailHelp" placeholder="Email address">
+      <button type="button" id="submitInterest" class="btn btn-primary px-4">Register</button>
+  </form> 
   </div>
 </div>
 
