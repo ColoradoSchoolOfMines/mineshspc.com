@@ -74,28 +74,31 @@ body {
 }
 
 /* Content, Headers, Footers */
-.content {
-    background-color: #ffffff;
-    font-size: 20px;
+.content h1 {
+    background-color: #24314b;
+    color: white;
     padding: 25px;
-    height: 100%;
 }
 
-.content p {
-    padding: 5px;
-}
-
-.signup-link {
+.content {
     background-color: white;
-    padding: 10px;
-    border-bottom: 30px solid #8E44AD;
+    font-size: 20px;
+    height: 100%;    
+}
+
+.content-text {
+    padding: 20px 30px;
 }
 
 .header {
     text-align: center;
-    color: #24314b;
+    background-color: #24314b;
+    color: white;
     margin-top: 20px;
     padding: 20px;
+    width: 85%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .footer {
@@ -104,33 +107,23 @@ body {
 }
 
 /* Text & Utilities */
-.content h1, h2 {
-    display: block;
-    background-color: #24314b;
-    color: #ffffff;
-    padding: 10px;
-}
-
 .center-image {
     margin-left: auto; 
     margin-right: auto; 
     display: block;
 }
 
+#submitInterest {
+    vertical-align: top;
+}
+
 h1, h2 {
     font-family: Gotham, sans-serif;
     font-weight: 700;
-}
-
-.btn-lg {
-    font-size: 18px;
+    margin-bottom: 0;
 }
 
 .form-control {
     display: inline;
     width: 15%;
-}
-
-#submitInterest {
-    vertical-align: top;
 }
