@@ -44,8 +44,18 @@ body {
     font-family: 'Montserrat', sans-serif;
 }
 
+/* TODO listen for hover in JavaScript and add class .rules-link-active? This solution below isn't great */
+.home-link-active {
+    border-bottom: 5px solid #24314b;
+}
+
 #rules-link:hover {
     color: #f367f4;
+    border-bottom: 5px solid #f367f4;
+}
+
+.rules-link-active {
+    color: #f367f4 !important;
     border-bottom: 5px solid #f367f4;
 }
 
@@ -54,13 +64,28 @@ body {
     border-bottom: 5px solid #78f358;
 }
 
+.registration-link-active {
+    color: #78f358 !important;
+    border-bottom: 5px solid #78f358;
+}
+
 #faq-link:hover {
     color: #8ff9fc;
     border-bottom: 5px solid #8ff9fc;
 }
 
+.faq-link-active {
+    color: #8ff9fc !important;
+    border-bottom: 5px solid #8ff9fc;
+}
+
 #archive-link:hover {
     color: #f0a147;
+    border-bottom: 5px solid #f0a147;
+}
+
+.archive-link-active {
+    color: #f0a147 !important;
     border-bottom: 5px solid #f0a147;
 }
 

@@ -8,22 +8,21 @@
         </a>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <a class="navbar-brand" href="#">
+            <a class='navbar-brand {{ if eq .Page.RelPermalink "/"}}home-link-active{{ end }}' href="#">
                 <img src="csmines.svg" width="140" height="95" alt="">
                 <p style="margin-left: 1%; font-size: 25px; display: inline-block;">HSPC</p>
             </a>
-            <!-- TODO add active coloring for which page you're on -->
-            <li class="nav-item">
-            <a class="nav-link" id="rules-link" aria-current="page" href="/rules">Rules</a>
+            <li class="nav-item">    
+                <a class='nav-link {{ if eq .Page.RelPermalink "/rules/"}}rules-link-active{{ end }}' id="rules-link" aria-current="page" href="/rules">Rules</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link" id="registration-link" aria-current="page" href="/registration">Registration</a>
+                <a class='nav-link {{ if eq .Page.RelPermalink "/registration/"}}registration-link-active{{ end }}' id="registration-link" aria-current="page" href="/registration">Registration</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link" id="faq-link" aria-current="page" href="/faq">FAQ</a>
+                <a class='nav-link {{ if eq .Page.RelPermalink "/faq/"}}faq-link-active{{ end }}' id="faq-link" aria-current="page" href="/faq">FAQ</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link" id="archive-link" aria-current="page" href="/archive">Archive</a>
+                <a class='nav-link {{ if eq .Page.RelPermalink "/archive/"}}archive-link-active{{ end }}' id="archive-link" aria-current="page" href="/archive">Archive</a>
             </li>
         </ul>
         </div>
