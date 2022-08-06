@@ -23,10 +23,9 @@ body {
 
 .navbar-brand {
     color: #24314b;
-    padding-bottom: .75rem;
+    padding-bottom: 0.75rem;
     padding-top: 0;
     font-size: 25px;
-    line-height: 50px;
     vertical-align: auto;
     font-family: 'Montserrat', sans-serif;
 }
@@ -44,7 +43,6 @@ body {
     font-family: 'Montserrat', sans-serif;
 }
 
-/* TODO listen for hover in JavaScript and add class .rules-link-active? This solution below isn't great */
 .home-link-active {
     border-bottom: 5px solid #24314b;
 }
@@ -113,6 +111,10 @@ body {
 
 .content-text {
     padding: 20px 30px;
+}
+
+.content-text h2 {
+    padding-top: 15px;
 }
 
 .header {
