@@ -10,6 +10,18 @@ title = "Registration"
   <div class="row">
     <div class="content">     
       <div class="content-text">
+        <p>I am a...</p>
+        <!-- TODO registration form // 3 different sections for parents, teachers, students, switch upon button click -->
+        <button type="button" class="btn btn-primary">
+          Student
+        </button>
+        <button type="button" class="btn btn-primary">
+          Teacher          
+        </button>
+        <button type="button" class="btn btn-primary">
+          Parent/Guardian
+        </button>
+        <br>
         <p>
           <b>The CS@Mines High School Programming Competition will be [TBA], 2023.</b>
           There will be TWO tracks in the competition this year (beginner and advanced), both of which can be done either virtually or in person. All members of a given team must be fully in person OR fully on Zoom. 
@@ -59,17 +71,13 @@ title = "Registration"
             Please send the following link to all students' guardians who are attending in-person.
             <br>In-person link: [TBA]
         </p>
-        
-        <!-- TODO registration form // 3 different sections for parents, teachers, students -->
+      
         <form class="row g-3">
-            <div class="col-md-4">
+            <div class="col-md-3">
               <label for="validationServer01" class="form-label">Teacher Name</label>
               <input type="text" class="form-control is-valid" id="validationServer01" required>
-              <div class="valid-feedback">
-                Looks good!
-              </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
               <label for="validationServerEmail" class="form-label">Teacher Email</label>
               <div class="input-group has-validation">
                 <input type="text" class="form-control is-invalid" id="validationServerUsername" aria-describedby="inputGroupPrepend3 validationServerUsernameFeedback" required>
@@ -78,7 +86,7 @@ title = "Registration"
                 </div>
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-3">
               <label for="validationServer03" class="form-label">School City</label>
               <input type="text" class="form-control is-invalid" id="validationServer03" aria-describedby="validationServer03Feedback" required>
               <div id="validationServer03Feedback" class="invalid-feedback">
@@ -107,6 +115,30 @@ title = "Registration"
               </div>
             </div>
             <div class="col-md-3">
+              <label for="validationServer04" class="form-label">Number of Teams</label>
+              <select class="form-select is-invalid" id="validationServer04" aria-describedby="validationServer04Feedback" required>
+                <option selected disabled value="">Choose...</option>
+                <option>1</option>
+                <option>2</option>
+              </select>
+              <div id="validationServer04Feedback" class="invalid-feedback">
+                Please select a valid competition.
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label for="validationServer04" class="form-label">Number of Students</label>
+              <select class="form-select is-invalid" id="validationServer04" aria-describedby="validationServer04Feedback" required>
+                <option selected disabled value="">Choose...</option>
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+              </select>
+              <div id="validationServer04Feedback" class="invalid-feedback">
+                Please select a valid competition.
+              </div>
+            </div>
+            <div class="col-md-3">
               <label for="validationServer04" class="form-label">Competition Form</label>
               <select class="form-select is-invalid" id="validationServer04" aria-describedby="validationServer04Feedback" required>
                 <option selected disabled value="">Choose...</option>
@@ -123,9 +155,6 @@ title = "Registration"
                 <label class="form-check-label" for="invalidCheck3">
                   Optional Campus Tour
                 </label>
-                <div id="invalidCheck3Feedback" class="invalid-feedback">
-                  You must agree before submitting.
-                </div>
               </div>
             </div>
             <div class="col-12">
