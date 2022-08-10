@@ -24,7 +24,6 @@ body {
 .navbar-brand {
     color: #24314b;
     padding-bottom: 0.75rem;
-    /* padding-bottom: 0; */
     padding-top: 0;
     font-size: 25px;
     vertical-align: auto;
@@ -45,6 +44,11 @@ body {
 }
 
 .home-link-active {
+    border-bottom: 5px solid #24314b;
+}
+
+#home-link:hover {
+    color: #24314b;
     border-bottom: 5px solid #24314b;
 }
 
