@@ -24,6 +24,7 @@ body {
 .navbar-brand {
     color: #24314b;
     padding-bottom: 0.75rem;
+    /* padding-bottom: 0; */
     padding-top: 0;
     font-size: 25px;
     vertical-align: auto;
@@ -94,6 +95,12 @@ body {
 
 .container-fluid {
     padding-top: .75rem;
+}
+
+.archive-row {
+    background-color: white; 
+    padding-left: 25px; 
+    padding-right: 25px;
 }
 
 /* Content, Headers, Footers */
