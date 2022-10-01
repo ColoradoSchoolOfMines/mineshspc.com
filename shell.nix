@@ -10,6 +10,5 @@ mkShell {
   ] ++ lib.lists.optional (!forCI) [
     gotools
     gopls
-    vgo2nix
   ];
 }
