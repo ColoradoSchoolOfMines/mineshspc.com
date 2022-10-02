@@ -93,10 +93,6 @@ body {
 }
 
 /* Containers */
-.container {
-    max-width: 85%;
-}
-
 .container-fluid {
     padding-top: .75rem;
 }
@@ -161,7 +157,9 @@ h1, h2 {
     margin-bottom: 0;
 }
 
-.form-control {
-    display: inline;
-    width: 15%;
+.registration-form-container {
+    width: 85%;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: white;
 }

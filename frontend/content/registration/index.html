@@ -2,179 +2,114 @@
 title = "Registration"
 +++
 
-<div class="header">
-  <h1>Registration</h1>
-</div>
-
-<div class="container mb-4">
+<div class="container">
   <div class="row">
-    <div class="content">     
-      <div class="content-text">
-        <p>Registration hasn't opened just yet! Check back soon. :)</p>
-        <!-- <p>I am a...</p> -->
-        <!-- TODO registration form // 3 different sections for parents, teachers, students, switch upon button click -->
-        <!-- <button type="button" class="btn btn-primary">
-          Student
-        </button>
-        <button type="button" class="btn btn-primary">
-          Teacher          
-        </button>
-        <button type="button" class="btn btn-primary">
-          Parent/Guardian
-        </button>
-        <br>
-        <p>
-          <b>The CS@Mines High School Programming Competition will be [TBA], 2023.</b>
-          There will be TWO tracks in the competition this year (beginner and advanced), both of which can be done either virtually or in person. All members of a given team must be fully in person OR fully on Zoom. 
-        </p>
-        <p>            
-            This form must be completed by a sponsoring teacher of a team registering to participate. 
-        </p>
-        <p> 
-            Teachers: 
-            <ol>
-                <li>Please organize students into teams so those with "more experience" (or "less experience") are in the same team. See the <a href="/faq">FAQ</a> for more information.</li>
-                <li>Please sign up your student team to the appropriate competition (i.e., don't put a team with advanced skills into the beginner competition)</li>
-                <ul>
-                    <li><i>If students have participated in the Mines HSPC previously (and have not graduated yet), we recommend the advanced competition!</i></li>
-                </ul>
-                <li>Please complete this form for <strong>EACH team</strong> you are registering and specify the team's preference for in person or virtual</li>
-                <li>Please provide student's school email address, if possible. If sharing the student’s school email address is a problem, please create a “1-time” email address for each student that they can use for the competition (e.g., mailinator).</li>
-            </ol>
-        </p>
-        <p> 
-            If more teams register than space exists for the in person competition, then only two teams from a given school will be allowed to attend in person (other teams can participate over Zoom, if desired). 
-            We will circle back with teachers if they can only send two teams to the in person competition (i.e., teachers will inform us with which teams will attend in person). 
-        </p>
-        <p> 
-            Deadline to register is [TBA]. If you need more time to register, please email Christine Liebe at <a href="mailto:cliebe@mines.edu">cliebe@mines.edu</a>. 
-        </p>
-        <p> 
-            If health conditions allow, an optional campus tour of Mines will be available from 3-4pm (for those interested).  
-        </p>
-        <p> 
-            A practice competition will be available from Monday (April 4) - Friday (April 8), for those teachers/students interested in preparing for the competition on Saturday April 9. Details on this practice competition will be sent to teachers that register team(s). 
-        </p>
-        <p> 
-            If your team membership changes after you have completed this form, please email Christine Liebe at <a href="mailto:cliebe@mines.edu">cliebe@mines.edu</a>. 
-        </p>
-        <p> 
-            <b>NOTE: Participating students must be 13 years of age (or older) AND must have parental consent AND must be in high school.</b>
-        </p>
-        <p>
-            <b>Participation in the easy competition is contingent on review by the HSPC team.</b>
-        </p>
-        <p> 
-            Please send the following link to all students' guardians who are attending virtually.
-            <br>Virtual link: [TBA]
-        </p>
-        <p> 
-            Please send the following link to all students' guardians who are attending in-person.
-            <br>In-person link: [TBA]
-        </p>
-       -->
-        <!-- TODO in registration form, show/hide student blocks depending on how many students are selected (1-4); same with teams (1-2) -->
-        <!-- <form class="row g-3">
-            <div class="col-md-3">
-              <label for="validationServer01" class="form-label">Teacher Name</label>
-              <input type="text" class="form-control is-valid" id="validationServer01" required>
-            </div>
-            <div class="col-md-3">
-              <label for="validationServerEmail" class="form-label">Teacher Email</label>
-              <div class="input-group has-validation">
-                <input type="text" class="form-control is-invalid" id="validationServerUsername" aria-describedby="inputGroupPrepend3 validationServerUsernameFeedback" required>
-                <div id="validationServerUsernameFeedback" class="invalid-feedback">
-                Please enter a valid email.
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <label for="validationServer03" class="form-label">School City</label>
-              <input type="text" class="form-control is-invalid" id="validationServer03" aria-describedby="validationServer03Feedback" required>
-              <div id="validationServer03Feedback" class="invalid-feedback">
-                Please provide a valid city.
-              </div>
-            </div>
-            <div class="col-md-3">
-              <label for="validationServer04" class="form-label">School State</label>
-              <select class="form-select is-invalid" id="validationServer04" aria-describedby="validationServer04Feedback" required>
-                <option selected disabled value="">Choose...</option>
-                <option>...</option>
-              </select>
-              <div id="validationServer04Feedback" class="invalid-feedback">
-                Please select a valid state.
-              </div>
-            </div>
-            <div class="col-md-3">
-              <label for="validationServer04" class="form-label">Competition Difficulty</label>
-              <select class="form-select is-invalid" id="validationServer04" aria-describedby="validationServer04Feedback" required>
-                <option selected disabled value="">Choose...</option>
-                <option>In-Person</option>
-                <option>Virtual</option>
-              </select>
-              <div id="validationServer04Feedback" class="invalid-feedback">
-                Please select a valid competition.
-              </div>
-            </div>
-            <div class="col-md-3">
-              <label for="validationServer04" class="form-label">Number of Teams</label>
-              <select class="form-select is-invalid" id="validationServer04" aria-describedby="validationServer04Feedback" required>
-                <option selected disabled value="">Choose...</option>
-                <option>1</option>
-                <option>2</option>
-              </select>
-              <div id="validationServer04Feedback" class="invalid-feedback">
-                Please select a valid competition.
-              </div>
-            </div>
-            <div class="col-md-3">
-              <label for="validationServer04" class="form-label">Number of Students</label>
-              <select class="form-select is-invalid" id="validationServer04" aria-describedby="validationServer04Feedback" required>
-                <option selected disabled value="">Choose...</option>
-                <option>1</option>
-                <option>2</option>
-                <option>3</option>
-                <option>4</option>
-              </select>
-              <div id="validationServer04Feedback" class="invalid-feedback">
-                Please select a valid competition.
-              </div>
-            </div>
-            <div class="col-md-3">
-              <label for="validationServer04" class="form-label">Competition Form</label>
-              <select class="form-select is-invalid" id="validationServer04" aria-describedby="validationServer04Feedback" required>
-                <option selected disabled value="">Choose...</option>
-                <option>Beginner</option>
-                <option>Advanced</option>
-              </select>
-              <div id="validationServer04Feedback" class="invalid-feedback">
-                Please select a valid competition.
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="form-check">
-                <input class="form-check-input is-invalid" type="checkbox" value="" id="invalidCheck3" aria-describedby="invalidCheck3Feedback">
-                <label class="form-check-label" for="invalidCheck3">
-                  Optional Campus Tour
-                </label>
-              </div>
-            </div>
-            <div class="col-12">
-              <div class="form-check">
-                <input class="form-check-input is-invalid" type="checkbox" value="" id="invalidCheck3" aria-describedby="invalidCheck3Feedback" required>
-                <label class="form-check-label" for="invalidCheck3">
-                  Agree to terms and conditions
-                </label>
-                <div id="invalidCheck3Feedback" class="invalid-feedback">
-                  You must agree before submitting.
-                </div>
-              </div>
-            </div>
-            <div class="col-12">
-              <button class="btn btn-primary" type="submit">Submit form</button>
-            </div>
-        </form> -->
+    <div class="col">
+      <div class="header">
+        <h1>Registration</h1>
       </div>
     </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="registration-form-container container p-4">
+    <form class="form-floating">
+      <div class="row mb-4 align-items-center">
+        <div class="col-auto">
+          <label for="iama" class="form-label">I am a</label>
+        </div>
+        <div class="col-auto">
+          <div id="iama" class="btn-group" role="group" aria-label="Basic radio toggle button group">
+            <input type="radio" class="btn-check" name="btnradio" id="btn-student" autocomplete="off"/>
+            <label class="btn btn-outline-primary" for="btn-student">Student</label>
+
+            <input type="radio" class="btn-check" name="btnradio" id="btn-teacher" autocomplete="off" checked />
+            <label class="btn btn-outline-primary" for="btn-teacher">Teacher</label>
+          </div>
+        </div>
+      </div>
+      <div id="no-registration-id" class="row mb-4 notify-student-to-get-link d-none">
+        <p>No registration ID found. Please ask your teacher to register your team.</p>
+      </div>
+      <div id="your-information" class="card mb-4">
+        <h4 class="card-header">Your Information</h4>
+        <div class="card-body">
+          <div class="row mb-2">
+            <div class="col-md-12">
+              <div class="form-floating">
+                <input type="text" class="form-control col-12" id="your-name" placeholder="Jane Doe">
+                <label for="your-name">Your Name</label>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <div class="form-floating">
+                <input type="email" class="form-control" id="email-address" placeholder="you@example.com">
+                <label for="email-address">Email address</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="your-information" class="card mb-4">
+        <h4 class="card-header">School Information</h4>
+        <div class="card-body">
+          <div class="row mb-2">
+            <div class="col-md-12">
+              <div class="form-floating">
+                <input type="text" class="form-control col-12" id="school-name" placeholder="Your High School">
+                <label for="school-name">School Name</label>
+              </div>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-12">
+              <div class="form-floating">
+                <input type="email" class="form-control" id="school-city" placeholder="Denver">
+                <label for="school-city">School City</label>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <div class="form-floating">
+                <input type="email" class="form-control" id="school-state" placeholder="Colorado">
+                <label for="school-state">School State/Province</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="prove-youre-human" class="card mb-4">
+        <h4 class="card-header">Prove You Are Human</h4>
+        <div class="card-body">
+          <div class="row mb-2">
+            <div class="col">
+              <p>What is the output of the following Python code snippet?</p>
+              <pre>L = [<span style="color: green;">"ab"</span>, "cd", "ef", "gh", "ij"]
+<span style="color: blue;">print</span>(L[0] + L[2] + L[3])</pre>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-12">
+              <div class="form-floating">
+                <input type="email" class="form-control" id="school-state" placeholder="A">
+                <label for="school-state">Output of the above snippet</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row text-center">
+        <div class="col-md-12">
+          <button type="submit" class="btn btn-lg btn-primary">Setup Teams</button>
+        </div>
+      </div>
+    </form>
   </div>
 </div>
