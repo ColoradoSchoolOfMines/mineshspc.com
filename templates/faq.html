@@ -1,7 +1,6 @@
-+++
-title = "FAQ"
-+++
+{{ define "title" }}FAQ{{ end }}
 
+{{ define "content" }}
 <div class="container header">
   <h1>Frequently Asked Questions</h1>
 </div>
@@ -95,9 +94,10 @@ title = "FAQ"
           there is more opportunity for collaboration.
         </p>
         <p>
-          See the <a href="{{< ref "../rules#bringing-own-tech" >}}">rules</a> for details.
+          See the <a href="/rules/#bringing-own-tech">rules</a> for details.
         </p>
       </div>
     </div>
   </div>
 </div>
+{{ end }}

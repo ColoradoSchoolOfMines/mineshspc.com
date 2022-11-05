@@ -1,3 +1,10 @@
+config.yaml
+credentials.json
+token.json
+
+# Executables
+mineshspc.com
+
 # Generated files by hugo
 /frontend/public/
 /frontend/resources/_gen/

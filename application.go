@@ -2,19 +2,31 @@ package main
 
 import (
 	"context"
+	"embed"
 	"encoding/json"
 	"fmt"
+	"html/template"
+	"io/fs"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"regexp"
+	"strings"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/gorilla/mux"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
 )
+
+//go:embed templates/*
+var templateFS embed.FS
+
+//go:embed static/* static/fonts/*
+var staticFS embed.FS
 
 type IAmA string
 
@@ -29,16 +41,18 @@ type InterestForm struct {
 }
 
 type Application struct {
+	Log           *zerolog.Logger
 	EmailRegex    *regexp.Regexp
 	Configuration Configuration
 
 	Client *sheets.Service
 }
 
-func NewApplication() *Application {
+func NewApplication(log *zerolog.Logger) *Application {
 	emailRegex, _ := regexp.Compile(`(?i)^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$`)
 
 	return &Application{
+		Log:        log,
 		EmailRegex: emailRegex,
 	}
 }
@@ -64,12 +78,12 @@ func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
 
 	var authCode string
 	if _, err := fmt.Scan(&authCode); err != nil {
-		log.Fatalf("Unable to read authorization code: %v", err)
+		log.Fatal().Err(err).Msg("Unable to read authorization code")
 	}
 
 	tok, err := config.Exchange(context.TODO(), authCode)
 	if err != nil {
-		log.Fatalf("Unable to retrieve token from web: %v", err)
+		log.Fatal().Err(err).Msg("Unable to retrieve token from web")
 	}
 	return tok
 }
@@ -91,7 +105,7 @@ func saveToken(path string, token *oauth2.Token) {
 	fmt.Printf("Saving credential file to: %s\n", path)
 	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		log.Fatalf("Unable to cache oauth token: %v", err)
+		log.Fatal().Err(err).Msg("Unable to cache oauth token")
 	}
 	defer f.Close()
 	json.NewEncoder(f).Encode(token)
@@ -101,29 +115,31 @@ func (app *Application) Authenticate() {
 	ctx := context.Background()
 	b, err := ioutil.ReadFile("credentials.json")
 	if err != nil {
-		log.Fatalf("Unable to read client secret file: %v", err)
+		log.Fatal().Err(err).Msg("Unable to read client secret file")
 	}
 
 	// If modifying these scopes, delete your previously saved token.json.
 	config, err := google.ConfigFromJSON(b, "https://www.googleapis.com/auth/spreadsheets")
 	if err != nil {
-		log.Fatalf("Unable to parse client secret file to config: %v", err)
+		log.Fatal().Err(err).Msg("Unable to parse client secret file to config")
 	}
 	client := getClient(config)
 	app.Client, err = sheets.NewService(ctx, option.WithHTTPClient(client))
 	if err != nil {
-		log.Fatalf("Unable to retrieve Sheets client: %v", err)
+		log.Fatal().Err(err).Msg("Unable to retrieve Sheets client")
 	}
 }
 
 func (app *Application) ConfigureSheets() {
 	spreadsheet, err := app.Client.Spreadsheets.Get(app.Configuration.SpreadsheetID).Do()
 	if err != nil {
-		log.Fatalf("Cannot access spreadsheet with ID: %s: %v", app.Configuration.SpreadsheetID, err)
+		log.Fatal().Err(err).
+			Str("spreadsheet_id", app.Configuration.SpreadsheetID).
+			Msg("Cannot access spreadsheet")
 	}
 
 	ensureExistsWithHeaders := func(title string, headers []interface{}) {
-		log.Infof("Ensuring that sheet with title '%s' exists", title)
+		log.Info().Str("title", title).Msg("Ensuring that sheet exists")
 		var sheetID int64
 		for _, s := range spreadsheet.Sheets {
 			if s.Properties.Title == title {
@@ -148,7 +164,7 @@ func (app *Application) ConfigureSheets() {
 				}).Do()
 
 			if err != nil {
-				log.Fatalf("Couldn't create sheet with title '%s': %v", title, err)
+				log.Fatal().Err(err).Str("title", title).Msg("Couldn't create sheet with title")
 			}
 			for _, s := range spreadsheet.Sheets {
 				if s.Properties.Title == title {
@@ -157,12 +173,12 @@ func (app *Application) ConfigureSheets() {
 			}
 		}
 
-		log.Infof("Ensuring that sheet with title '%s' has the correct headers", title)
+		log.Info().Str("title", title).Msg("Ensuring that sheet with has the correct headers")
 
 		topRow := fmt.Sprintf("%s!A1:%s1", title, string('A'+len(headers)-1))
 		valueRange, err := app.Client.Spreadsheets.Values.Get(app.Configuration.SpreadsheetID, topRow).Do()
 		if err != nil {
-			log.Fatal("Couldn't get the values of the first row: %v", err)
+			log.Fatal().Err(err).Msg("Couldn't get the values of the first row")
 		}
 
 		// Only do anything if there's nothing in the top row
@@ -176,14 +192,14 @@ func (app *Application) ConfigureSheets() {
 			},
 		).ValueInputOption("RAW").Do()
 		if err != nil {
-			log.Fatal("Couldn't update the header row: %v", err)
+			log.Fatal().Err(err).Msg("Couldn't update the header row")
 		}
 	}
 
 	ensureExistsWithHeaders("Interest", []interface{}{"Student or Teacher", "Email"})
 }
 
-func (app *Application) RegisterInterest(w http.ResponseWriter, r *http.Request) {
+func (a *Application) RegisterInterest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
 	w.Header().Set("Access-Control-Allow-Methods", "PUT, POST, OPTIONS")
@@ -194,26 +210,26 @@ func (app *Application) RegisterInterest(w http.ResponseWriter, r *http.Request)
 	}
 
 	if r.Method != http.MethodPut {
-		log.Error("register_interest must be PUT")
+		a.Log.Error().Msg("register_interest must be PUT")
 		http.Error(w, "register_interest must be PUT", http.StatusBadRequest)
 		return
 	}
 	var interestForm InterestForm
 	err := json.NewDecoder(r.Body).Decode(&interestForm)
 	if err != nil {
-		log.Error(err)
+		a.Log.Error().Err(err).Msg("Failed to decode interest form")
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if !app.EmailRegex.MatchString(interestForm.Email) {
-		log.Error("Invalid email address")
+	if !a.EmailRegex.MatchString(interestForm.Email) {
+		a.Log.Error().Msg("Invalid email address")
 		http.Error(w, "Invalid email address", http.StatusBadRequest)
 	}
 
 	// Now, actually add the user to the spreadsheet
-	_, err = app.Client.Spreadsheets.Values.Append(
-		app.Configuration.SpreadsheetID,
+	_, err = a.Client.Spreadsheets.Values.Append(
+		a.Configuration.SpreadsheetID,
 		"Interest",
 		&sheets.ValueRange{
 			Values: [][]interface{}{
@@ -221,7 +237,7 @@ func (app *Application) RegisterInterest(w http.ResponseWriter, r *http.Request)
 			},
 		}).ValueInputOption("RAW").Do()
 	if err != nil {
-		log.Error(err)
+		a.Log.Error().Err(err).Msg("Failed to add user to the spreadsheet")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -229,6 +245,47 @@ func (app *Application) RegisterInterest(w http.ResponseWriter, r *http.Request)
 	w.WriteHeader(http.StatusOK)
 }
 
-func (app *Application) RegisterHandlers() {
-	http.HandleFunc("/register_interest", app.RegisterInterest)
+func (app *Application) ServeTemplate(templateName string) func(w http.ResponseWriter, r *http.Request) {
+	log := app.Log.With().Str("page_name", templateName).Logger()
+
+	template, err := template.ParseFS(templateFS, "templates/base.html", "templates/partials/*", fmt.Sprintf("templates/%s", templateName))
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to parse template")
+	}
+
+	parts := strings.Split(templateName, ".")
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		err := template.ExecuteTemplate(w, "base.html", map[string]any{
+			"PageName": parts[0],
+		})
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to execute the template")
+		}
+	}
+}
+
+func (a *Application) Start() {
+	staticRoot, err := fs.Sub(staticFS, "static")
+	if err != nil {
+		a.Log.Fatal().Err(err).Msg("failed to open the static folder")
+	}
+
+	r := mux.NewRouter().StrictSlash(true)
+
+	// Static pages
+	r.HandleFunc("/", a.ServeTemplate("home.html"))
+	r.HandleFunc("/rules/", a.ServeTemplate("rules.html"))
+	r.HandleFunc("/registration/", a.ServeTemplate("registration.html"))
+	r.HandleFunc("/faq/", a.ServeTemplate("faq.html"))
+	r.HandleFunc("/archive/", a.ServeTemplate("archive.html"))
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.FS(staticRoot))))
+
+	r.HandleFunc("/register_interest/", a.RegisterInterest)
+
+	//app.Authenticate()
+	//app.ConfigureSheets()
+
+	http.Handle("/", r)
+	http.ListenAndServe(":8090", nil)
 }

@@ -5,7 +5,7 @@ in
 with pkgs;
 mkShell {
   buildInputs = [
-    go
+    go_1_19
     hugo
   ] ++ lib.lists.optional (!forCI) [
     gotools
