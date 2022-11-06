@@ -46,6 +46,8 @@ type Application struct {
 	Configuration Configuration
 
 	Client *sheets.Service
+
+	TeacherRegistrationCaptchas map[uuid.UUID]string
 }
 
 func NewApplication(log *zerolog.Logger) *Application {
@@ -54,6 +56,8 @@ func NewApplication(log *zerolog.Logger) *Application {
 	return &Application{
 		Log:        log,
 		EmailRegex: emailRegex,
+
+		TeacherRegistrationCaptchas: map[uuid.UUID]string{},
 	}
 }
 
@@ -282,13 +286,7 @@ func (a *Application) Start() {
 	r.HandleFunc("/", ServeTemplate(a.Log, "home.html", noArgs))
 	r.HandleFunc("/rules/", ServeTemplate(a.Log, "rules.html", noArgs))
 	r.HandleFunc("/register/", ServeTemplate(a.Log, "register.html", noArgs))
-	r.HandleFunc("/register/teacher/", ServeTemplate(a.Log, "teacher.html", func(r *http.Request) any {
-		return map[string]any{
-			"RegistrationID":  uuid.New().String(),
-			"CaptchaElements": []string{"ab", "cd", "ef", "gh", "ij"},
-			"CaptchaIndexes":  []int{1, 3, 2},
-		}
-	}))
+	r.HandleFunc("/register/teacher/", ServeTemplate(a.Log, "teacher.html", a.GetTeacherTemplate))
 	r.HandleFunc("/register/student/", ServeTemplate(a.Log, "register.html", func(r *http.Request) any {
 		return map[string]any{
 			"RegistrationID":  uuid.New().String(),
@@ -297,7 +295,7 @@ func (a *Application) Start() {
 		}
 	}))
 	r.HandleFunc("/faq/", ServeTemplate(a.Log, "faq.html", noArgs))
-	r.HandleFunc("/archive/", ServeTemplate(a.Log, "archive.html", a.getArchiveTemplate))
+	r.HandleFunc("/archive/", ServeTemplate(a.Log, "archive.html", a.GetArchiveTemplate))
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/", http.FileServer(http.FS(staticFS))))
 
 	// Registration endpoints

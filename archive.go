@@ -26,7 +26,7 @@ type YearInfo struct {
 	Results         []CompetitionResult
 }
 
-func (a *Application) getArchiveTemplate(*http.Request) []YearInfo {
+func (a *Application) GetArchiveTemplate(*http.Request) []YearInfo {
 	return []YearInfo{
 		{
 			Year: 2022,
