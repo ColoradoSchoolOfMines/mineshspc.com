@@ -144,6 +144,10 @@ h3 {
 .content .page-content.archive,
 .content .page-content.rules,
 .content .page-content.register,
+.content .page-content.student,
+.content .page-content.teacher,
+.content .page-content.team,
+.content .page-content.teams,
 .content .page-content.faq {
   background-color: white;
 }
