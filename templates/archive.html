@@ -1,672 +1,81 @@
 {{ define "title" }}Archive{{ end }}
 
 {{ define "content" }}
-<div class="container header">
-  <h1>Archive</h1>
-  <p>
-    For the last five years, the CS@Mines High School Programming
-    Competition has provided high school students an opportunity to
-    demonstrate their programming and problem solving skills in a
-    competitive environment.
-  </p>
+<div class="container">
+  <div class="row page-header">
+    <div class="col">
+      <h1>Archive</h1>
+      <p>
+        For the last five years, the CS@Mines High School Programming
+        Competition has provided high school students an opportunity to
+        demonstrate their programming and problem solving skills in a
+        competitive environment.
+      </p>
+    </div>
+  </div>
 </div>
 
-<div class="container mb-4">
-  <div class="row">
-    <div class="content">     
-      <div class="content-text">
-        <h2>2022</h2>
-        <p>The 2022 competition was the first to feature two divisions:
-          a beginner division and an advanced division. It was also
-          the first hybrid competition with both remote and in-person
-          contestants.</p>
-          <p>The advanced division had 26 teams, while the beginner
-            division had 39 teams. Due to the number of teams, we
-            decided to give awards to first place through fourth place.</p>
-          </div>
+<div class="container page-content archive pb-4">
+  {{- range $y := .Data -}}
+    <div class="row">
+      <div class="col mt-4 mx-4">
+          <h2>{{ .Year }}</h2>
+          {{- range .RecapParagraphs -}}<p>{{ . }}</p>{{- end -}}
+      </div>
+    </div>
+    <div class="row m-4">
+      <div class="col-md-6">
+        <div class="d-grid gap-2">
+          {{- range .Links -}}
+            <a href="{{ .URL }}" target="_blank" class="btn btn-outline-primary">{{- .Title -}}</a>
+          {{- end -}}
         </div>
       </div>
-      
-      <div class="row archive-row">
-        <div class="col-md-6">
-          <div class="d-grid gap-2">
-            <a
-            href="https://sumnerevans.com/posts/school/2022-hspc/"
-            target="_blank"
-            class="btn btn-outline-primary"
-            >Competition Recap and Solution Sketches
-            </a>
-            <a
-              href="https://mines22advanced.kattis.com/problems"
-              target="_blank"
-              class="btn btn-outline-primary"
-              >Advanced Problems
-            </a>
-            <a
-              href="https://mines22beginner.kattis.com/problems"
-              target="_blank"
-              class="btn btn-outline-primary"
-              >Beginner Problems
-            </a>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="accordion" id="winners2022">
+      <div class="col-md-6">
+        <div class="accordion" id="winners{{ .Year }}">
+          {{- range $i, $r := .Results -}}
             <div class="accordion-item">
-              <h2 class="accordion-header" id="headingOne">
+              <h2 class="accordion-header" id="heading{{ $y.Year }}{{ .Name }}">
                 <button
-                  class="accordion-button"
+                  class="accordion-button {{ if gt $i 0 }}collapsed{{ end }}"
                   type="button"
                   data-bs-toggle="collapse"
-                  data-bs-target="#winners2022advanced"
+                  data-bs-target="#winners{{ $y.Year }}{{ .Name }}"
                   aria-expanded="true"
-                  aria-controls="winners2022advanced"
+                  aria-controls="winners{{ $y.Year }}{{ .Name }}"
                 >
-                  <strong>Advanced Competition Winners</strong>
+                  <strong>{{- .Name }} Competition Winners</strong>
                 </button>
               </h2>
               <div
-                id="winners2022advanced"
-                class="accordion-collapse collapse show"
-                aria-labelledby="headingOne"
-                data-bs-parent="#winners2022"
-              >
+                id="winners{{ $y.Year }}{{ .Name }}"
+                class="accordion-collapse collapse {{ if eq $i 0 }}show{{ end }}"
+                aria-labelledby="heading{{ $y.Year }}{{ .Name }}"
+                data-bs-parent="#winners{{ $y.Year }}">
                 <div class="accordion-body p-0">
                   <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">PEN A Team</h5>
-                        <strong>
-                          <i
-                            class="bi bi-trophy-fill"
-                            role="img"
-                            aria-label="Trophy"
-                          ></i>
-                          1st Place
-                        </strong>
-                      </div>
-                      <p class="mb-1 text-secondary">
-                        PEN Academy &bull; Cresskill, New Jersey
-                      </p>
-                    </li>
-                    <li class="list-group-item">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">Cherry Creek Cobras</h5>
-                        <strong>
-                          <i
-                            class="bi bi-trophy-fill"
-                            role="img"
-                            aria-label="Trophy"
-                          ></i>
-                          2nd Place
-                        </strong>
-                      </div>
-                      <p class="mb-1 text-secondary">
-                        Cherry Creek High School &bull; Greenwood
-                        Village, Colorado
-                      </p>
-                    </li>
-                    <li class="list-group-item">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">River Hill Team 1</h5>
-                        <strong>
-                          <i
-                            class="bi bi-trophy-fill"
-                            role="img"
-                            aria-label="Trophy"
-                          ></i>
-                          3rd Place
-                        </strong>
-                      </div>
-                      <p class="mb-1 text-secondary">
-                        River Hill High School &bull; Clarksville,
-                        Maryland
-                      </p>
-                    </li>
-                    <li class="list-group-item">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">The Spanish Inquisition</h5>
-                        <strong>
-                          <i
-                            class="bi bi-trophy-fill"
-                            role="img"
-                            aria-label="Trophy"
-                          ></i>
-                          4th Place
-                        </strong>
-                      </div>
-                      <p class="mb-1 text-secondary">
-                        Regis Jesuit High School &bull; Aurora, Colorado
-                      </p>
-                    </li>
+                    {{- range .Teams -}}
+                      <li class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                          <h5 class="mb-1">{{ .Name }}</h5>
+                          <strong>
+                            <i class="bi bi-trophy-fill" role="img" aria-label="Trophy"></i>
+                            {{ .Place }} Place
+                          </strong>
+                        </div>
+                        <p class="mb-1 text-secondary">
+                          {{ .School }} &bull; {{ .Location }}
+                        </p>
+                      </li>
+                    {{- end -}}
                   </ul>
                 </div>
               </div>
             </div>
-            <div class="accordion-item">
-              <h2 class="accordion-header" id="headingTwo">
-                <button
-                  class="accordion-button collapsed"
-                  type="button"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#collapseTwo"
-                  aria-expanded="false"
-                  aria-controls="collapseTwo"
-                >
-                  <strong>Beginner Competition Winners</strong>
-                </button>
-              </h2>
-              <div
-                id="collapseTwo"
-                class="accordion-collapse collapse"
-                aria-labelledby="headingTwo"
-                data-bs-parent="#winners2022"
-              >
-                <div class="accordion-body p-0">
-                  <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">LLL</h5>
-                        <strong>
-                          <i
-                            class="bi bi-trophy-fill"
-                            role="img"
-                            aria-label="Trophy"
-                          ></i>
-                          1st Place
-                        </strong>
-                      </div>
-                      <p class="mb-1 text-secondary">
-                        Future Forward at Bollman &bull; Thornton,
-                        Colorado
-                      </p>
-                    </li>
-                    <li class="list-group-item">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">Error 404: Name not found</h5>
-                        <strong>
-                          <i
-                            class="bi bi-trophy-fill"
-                            role="img"
-                            aria-label="Trophy"
-                          ></i>
-                          2nd Place
-                        </strong>
-                      </div>
-                      <p class="mb-1 text-secondary">
-                        Colorado Academy &bull; Denver, Colorado
-                      </p>
-                    </li>
-                    <li class="list-group-item">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">Liberty 1</h5>
-                        <strong>
-                          <i
-                            class="bi bi-trophy-fill"
-                            role="img"
-                            aria-label="Trophy"
-                          ></i>
-                          3rd Place
-                        </strong>
-                      </div>
-                      <p class="mb-1 text-secondary">
-                        Liberty Common School &bull; Fort Collins,
-                        Colorado
-                      </p>
-                    </li>
-                    <li class="list-group-item">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">Cool Cats</h5>
-                        <strong>
-                          <i
-                            class="bi bi-trophy-fill"
-                            role="img"
-                            aria-label="Trophy"
-                          ></i>
-                          4th Place
-                        </strong>
-                      </div>
-                      <p class="mb-1 text-secondary">
-                        Arvada West High School &bull; Arvada, Colorado
-                      </p>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="content">     
-          <div class="content-text">
-            <h2>2021</h2>
-            <p>
-              The 2021 competition was an all-remote competition featuring 55 teams from across the
-              nation.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="row archive-row pb-4">
-        <div class="col-md-6">
-          <div class="d-grid gap-2">
-            <a
-              href="https://sumnerevans.com/posts/school/2021-hspc/"
-              target="_blank"
-              class="btn btn-outline-primary"
-              >Competition Recap and Solution Sketches
-            </a>
-            <a
-              href="https://mines21.kattis.com/problems"
-              target="_blank"
-              class="btn btn-outline-primary"
-              >Problems
-            </a>
-          </div>
-        </div>
-  
-        <div class="col-md-6">
-          <div class="accordion" id="winners2021">
-            <div class="accordion-item">
-              <h2 class="accordion-header" id="headingOne">
-                <button
-                  class="accordion-button"
-                  type="button"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#winners2021"
-                  aria-expanded="true"
-                  aria-controls="winners2021"
-                >
-                  <strong>Competition Winners</strong>
-                </button>
-              </h2>
-              <div
-                id="winners2021"
-                class="accordion-collapse collapse show"
-                aria-labelledby="headingOne"
-                data-bs-parent="#winners2021"
-              >
-                <div class="accordion-body p-0">
-                  <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">River Hill HS Team 1</h5>
-                        <strong>
-                          <i
-                            class="bi bi-trophy-fill"
-                            role="img"
-                            aria-label="Trophy"
-                          ></i>
-                          1st Place
-                        </strong>
-                      </div>
-                      <p class="mb-1 text-secondary">
-                        River Hill High School &bull; Clarksville,
-                        Maryland
-                      </p>
-                    </li>
-                    <li class="list-group-item">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">PEN A Team</h5>
-                        <strong>
-                          <i
-                            class="bi bi-trophy-fill"
-                            role="img"
-                            aria-label="Trophy"
-                          ></i>
-                          2nd Place
-                        </strong>
-                      </div>
-                      <p class="mb-1 text-secondary">
-                        PEN Academy &bull; Cresskill, New Jersey
-                      </p>
-                    </li>
-                    <li class="list-group-item">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">River Hill HS Team 2</h5>
-                        <strong>
-                          <i
-                            class="bi bi-trophy-fill"
-                            role="img"
-                            aria-label="Trophy"
-                          ></i>
-                          3rd Place
-                        </strong>
-                      </div>
-                      <p class="mb-1 text-secondary">
-                        River Hill High School &bull; Clarksville,
-                        Maryland
-                      </p>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="content">     
-          <div class="content-text">
-            <h2>2020</h2>
-            <p>Due to COVID, the 2020 competition was the first all-remote HSPC competition. The
-              competition featured 30 teams.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="row archive-row pb-4">
-        <div class="col-md-6">
-          <div class="d-grid gap-2">
-            <a
-              href="https://sumnerevans.com/posts/school/2020-hspc/"
-              target="_blank"
-              class="btn btn-outline-primary"
-              >Competition Recap and Solution Sketches
-            </a>
-            <a
-              href="https://mines20.kattis.com/problems"
-              target="_blank"
-              class="btn btn-outline-primary"
-              >Problems
-            </a>
-          </div>
-        </div>
-  
-        <div class="col-md-6">
-          <div class="accordion" id="winners2020">
-            <div class="accordion-item">
-              <h2 class="accordion-header" id="headingOne">
-                <button
-                  class="accordion-button"
-                  type="button"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#winners2020"
-                  aria-expanded="true"
-                  aria-controls="winners2020"
-                >
-                  <strong>Competition Winners</strong>
-                </button>
-              </h2>
-              <div
-                id="winners2020"
-                class="accordion-collapse collapse show"
-                aria-labelledby="headingOne"
-                data-bs-parent="#winners2020"
-              >
-                <div class="accordion-body p-0">
-                  <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">Installation Wizards</h5>
-                        <strong>
-                          <i
-                            class="bi bi-trophy-fill"
-                            role="img"
-                            aria-label="Trophy"
-                          ></i>
-                          1st Place
-                        </strong>
-                      </div>
-                      <p class="mb-1 text-secondary">
-                        STEM School Highlands Ranch &bull; Highlands Ranch, Colorado
-                      </p>
-                    </li>
-                    <li class="list-group-item">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">i</h5>
-                        <strong>
-                          <i
-                            class="bi bi-trophy-fill"
-                            role="img"
-                            aria-label="Trophy"
-                          ></i>
-                          2nd Place
-                        </strong>
-                      </div>
-                      <p class="mb-1 text-secondary">
-                        STEM School Highlands Ranch &bull; Highlands Ranch, Colorado
-                      </p>
-                    </li>
-                    <li class="list-group-item">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">Sun Devils</h5>
-                        <strong>
-                          <i
-                            class="bi bi-trophy-fill"
-                            role="img"
-                            aria-label="Trophy"
-                          ></i>
-                          3rd Place
-                        </strong>
-                      </div>
-                      <p class="mb-1 text-secondary">
-                        Kent Denver &bull; Denver, Colorado
-                      </p>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="content">     
-          <div class="content-text">
-            <h2>2019</h2>
-            <p>
-              The second ever CS@Mines High School Programming Competition featured 22 teams from
-              all around Colorado and from as far as Steamboat Springs.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="row archive-row pb-4">
-        <div class="col-md-6">
-          <div class="d-grid gap-2">
-            <a
-              href="https://sumnerevans.com/posts/school/2019-hspc/"
-              target="_blank"
-              class="btn btn-outline-primary"
-              >Competition Recap and Solution Sketches
-            </a>
-            <a
-              href="https://mines19.kattis.com/problems"
-              target="_blank"
-              class="btn btn-outline-primary"
-              >Problems
-            </a>
-          </div>
-        </div>
-  
-        <div class="col-md-6">
-          <div class="accordion" id="winners2019">
-            <div class="accordion-item">
-              <h2 class="accordion-header" id="headingOne">
-                <button
-                  class="accordion-button"
-                  type="button"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#winners2019"
-                  aria-expanded="true"
-                  aria-controls="winners2019"
-                >
-                  <strong>Competition Winners</strong>
-                </button>
-              </h2>
-              <div
-                id="winners2019"
-                class="accordion-collapse collapse show"
-                aria-labelledby="headingOne"
-                data-bs-parent="#winners2019"
-              >
-                <div class="accordion-body p-0">
-                  <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">STEM Team 1</h5>
-                        <strong>
-                          <i
-                            class="bi bi-trophy-fill"
-                            role="img"
-                            aria-label="Trophy"
-                          ></i>
-                          1st Place
-                        </strong>
-                      </div>
-                      <p class="mb-1 text-secondary">
-                        STEM School Highlands Ranch &bull; Highlands Ranch, Colorado
-                      </p>
-                    </li>
-                    <li class="list-group-item">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">IntrospectionExceptions</h5>
-                        <strong>
-                          <i
-                            class="bi bi-trophy-fill"
-                            role="img"
-                            aria-label="Trophy"
-                          ></i>
-                          2nd Place
-                        </strong>
-                      </div>
-                      <p class="mb-1 text-secondary">
-                        Colorado Academy &bull; Lakewood, Colorado
-                      </p>
-                    </li>
-                    <li class="list-group-item">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">Sun Devils</h5>
-                        <strong>
-                          <i
-                            class="bi bi-trophy-fill"
-                            role="img"
-                            aria-label="Trophy"
-                          ></i>
-                          3rd Place
-                        </strong>
-                      </div>
-                      <p class="mb-1 text-secondary">
-                        Monarch High School &bull; Louisville, Colorado
-                      </p>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="content">     
-          <div class="content-text">
-            <h2>2018</h2>
-            <p>
-              The first ever CS@Mines High School Programming Competition featured 22 teams.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="row archive-row pb-4">
-        <div class="col-md-6">
-          <div class="d-grid gap-2">
-            <a
-              href="https://mines18.kattis.com/problems"
-              target="_blank"
-              class="btn btn-outline-primary"
-              >Problems
-            </a>
-          </div>
-        </div>
-  
-        <div class="col-md-6">
-          <div class="accordion" id="winners2018">
-            <div class="accordion-item">
-              <h2 class="accordion-header" id="headingOne">
-                <button
-                  class="accordion-button"
-                  type="button"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#winners2018"
-                  aria-expanded="true"
-                  aria-controls="winners2018"
-                >
-                  <strong>Competition Winners</strong>
-                </button>
-              </h2>
-              <div
-                id="winners2018"
-                class="accordion-collapse collapse show"
-                aria-labelledby="headingOne"
-                data-bs-parent="#winners2018"
-              >
-                <div class="accordion-body p-0">
-                  <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">The Crummies</h5>
-                        <strong>
-                          <i
-                            class="bi bi-trophy-fill"
-                            role="img"
-                            aria-label="Trophy"
-                          ></i>
-                          1st Place
-                        </strong>
-                      </div>
-                      <p class="mb-1 text-secondary">
-                        Warren Tech &bull; Arvada, Colorado
-                      </p>
-                    </li>
-                    <li class="list-group-item">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">The Bean Beans</h5>
-                        <strong>
-                          <i
-                            class="bi bi-trophy-fill"
-                            role="img"
-                            aria-label="Trophy"
-                          ></i>
-                          2nd Place
-                        </strong>
-                      </div>
-                      <p class="mb-1 text-secondary">
-                        Colorado Academy &bull; Lakewood, Colorado
-                      </p>
-                    </li>
-                    <li class="list-group-item">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">Warriors</h5>
-                        <strong>
-                          <i
-                            class="bi bi-trophy-fill"
-                            role="img"
-                            aria-label="Trophy"
-                          ></i>
-                          3rd Place
-                        </strong>
-                      </div>
-                      <p class="mb-1 text-secondary">
-                        Arapahoe High School &bull; Centennial, Colorado
-                      </p>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
+          {{- end -}}
         </div>
       </div>
     </div>
-  </div>
+  {{- end -}}
 </div>
 {{ end }}

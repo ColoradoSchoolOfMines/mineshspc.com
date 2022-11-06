@@ -1,102 +1,104 @@
 {{ define "title" }}FAQ{{ end }}
 
 {{ define "content" }}
-<div class="container header">
-  <h1>Frequently Asked Questions</h1>
+<div class="container">
+  <div class="row page-header">
+    <div class="col">
+      <h1>Frequently Asked Questions</h1>
+    </div>
+  </div>
 </div>
 
-<div class="container mb-4">
+<div class="container page-content faq">
   <div class="row">
-    <div class="content">
-      <div class="content-text">
-        <h2>Where can I find practice problems?</h2>
-        <p>
-          The best way to practice is by solving the problems from previous
-          competitions. You can find the problems from past competitions here:
-        </p>
-        <ul>
-          <li>
-            <a href="https://mines22advanced.kattis.com/problems">2022 Advanced</a> and
-            <a href="https://mines22beginner.kattis.com/problems">2022 Beginner</a>
-          </li>
-          <li><a href="https://mines21.kattis.com/problems">2021</a></li>
-          <li><a href="https://mines20.kattis.com/problems">2020</a></li>
-          <li><a href="https://mines19.kattis.com/problems">2019</a></li>
-          <li><a href="https://mines18.kattis.com/problems">2018</a></li>
-        </ul>
-        <p>
-          The
-          <a href="https://open.kattis.com" target="_blank">Open Kattis Archive</a>
-          has archived problems from many historical programming competitions
-          as well. Start with the easy problems first!
-        </p>
-        <p>
-          We will use Kattis to run the competition, so all the problems will be given in a similar
-          input/output format.
-        </p>
-        <h2>How many people can be on my team?</h2>
-        <p>
-          We recommend a team size of three, but will allow teams of two or
-          four. Teams of more than four students are not allowed, nor is it
-          allowed to compete individually.
-        </p>
-        <h2>What languages can we use?</h2>
-        <p>
-          You can use C, C++, Python, Java, JavaScript, or Ruby.
-        </p>
-        <p>
-          We recommend that everyone on your team know at least one of these languages in common. We
-          additionally recommend that teams practice submitting solutions on Kattis because the
-          input/output is done in a very specific manner that students may not be familiar with.
-        </p>
-        <h2>What editors do the competition computers have?</h2>
-        <p>
-          The competition computers run Linux (<a href="https://ubuntu.com">Ubuntu</a>'s latest distribution) and have the following programs installed:
-        </p>
-        <p>
-          IDEs: <a href="https://www.jetbrains.com/idea/">IntelliJ IDEA</a>, <a href="https://www.jetbrains.com/pycharm/">PyCharm</a>, <a href="https://www.eclipse.org/ide/">Eclipse</a>, <a href="https://www.jetbrains.com/clion/">CLion</a>, <a href="https://netbeans.apache.org">NetBeans</a>, <a href="https://www.jetbrains.com/ruby/">RubyMine</a>
-        </p>
-        <p>
-          Editors: <a href="https://code.visualstudio.com">Visual Studio Code</a>, <a href="https://atom.io">Atom</a>, <a href="https://docs.python.org/3/library/idle.html">IDLE</a>,
-          <a href="https://www.gnu.org/software/emacs/">emacs</a>, <a href="https://www.vim.org">vim</a>
-        </p>
-        <p>
-          Environments: <a href="https://nodejs.org/en/">NodeJS</a>, <a href="https://kotlinlang.org">Kotlin</a>
-          (if your environment isn't listed, don't worry! We will ensure you have the necessary environments)
-        </p>
-        <h2 id="division">What divison should I register my team in?</h2>
-        <p>
-          The beginner competition assumes knowledge of foundational programming concepts, which we consider to be expressions, conditionals, loops, and lists, as well as nested loops and lists. 
-          Some problems may be easily solved with knowledge of more advanced CS concepts, but all can be solved with just foundational concepts. 
-          The following are sample problems that represent the typical difficulty of problems in the beginner competition:
-          <a href="https://open.kattis.com/problems/quadrant">quadrant</a>,
-          <a href="https://open.kattis.com/problems/tornbygge">tornbygge</a>,
-          <a href="https://open.kattis.com/problems/secretmessage">secretmessage</a>
-        </p>
-        <p>            
-            The advanced competition assumes knowledge of more advanced CS concepts, including data structures like maps, sets, and trees. 
-            Some problems require knowledge of algorithms such as BFS, or advanced data structures such as priority queues. 
-            Some simpler problems will also be included to balance the difficulty of the competition. 
-            The following are sample problems that represent the typical difficulty of problems in the advanced competition:
-            <a href="https://open.kattis.com/problems/grandpabernie">grandpabernie</a>,
-            <a href="https://open.kattis.com/problems/ladice">ladice</a>,
-            <a href="https://open.kattis.com/problems/grid">grid</a>
-        </p>
-        <h2>How long is the competition?</h2>
-        <p>
-          The Kattis competition will be open for 4 hours, from <b>10:00 AM until 2:00 PM Mountain Time</b>.
-          There are opening and closing ceremonies lasting an hour at the start and end of the
-          competition, respectively.
-        </p>
-        <h2>Can I bring my own laptop or tablet?</h2>
-        <p>
-          Yes. However, we find that using less computers benefits team problem solving ability as
-          there is more opportunity for collaboration.
-        </p>
-        <p>
-          See the <a href="/rules/#bringing-own-tech">rules</a> for details.
-        </p>
-      </div>
+    <div class="col m-4">
+      <h2>Where can I find practice problems?</h2>
+      <p>
+        The best way to practice is by solving the problems from previous
+        competitions. You can find the problems from past competitions here:
+      </p>
+      <ul>
+        <li>
+          <a href="https://mines22advanced.kattis.com/problems">2022 Advanced</a> and
+          <a href="https://mines22beginner.kattis.com/problems">2022 Beginner</a>
+        </li>
+        <li><a href="https://mines21.kattis.com/problems">2021</a></li>
+        <li><a href="https://mines20.kattis.com/problems">2020</a></li>
+        <li><a href="https://mines19.kattis.com/problems">2019</a></li>
+        <li><a href="https://mines18.kattis.com/problems">2018</a></li>
+      </ul>
+      <p>
+        The
+        <a href="https://open.kattis.com" target="_blank">Open Kattis Archive</a>
+        has archived problems from many historical programming competitions
+        as well. Start with the easy problems first!
+      </p>
+      <p>
+        We will use Kattis to run the competition, so all the problems will be given in a similar
+        input/output format.
+      </p>
+      <h2>How many people can be on my team?</h2>
+      <p>
+        We recommend a team size of three, but will allow teams of two or
+        four. Teams of more than four students are not allowed, nor is it
+        allowed to compete individually.
+      </p>
+      <h2>What languages can we use?</h2>
+      <p>
+        You can use C, C++, Python, Java, JavaScript, or Ruby.
+      </p>
+      <p>
+        We recommend that everyone on your team know at least one of these languages in common. We
+        additionally recommend that teams practice submitting solutions on Kattis because the
+        input/output is done in a very specific manner that students may not be familiar with.
+      </p>
+      <h2>What editors do the competition computers have?</h2>
+      <p>
+        The competition computers run Linux (<a href="https://ubuntu.com">Ubuntu</a>'s latest distribution) and have the following programs installed:
+      </p>
+      <p>
+        IDEs: <a href="https://www.jetbrains.com/idea/">IntelliJ IDEA</a>, <a href="https://www.jetbrains.com/pycharm/">PyCharm</a>, <a href="https://www.eclipse.org/ide/">Eclipse</a>, <a href="https://www.jetbrains.com/clion/">CLion</a>, <a href="https://netbeans.apache.org">NetBeans</a>, <a href="https://www.jetbrains.com/ruby/">RubyMine</a>
+      </p>
+      <p>
+        Editors: <a href="https://code.visualstudio.com">Visual Studio Code</a>, <a href="https://atom.io">Atom</a>, <a href="https://docs.python.org/3/library/idle.html">IDLE</a>,
+        <a href="https://www.gnu.org/software/emacs/">emacs</a>, <a href="https://www.vim.org">vim</a>
+      </p>
+      <p>
+        Environments: <a href="https://nodejs.org/en/">NodeJS</a>, <a href="https://kotlinlang.org">Kotlin</a>
+        (if your environment isn't listed, don't worry! We will ensure you have the necessary environments)
+      </p>
+      <h2 id="division">What divison should I register my team in?</h2>
+      <p>
+        The beginner competition assumes knowledge of foundational programming concepts, which we consider to be expressions, conditionals, loops, and lists, as well as nested loops and lists. 
+        Some problems may be easily solved with knowledge of more advanced CS concepts, but all can be solved with just foundational concepts. 
+        The following are sample problems that represent the typical difficulty of problems in the beginner competition:
+        <a href="https://open.kattis.com/problems/quadrant">quadrant</a>,
+        <a href="https://open.kattis.com/problems/tornbygge">tornbygge</a>,
+        <a href="https://open.kattis.com/problems/secretmessage">secretmessage</a>
+      </p>
+      <p>            
+          The advanced competition assumes knowledge of more advanced CS concepts, including data structures like maps, sets, and trees. 
+          Some problems require knowledge of algorithms such as BFS, or advanced data structures such as priority queues. 
+          Some simpler problems will also be included to balance the difficulty of the competition. 
+          The following are sample problems that represent the typical difficulty of problems in the advanced competition:
+          <a href="https://open.kattis.com/problems/grandpabernie">grandpabernie</a>,
+          <a href="https://open.kattis.com/problems/ladice">ladice</a>,
+          <a href="https://open.kattis.com/problems/grid">grid</a>
+      </p>
+      <h2>How long is the competition?</h2>
+      <p>
+        The Kattis competition will be open for 4 hours, from <b>10:00 AM until 2:00 PM Mountain Time</b>.
+        There are opening and closing ceremonies lasting an hour at the start and end of the
+        competition, respectively.
+      </p>
+      <h2>Can I bring my own laptop or tablet?</h2>
+      <p>
+        Yes. However, we find that using less computers benefits team problem solving ability as
+        there is more opportunity for collaboration.
+      </p>
+      <p>
+        See the <a href="/rules/#bringing-own-tech">rules</a> for details.
+      </p>
     </div>
   </div>
 </div>

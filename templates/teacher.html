@@ -1,11 +1,11 @@
-{{ define "title" }}Registration{{ end }}
+{{ define "title" }}Register{{ end }}
 
 {{ define "content" }}
 <div class="container">
   <div class="row">
     <div class="col">
       <div class="header">
-        <h1>Registration</h1>
+        <h1>Register</h1>
       </div>
     </div>
   </div>
@@ -14,6 +14,7 @@
 <div class="container">
   <div class="registration-form-container container p-4">
     <form class="form-floating">
+      <input type="hidden" name="registration-id" value="{{ .Data.RegistrationID }}" />
       <div class="row mb-4 align-items-center">
         <div class="col-auto">
           <label for="iama" class="form-label">I am a</label>
@@ -88,8 +89,13 @@
           <div class="row mb-2">
             <div class="col">
               <p>What is the output of the following Python code snippet?</p>
-              <pre>L = [<span style="color: green;">"ab"</span>, "cd", "ef", "gh", "ij"]
-<span style="color: blue;">print</span>(L[0] + L[2] + L[3])</pre>
+              <pre>L = [
+                {{- range $i, $s := .Data.CaptchaElements -}}
+                  <span style="color: green;">"{{ $s }}"</span>{{ if lt $i 4 }}, {{ end }}
+                {{- end -}}
+                ]
+<span style="color: blue;">print</span>({{- range $i, $s := .Data.CaptchaIndexes -}}
+                L[{{ $s }}]{{ if lt $i 2 }} + {{ end }}{{ end -}})</pre>
             </div>
           </div>
           
@@ -113,3 +119,4 @@
   </div>
 </div>
 {{ end }}
+

@@ -6,13 +6,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
-	"io/fs"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"regexp"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -245,8 +245,13 @@ func (a *Application) RegisterInterest(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (app *Application) ServeTemplate(templateName string) func(w http.ResponseWriter, r *http.Request) {
-	log := app.Log.With().Str("page_name", templateName).Logger()
+type TemplateData[T any] struct {
+	PageName string
+	Data     T
+}
+
+func ServeTemplate[T any](logger *zerolog.Logger, templateName string, generateTemplateData func(r *http.Request) T) func(w http.ResponseWriter, r *http.Request) {
+	log := logger.With().Str("page_name", templateName).Logger()
 
 	template, err := template.ParseFS(templateFS, "templates/base.html", "templates/partials/*", fmt.Sprintf("templates/%s", templateName))
 	if err != nil {
@@ -256,9 +261,11 @@ func (app *Application) ServeTemplate(templateName string) func(w http.ResponseW
 	parts := strings.Split(templateName, ".")
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		err := template.ExecuteTemplate(w, "base.html", map[string]any{
-			"PageName": parts[0],
-		})
+		templateData := TemplateData[T]{
+			PageName: parts[0],
+			Data:     generateTemplateData(r),
+		}
+		err := template.ExecuteTemplate(w, "base.html", templateData)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to execute the template")
 		}
@@ -266,26 +273,40 @@ func (app *Application) ServeTemplate(templateName string) func(w http.ResponseW
 }
 
 func (a *Application) Start() {
-	staticRoot, err := fs.Sub(staticFS, "static")
-	if err != nil {
-		a.Log.Fatal().Err(err).Msg("failed to open the static folder")
-	}
-
+	a.Log.Info().Msg("Starting router")
 	r := mux.NewRouter().StrictSlash(true)
 
-	// Static pages
-	r.HandleFunc("/", a.ServeTemplate("home.html"))
-	r.HandleFunc("/rules/", a.ServeTemplate("rules.html"))
-	r.HandleFunc("/registration/", a.ServeTemplate("registration.html"))
-	r.HandleFunc("/faq/", a.ServeTemplate("faq.html"))
-	r.HandleFunc("/archive/", a.ServeTemplate("archive.html"))
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.FS(staticRoot))))
+	noArgs := func(r *http.Request) any { return nil }
 
-	r.HandleFunc("/register_interest/", a.RegisterInterest)
+	// Static pages
+	r.HandleFunc("/", ServeTemplate(a.Log, "home.html", noArgs))
+	r.HandleFunc("/rules/", ServeTemplate(a.Log, "rules.html", noArgs))
+	r.HandleFunc("/register/", ServeTemplate(a.Log, "register.html", noArgs))
+	r.HandleFunc("/register/teacher/", ServeTemplate(a.Log, "teacher.html", func(r *http.Request) any {
+		return map[string]any{
+			"RegistrationID":  uuid.New().String(),
+			"CaptchaElements": []string{"ab", "cd", "ef", "gh", "ij"},
+			"CaptchaIndexes":  []int{1, 3, 2},
+		}
+	}))
+	r.HandleFunc("/register/student/", ServeTemplate(a.Log, "register.html", func(r *http.Request) any {
+		return map[string]any{
+			"RegistrationID":  uuid.New().String(),
+			"CaptchaElements": []string{"ab", "cd", "ef", "gh", "ij"},
+			"CaptchaIndexes":  []int{1, 3, 2},
+		}
+	}))
+	r.HandleFunc("/faq/", ServeTemplate(a.Log, "faq.html", noArgs))
+	r.HandleFunc("/archive/", ServeTemplate(a.Log, "archive.html", a.getArchiveTemplate))
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/", http.FileServer(http.FS(staticFS))))
+
+	// Registration endpoints
+	r.HandleFunc("/register/", a.RegisterInterest)
 
 	//app.Authenticate()
 	//app.ConfigureSheets()
 
 	http.Handle("/", r)
+	a.Log.Info().Msg("Listening on port 8090")
 	http.ListenAndServe(":8090", nil)
 }

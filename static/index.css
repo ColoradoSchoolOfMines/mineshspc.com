@@ -1,165 +1,166 @@
 /* Page formatting */
 @font-face {
-    font-family: 'Gotham';
-    src: url('./fonts/subset-GothamBold.woff2') format('woff2'),
-    url('./fonts/subset-GothamBold.woff') format('woff');
-    font-weight: 700;
-    font-style: bold;
+  font-family: "Gotham";
+  src: url("./fonts/subset-GothamBold.woff2") format("woff2"),
+    url("./fonts/subset-GothamBold.woff") format("woff");
+  font-weight: 700;
+  font-style: bold;
 }
 
 body {
-    background-color: rgba(105, 88, 130, 0.15);
+  background-color: rgba(105, 88, 130, 0.15);
 }
 
 /* Navigation */
 .navbar {
-    padding: 0;
-    background-color: white; 
+  padding: 0;
+  background-color: white;
 }
 
 .navbar-light .navbar-nav .nav-link {
-    color: #24314b;
+  color: #24314b;
 }
 
 .navbar-brand {
-    color: #24314b;
-    padding-bottom: 0.75rem;
-    padding-top: 0;
-    font-size: 25px;
-    vertical-align: auto;
-    font-family: 'Montserrat', sans-serif;
+  color: #24314b;
+  padding-bottom: 0.75rem;
+  padding-top: 0;
+  font-size: 25px;
+  vertical-align: auto;
+  font-family: "Montserrat", sans-serif;
 }
 
 .logo-text {
-    margin-top: auto;
-    margin-bottom: 0;
-    display: inline-block;
+  margin-top: auto;
+  margin-bottom: 0;
+  display: inline-block;
 }
 
 .nav-link {
-    font-size: 25px;
-    height: 100%;
-    line-height: 75px;
-    font-family: 'Montserrat', sans-serif;
+  font-size: 25px;
+  height: 100%;
+  line-height: 75px;
+  font-family: "Montserrat", sans-serif;
 }
 
 .home-link-active {
-    border-bottom: 5px solid #24314b;
+  border-bottom: 5px solid #24314b;
 }
 
 #home-link:hover {
-    color: #24314b;
-    border-bottom: 5px solid #24314b;
+  color: #24314b;
+  border-bottom: 5px solid #24314b;
 }
 
 #rules-link:hover {
-    color: #f367f4;
-    border-bottom: 5px solid #f367f4;
+  color: #f367f4;
+  border-bottom: 5px solid #f367f4;
 }
 
 .rules-link-active {
-    color: #f367f4 !important;
-    border-bottom: 5px solid #f367f4;
+  color: #f367f4 !important;
+  border-bottom: 5px solid #f367f4;
 }
 
 #registration-link:hover {
-    color: #78f358;
-    border-bottom: 5px solid #78f358;
+  color: #78f358;
+  border-bottom: 5px solid #78f358;
 }
 
 .registration-link-active {
-    color: #78f358 !important;
-    border-bottom: 5px solid #78f358;
+  color: #78f358 !important;
+  border-bottom: 5px solid #78f358;
 }
 
 #faq-link:hover {
-    color: #8ff9fc;
-    border-bottom: 5px solid #8ff9fc;
+  color: #8ff9fc;
+  border-bottom: 5px solid #8ff9fc;
 }
 
 .faq-link-active {
-    color: #8ff9fc !important;
-    border-bottom: 5px solid #8ff9fc;
+  color: #8ff9fc !important;
+  border-bottom: 5px solid #8ff9fc;
 }
 
 #archive-link:hover {
-    color: #f0a147;
-    border-bottom: 5px solid #f0a147;
+  color: #f0a147;
+  border-bottom: 5px solid #f0a147;
 }
 
 .archive-link-active {
-    color: #f0a147 !important;
-    border-bottom: 5px solid #f0a147;
+  color: #f0a147 !important;
+  border-bottom: 5px solid #f0a147;
 }
 
 /* Containers */
 .container-fluid {
-    padding-top: .75rem;
+  padding-top: 0.75rem;
 }
 
 .archive-row {
-    background-color: white; 
-    padding-left: 25px; 
-    padding-right: 25px;
+  background-color: white;
+  padding-left: 25px;
+  padding-right: 25px;
 }
 
-/* Content, Headers, Footers */
-.content h1 {
-    background-color: #24314b;
-    color: white;
-    padding: 25px;
+/* Headers */
+h1,
+h2,
+h3 {
+  font-family: Gotham, sans-serif;
+  font-weight: 700;
+  margin-bottom: 0;
 }
 
-.content {
-    background-color: white;
-    font-size: 20px;
-    height: 100%;    
+/* Content */
+
+.content .page-header {
+  text-align: center;
+  background-color: #24314b;
+  color: white;
+  margin-top: 20px;
+  padding: 20px;
 }
 
-.content-text {
-    padding: 20px 30px;
+.content .page-content {
+  font-size: 20px;
 }
 
-.content-text h2 {
-    padding-top: 15px;
+.content .page-content.home h1 {
+  background-color: #24314b;
+  color: white;
+  padding: 25px;
 }
 
-.header {
-    text-align: center;
-    background-color: #24314b;
-    color: white;
-    margin-top: 20px;
-    padding: 20px;
-    width: 85%;
-    margin-left: auto;
-    margin-right: auto;
+.content .page-content.home .info-box {
+  background-color: white;
+  font-size: 20px;
 }
 
+.content .page-content.home .info-box .content-text {
+  padding: 20px 30px;
+}
+
+.content .page-content.archive,
+.content .page-content.rules,
+.content .page-content.register,
+.content .page-content.faq {
+  background-color: white;
+}
+
+/* Footer */
 .footer {
-    margin-bottom: 20px;
-    padding: 20px;
+  margin-bottom: 20px;
+  padding: 20px;
 }
 
 /* Text & Utilities */
 .center-image {
-    margin-left: auto; 
-    margin-right: auto; 
-    display: block;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
 }
 
 #submitInterest {
-    vertical-align: top;
-}
-
-h1, h2 {
-    font-family: Gotham, sans-serif;
-    font-weight: 700;
-    margin-bottom: 0;
-}
-
-.registration-form-container {
-    width: 85%;
-    margin-left: auto;
-    margin-right: auto;
-    background-color: white;
+  vertical-align: top;
 }
