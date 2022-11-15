@@ -12,4 +12,4 @@ COPY --from=build /build/mineshspc.com /mineshspc.com
 
 EXPOSE 8090
 WORKDIR /data
-ENTRYPOINT ["/mineshsp.com"]
+ENTRYPOINT ["/mineshspc.com"]
