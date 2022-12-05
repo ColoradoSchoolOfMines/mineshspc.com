@@ -284,6 +284,7 @@ func (a *Application) Start() {
 
 	// Static pages
 	r.HandleFunc("/", ServeTemplate(a.Log, "home.html", noArgs))
+	r.HandleFunc("/authors/", ServeTemplate(a.Log, "authors.html", noArgs))
 	r.HandleFunc("/rules/", ServeTemplate(a.Log, "rules.html", noArgs))
 	r.HandleFunc("/register/", ServeTemplate(a.Log, "register.html", noArgs))
 	r.HandleFunc("/register/teacher/", ServeTemplate(a.Log, "teacher.html", a.GetTeacherTemplate))
