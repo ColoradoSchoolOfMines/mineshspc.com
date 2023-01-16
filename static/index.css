@@ -17,17 +17,17 @@ body {
   background-color: white;
 }
 
-.navbar-light .navbar-nav .nav-link {
-  color: #24314b;
-}
-
 .navbar-brand {
   color: #24314b;
   padding-bottom: 0.75rem;
   padding-top: 0;
   font-size: 25px;
-  vertical-align: auto;
   font-family: "Montserrat", sans-serif;
+}
+
+.brand-text {
+  margin-left: 1%; 
+  display: inline-block;
 }
 
 .logo-text {
@@ -37,6 +37,7 @@ body {
 }
 
 .nav-link {
+  color: #24314b;
   font-size: 25px;
   height: 100%;
   line-height: 75px;
