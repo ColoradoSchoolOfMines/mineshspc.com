@@ -25,17 +25,6 @@ body {
   font-family: "Montserrat", sans-serif;
 }
 
-.brand-text {
-  margin-left: 1%; 
-  display: inline-block;
-}
-
-.logo-text {
-  margin-top: auto;
-  margin-bottom: 0;
-  display: inline-block;
-}
-
 .nav-link {
   color: #24314b;
   font-size: 25px;
@@ -54,43 +43,43 @@ body {
 }
 
 #rules-link:hover {
-  color: #f367f4;
-  border-bottom: 5px solid #f367f4;
+  color: #B44A88;
+  border-bottom: 5px solid #B44A88;
 }
 
 .rules-link-active {
-  color: #f367f4 !important;
-  border-bottom: 5px solid #f367f4;
+  color: #B44A88 !important;
+  border-bottom: 5px solid #B44A88;
 }
 
 #registration-link:hover {
-  color: #78f358;
-  border-bottom: 5px solid #78f358;
+  color: #008234;
+  border-bottom: 5px solid #008234;
 }
 
 .registration-link-active {
-  color: #78f358 !important;
-  border-bottom: 5px solid #78f358;
+  color: #008234 !important;
+  border-bottom: 5px solid #008234;
 }
 
 #faq-link:hover {
-  color: #8ff9fc;
-  border-bottom: 5px solid #8ff9fc;
+  color: #268282;
+  border-bottom: 5px solid #268282;
 }
 
 .faq-link-active {
-  color: #8ff9fc !important;
-  border-bottom: 5px solid #8ff9fc;
+  color: #268282 !important;
+  border-bottom: 5px solid #268282;
 }
 
 #archive-link:hover {
-  color: #f0a147;
-  border-bottom: 5px solid #f0a147;
+  color: #9B6400;
+  border-bottom: 5px solid #9B6400;
 }
 
 .archive-link-active {
-  color: #f0a147 !important;
-  border-bottom: 5px solid #f0a147;
+  color: #9B6400 !important;
+  border-bottom: 5px solid #9B6400;
 }
 
 /* Containers */
@@ -113,8 +102,12 @@ h3 {
   margin-bottom: 0;
 }
 
-/* Content */
+#schedule-header {
+  font-size: 22px;
+  font-weight: bold;
+}
 
+/* Content */
 .content .page-header {
   text-align: center;
   background-color: #24314b;
@@ -166,6 +159,11 @@ h3 {
   display: block;
 }
 
-#submitInterest {
-  vertical-align: top;
+#registration-info {
+  font-size: 20px;
+}
+
+.w-100 hr {
+  margin-block-start: 0.5em;
+  margin-block-end: 0.5em;
 }

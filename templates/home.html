@@ -2,7 +2,7 @@
 
 {{ define "content" }}
 
-<div class="text-center bg-white mt-4 mb-4 pt-5 pb-5">
+<div class="text-center bg-white mt-4 mb-4 pt-5 pb-4">
   <div class="container">
     <a href="https://cs.mines.edu" target="_blank">
       <img class="center-image" style="width: 25%; display: inline;" src="/static/csmines.svg" alt="CS@Mines">
@@ -10,9 +10,9 @@
   </div>
 
   <h1 class="display-5">High School Programming Competition</h1>
-  <h3 class="mb-2">The 2023 competition will be held <b>Saturday, April 29th, 2023</b>.</h3>
+  <h2 class="mb-2">The 2023 competition will be held Saturday, April 29th, 2023.</h2>
   <div class="mx-auto">
-    <p class="lead mb-4">
+    <p id="registration-info" class="mb-4">
       Engage in exciting problems at the Mines HSPC! Registration will open soon for the Spring 2023 competition (F2F or online via Zoom)
     </p>
     <a href="https://forms.gle/VkaLnHMQrS6wESFV8" class="btn btn-primary btn-lg px-6">Register Interest</a>
@@ -61,35 +61,26 @@
       <div class="info-box">
         <h1>Schedule</h1>
         <div class="content-text">
-          <h4><i>Saturday, April 29th, 2023</i></h4>
-          <table class="table">
-            <tbody>
-              <tr>
-                <td>8:30 AM to 9:00 AM</td>
-                <td>Registration</td>
-              </tr>
-              <tr>
-                <td>9:00 AM to 10:00 AM</td>
-                <td>Introduction and Setup</td>
-              </tr>
-              <tr>
-                <td>10:00 AM to 2:00 PM</td>
-                <td>Competition</td>
-              </tr>
-              <tr>
-                <td>11:30 AM to 12:00 PM</td>
-                <td>Lunch available (at Mines)</td>
-              </tr>
-              <tr>
-                <td>2:00 PM to 3:00 PM</td>
-                <td>Awards</td>
-              </tr>
-              <tr>
-                <td>3:00 PM to 4:00 PM</td>
-                <td>Campus Tour (optional)</td>
-              </tr>
-            </tbody>
-          </table>
+          <p id="schedule-header">Saturday, April 29th, 2023</p>
+          <div class="row mb-1">
+            <div class="col-5" aria-label="Time">8:30 AM to 9:00 AM</div>
+            <div class="col" aria-label="Event">Registration</div>
+            <div class="w-100"><hr></div>
+            <div class="col-5">9:00 AM to 10:00 AM</div>
+            <div class="col">Introduction and Setup</div>
+            <div class="w-100"><hr></div>
+            <div class="col-5">10:00 AM to 2:00 PM</div>
+            <div class="col">Competition</div>
+            <div class="w-100"><hr></div>
+            <div class="col-5">11:30 AM to 12:00 PM</div>
+            <div class="col">Lunch available (at Mines)</div>
+            <div class="w-100"><hr></div>
+            <div class="col-5">2:00 PM to 3:00 PM</div>
+            <div class="col">Awards</div>
+            <div class="w-100"><hr></div>
+            <div class="col-5">3:00 PM to 4:00 PM</div>
+            <div class="col">Campus Tour (optional)</div>
+          </div>
         </div>
       </div>
     </div>
