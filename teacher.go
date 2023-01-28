@@ -16,7 +16,7 @@ type TeacherRegistrationTemplate struct {
 	CaptchaIndexes  []int
 }
 
-func (a *Application) GetTeacherRegistrationTemplate(r *http.Request) TeacherRegistrationTemplate {
+func (a *Application) GetTeacherRegistrationTemplate(r *http.Request) any {
 	captchaElements := make([]string, 5)
 	for i := range captchaElements {
 		captchaElements[i] = string(alphabet[rand.Intn(len(alphabet))]) + string(alphabet[rand.Intn(len(alphabet))])

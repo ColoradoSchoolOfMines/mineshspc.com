@@ -39,12 +39,12 @@ func NewApplication(log *zerolog.Logger, db *sql.DB) *Application {
 	}
 }
 
-type TemplateData[T any] struct {
+type TemplateData struct {
 	PageName string
-	Data     T
+	Data     any
 }
 
-func ServeTemplate[T any](logger *zerolog.Logger, templateName string, generateTemplateData func(r *http.Request) T) func(w http.ResponseWriter, r *http.Request) {
+func ServeTemplate(logger *zerolog.Logger, templateName string, generateTemplateData func(r *http.Request) any) func(w http.ResponseWriter, r *http.Request) {
 	log := logger.With().Str("page_name", templateName).Logger()
 
 	template, err := template.ParseFS(templateFS, "templates/base.html", "templates/partials/*", fmt.Sprintf("templates/%s", templateName))
@@ -55,7 +55,7 @@ func ServeTemplate[T any](logger *zerolog.Logger, templateName string, generateT
 	parts := strings.Split(templateName, ".")
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		templateData := TemplateData[T]{
+		templateData := TemplateData{
 			PageName: parts[0],
 			Data:     generateTemplateData(r),
 		}
@@ -73,29 +73,40 @@ func (a *Application) Start() {
 	noArgs := func(r *http.Request) any { return nil }
 
 	// Static pages
-	r.HandleFunc("/", ServeTemplate(a.Log, "home.html", noArgs))
-	r.HandleFunc("/authors/", ServeTemplate(a.Log, "authors.html", noArgs))
-	r.HandleFunc("/rules/", ServeTemplate(a.Log, "rules.html", noArgs))
-	r.HandleFunc("/register/", ServeTemplate(a.Log, "register.html", noArgs))
-	r.HandleFunc("/faq/", ServeTemplate(a.Log, "faq.html", noArgs))
-	r.HandleFunc("/archive/", ServeTemplate(a.Log, "archive.html", a.GetArchiveTemplate))
+	staticPages := map[string]struct {
+		Template     string
+		ArgGenerator func(r *http.Request) any
+	}{
+		"/":         {"home.html", noArgs},
+		"/authors":  {"authors.html", noArgs},
+		"/rules":    {"rules.html", noArgs},
+		"/register": {"register.html", noArgs},
+		"/faq":      {"faq.html", noArgs},
+		"/archive":  {"archive.html", a.GetArchiveTemplate},
+
+		"/register/teacher/login":         {"teacherlogin.html", noArgs},
+		"/register/teacher/createaccount": {"teachercreateaccount.html", a.GetTeacherRegistrationTemplate},
+		"/register/student/confirminfo":   {"student.html", noArgs},
+		"/register/parent/signforms":      {"parent.html", noArgs},
+	}
+	for path, templateInfo := range staticPages {
+		r.HandleFunc(path, ServeTemplate(a.Log, templateInfo.Template, templateInfo.ArgGenerator)).Methods(http.MethodGet)
+	}
 
 	// Serve static files
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/", http.FileServer(http.FS(staticFS))))
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/", http.FileServer(http.FS(staticFS)))).Methods(http.MethodGet)
 
-	r.HandleFunc("/register/teacher", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, r.URL.String()+"/createaccount", http.StatusTemporaryRedirect)
-	})
-	r.HandleFunc("/register/teacher/login", ServeTemplate(a.Log, "teacherlogin.html", noArgs))
-	r.HandleFunc("/register/teacher/createaccount", ServeTemplate(a.Log, "teachercreateaccount.html", a.GetTeacherRegistrationTemplate))
-	r.HandleFunc("/register/student", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, r.URL.String()+"/confirminfo", http.StatusTemporaryRedirect)
-	})
-	r.HandleFunc("/register/student/confirminfo", ServeTemplate(a.Log, "student.html", noArgs))
-	r.HandleFunc("/register/parent", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, r.URL.String()+"/signforms", http.StatusTemporaryRedirect)
-	})
-	r.HandleFunc("/register/parent/signforms", ServeTemplate(a.Log, "parent.html", noArgs))
+	// Registration pages
+	redirects := map[string]string{
+		"/register/teacher": "/register/teacher/createaccount",
+		"/register/student": "/register/student/confirminfo",
+		"/register/parent":  "/register/parent/signforms",
+	}
+	for path, redirectPath := range redirects {
+		r.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
+			http.Redirect(w, r, redirectPath, http.StatusTemporaryRedirect)
+		}).Methods(http.MethodGet)
+	}
 
 	http.Handle("/", r)
 
