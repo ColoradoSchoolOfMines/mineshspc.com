@@ -5,7 +5,7 @@ import (
 )
 
 type Configuration struct {
-	SpreadsheetID string `yaml:"spreadsheet_id"`
+	SendGridAPIKey string `yaml:"sendgrid_api_key"`
 }
 
 func (c *Configuration) Parse(data []byte) error {

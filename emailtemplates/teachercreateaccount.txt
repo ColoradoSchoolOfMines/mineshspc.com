@@ -1,0 +1,12 @@
+Hello {{ .Name }},
+
+Please confirm your email to create your Mines HSPC teacher account by clicking
+on the following link:
+
+{{ .ConfirmURL }}
+
+The above link will expire in 1 hour.
+
+If you did not request this email, please ignore this email.
+
+- The Mines HSPC Staff
