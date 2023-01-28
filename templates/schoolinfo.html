@@ -1,0 +1,66 @@
+{{ define "title" }}Enter School Information{{ end }}
+
+{{ define "content" }}
+<div class="container page-header">
+  <div class="row">
+    <div class="col">
+      <div class="header">
+        <h1>Enter School Information</h1>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container page-content teacher">
+  <div class="row">
+    <div class="col text-center m-4">
+      <h3>
+        Please enter the following information about your school.
+      </h3>
+    </div>
+  </div>
+  <form method="post" action="/teacher/schoolinfo" class="form-floating">
+    <input type="hidden" name="registration-id" value="{{ .Data.RegistrationID }}" />
+    <div class="row">
+      <div class="col m-4 mt-0">
+        <div class="card">
+          <h4 class="card-header">School Information</h4>
+          <div class="card-body">
+            <div class="row mb-2">
+              <div class="col-md-12">
+                <div class="form-floating">
+                  <input type="text" class="form-control col-12" id="school-name" placeholder="Your High School">
+                  <label for="school-name">School Name</label>
+                </div>
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-12">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="school-city" placeholder="Denver">
+                  <label for="school-city">School City</label>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="school-state" placeholder="Colorado">
+                  <label for="school-state">School State/Province</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row text-center pb-4">
+      <div class="col-md-12">
+        <button type="submit" class="btn btn-lg btn-primary">Setup Teams</button>
+      </div>
+    </div>
+  </form>
+</div>
+{{ end }}
+
+

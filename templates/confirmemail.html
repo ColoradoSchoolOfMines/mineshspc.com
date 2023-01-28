@@ -1,0 +1,24 @@
+{{ define "title" }}Confirm Email{{ end }}
+
+{{ define "content" }}
+<div class="container">
+  <div class="row page-header">
+    <div class="col">
+      <h1>Confirm Email</h1>
+    </div>
+  </div>
+</div>
+
+<div class="container page-content confirm-email">
+  <div class="row">
+    <div class="col m-4">
+      We've sent a confirmation email to {{ .Email }}.
+
+      <div class="center"><i class="fa-envelope-open"></i></div>
+
+      Please check your email and click the link to confirm your email address and log in.
+    </div>
+  </div>
+</div>
+{{ end }}
+
