@@ -23,3 +23,38 @@ func (d *Database) NewTeacherSession(email string, sessionToken uuid.UUID, expir
 	`, email, sessionToken.String(), expiresAt.UnixMilli())
 	return err
 }
+
+type Teacher struct {
+	Name           string
+	Email          string
+	EmailConfirmed bool
+	SchoolName     string
+	SchoolCity     string
+	SchoolState    string
+}
+
+func (d *Database) GetTeacherBySessionToken(sessionToken uuid.UUID) (*Teacher, error) {
+	row := d.Raw.QueryRow(`
+		SELECT t.name, t.email, t.emailconfirmed, t.schoolname, t.schoolcity, t.schoolstate
+		FROM teachers t
+		JOIN sessions s ON s.email = t.email
+		WHERE s.token = ?
+			AND s.expires >= ?
+	`, sessionToken.String(), time.Now().UnixMilli())
+
+	var teacher Teacher
+	if err := row.Scan(&teacher.Name, &teacher.Email, &teacher.EmailConfirmed,
+		&teacher.SchoolName, &teacher.SchoolCity, &teacher.SchoolState); err != nil {
+		return nil, err
+	}
+	return &teacher, nil
+}
+
+func (d *Database) SetTeacherSchoolInfo(email, schoolName, schoolCity, schoolState string) error {
+	_, err := d.Raw.Exec(`
+		UPDATE teachers
+		SET schoolname = ?, schoolcity = ?, schoolstate = ?
+		WHERE email = ?
+	`, schoolName, schoolCity, schoolState, email)
+	return err
+}

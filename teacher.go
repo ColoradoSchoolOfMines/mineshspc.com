@@ -62,7 +62,8 @@ func (a *Application) GetTeacherRegistrationTemplate(r *http.Request) map[string
 }
 
 func (a *Application) HandleTeacherLogin(w http.ResponseWriter, r *http.Request) {
-
+	// TODO implement this. Make sure to check that the email was confirmed
+	// before allowing to avoid replay attacks.
 }
 
 func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.Request) {
@@ -96,7 +97,7 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 		return
 	}
 
-	err = a.DB.NewTeacher(emailAddress, name)
+	err = a.DB.NewTeacher(name, emailAddress)
 	if errors.Is(err, sqlite3.ErrConstraintUnique) {
 		log.Error().Err(err).Msg("account already exists")
 		a.TeacherCreateAccountRenderer(w, r, map[string]any{
@@ -167,14 +168,14 @@ func (a *Application) HandleTeacherEmailConfirmation(w http.ResponseWriter, r *h
 		return
 	}
 
+	// If there is no login code, then this was a redirect from the login/create account page.
 	loginCode := r.URL.Query().Get("login_code")
 	if loginCode == "" {
-		a.ConfirmEmailRenderer(w, r, map[string]any{
-			"Email": emailCookie.Value,
-		})
+		a.ConfirmEmailRenderer(w, r, map[string]any{"Email": emailCookie.Value})
 		return
 	}
 
+	// Verify the login code and give them a session.
 	if loginCodeUUID, err := uuid.Parse(loginCode); err != nil {
 		a.Log.Error().Err(err).Msg("failed to parse login code")
 		w.WriteHeader(http.StatusBadRequest)
@@ -202,5 +203,69 @@ func (a *Application) HandleTeacherEmailConfirmation(w http.ResponseWriter, r *h
 		return
 	}
 	http.SetCookie(w, &http.Cookie{Name: "session_id", Value: sessionID.String(), Path: "/", Expires: expires})
-	http.Redirect(w, r, "/register/schoolinfo", http.StatusSeeOther)
+	http.Redirect(w, r, "/teacher/register/schoolinfo", http.StatusSeeOther)
+}
+
+func (a *Application) GetTeacherSchoolInfoTemplate(r *http.Request) map[string]any {
+	user, err := a.GetLoggedInTeacher(r)
+	if err != nil {
+		a.Log.Error().Err(err).Msg("Failed to get logged in user")
+		return nil
+	}
+	a.Log.Info().Interface("user", user).Msg("found user")
+
+	validated := ""
+	if user.SchoolName != "" || user.SchoolCity != "" || user.SchoolState != "" {
+		validated = "validated"
+	}
+	return map[string]any{
+		"Username":    user.Name,
+		"Validated":   validated,
+		"SchoolName":  user.SchoolName,
+		"SchoolCity":  user.SchoolCity,
+		"SchoolState": user.SchoolState,
+	}
+}
+
+func (a *Application) HandleTeacherSchoolInfo(w http.ResponseWriter, r *http.Request) {
+	log := a.Log.With().Str("page_name", "teacher_school_info").Logger()
+	user, err := a.GetLoggedInTeacher(r)
+	if err != nil {
+		// TODO indicate that they are logged out
+		http.Redirect(w, r, "/register/teacher/login", http.StatusSeeOther)
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		log.Error().Err(err).Msg("failed to parse form")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	schoolName := r.Form.Get("school-name")
+	schoolCity := r.Form.Get("school-city")
+	schoolState := r.Form.Get("school-state")
+
+	if schoolName == "" || schoolCity == "" || schoolState == "" {
+		a.ConfirmEmailRenderer(w, r, map[string]any{
+			"Errors": map[string]any{
+				"school-name":  schoolName == "",
+				"school-city":  schoolCity == "",
+				"school-state": schoolState == "",
+			},
+		})
+		return
+	}
+
+	err = a.DB.SetTeacherSchoolInfo(user.Email, schoolName, schoolCity, schoolState)
+	if err != nil {
+		a.ConfirmEmailRenderer(w, r, map[string]any{
+			"Errors": map[string]any{
+				"general": "Failed to save school info. Please try again.",
+			},
+		})
+		return
+	}
+
+	http.Redirect(w, r, "/teacher/register/teams", http.StatusSeeOther)
 }

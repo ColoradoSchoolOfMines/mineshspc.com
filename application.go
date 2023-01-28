@@ -35,6 +35,8 @@ type Application struct {
 	TeacherRegistrationCaptchas  map[uuid.UUID]string
 	TeacherCreateAccountRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 
+	TeacherSchoolInfoRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
+
 	SendGridClient *sendgrid.Client
 }
 
@@ -131,10 +133,12 @@ func (a *Application) Start() {
 		}).Methods(http.MethodGet)
 	}
 
-	// Teacher create account page
+	// Registration renderers
 	a.TeacherCreateAccountRenderer = a.ServeTemplateExtra(a.Log, "teachercreateaccount.html", a.GetTeacherRegistrationTemplate)
+	a.TeacherSchoolInfoRenderer = a.ServeTemplateExtra(a.Log, "schoolinfo.html", a.GetTeacherSchoolInfoTemplate)
 	registrationPages := map[string]func(w http.ResponseWriter, r *http.Request, extraData map[string]any){
 		"/register/teacher/createaccount": a.TeacherCreateAccountRenderer,
+		"/register/teacher/schoolinfo":    a.TeacherSchoolInfoRenderer,
 	}
 	for path, renderer := range registrationPages {
 		r.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) { renderer(w, r, nil) }).Methods(http.MethodGet)
@@ -148,6 +152,7 @@ func (a *Application) Start() {
 	formHandlers := map[string]func(w http.ResponseWriter, r *http.Request){
 		"/register/teacher/login":         a.HandleTeacherLogin,
 		"/register/teacher/createaccount": a.HandleTeacherCreateAccount,
+		"/register/teacher/schoolinfo":    a.HandleTeacherSchoolInfo,
 	}
 	for path, fn := range formHandlers {
 		r.HandleFunc(path, fn).Methods(http.MethodPost)

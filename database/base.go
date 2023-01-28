@@ -27,7 +27,12 @@ func (d *Database) RunMigrations() {
 			CREATE TABLE IF NOT EXISTS teachers (
 				email          TEXT NOT NULL PRIMARY KEY,
 				name           TEXT NOT NULL,
-				emailconfirmed BOOLEAN NOT NULL DEFAULT FALSE
+				emailconfirmed BOOLEAN NOT NULL DEFAULT FALSE,
+
+				-- school info is 1:1 with teachers
+				schoolname     TEXT,
+				schoolcity     TEXT,
+				schoolstate    TEXT
 			);
 		`,
 		`
@@ -38,6 +43,7 @@ func (d *Database) RunMigrations() {
 				PRIMARY KEY (email, token)
 			);
 		`,
+
 	}
 	txn, err := d.Raw.BeginTx(context.TODO(), nil)
 	if err != nil {

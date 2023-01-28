@@ -12,14 +12,19 @@
 </div>
 
 <div class="container page-content teacher">
-  <div class="row">
-    <div class="col text-center m-4">
-      <h3>
-        Please enter the following information about your school.
-      </h3>
+  <form method="post" action="/register/teacher/schoolinfo"
+        class="form-floating {{ if .Data.Validated }}was-validated{{ end }}">
+    {{ with .Data.Error.General }}
+      <div class="alert alert-danger" role="alert">
+        {{ . }}
+      </div>
+    {{ end }}
+    <div class="row">
+      <div class="col text-center m-4">
+        <b>Welcome back {{ .Data.Username }}.</b> Please enter the following information about your
+        school.
+      </div>
     </div>
-  </div>
-  <form method="post" action="/register/teacher/schoolinfo" class="form-floating">
     <div class="row">
       <div class="col m-4 mt-0">
         <div class="card">
@@ -28,7 +33,10 @@
             <div class="row mb-2">
               <div class="col-md-12">
                 <div class="form-floating">
-                  <input type="text" class="form-control col-12" id="school-name" placeholder="Your High School">
+                  <input type="text" class="form-control col-12" name="school-name" id="school-name"
+                    placeholder="Your High School" required
+                    {{ if .Data.Validated }}value="{{ .Data.SchoolName }}"{{ end }}
+                  />
                   <label for="school-name">School Name</label>
                 </div>
               </div>
@@ -36,7 +44,10 @@
             <div class="row mb-2">
               <div class="col-12">
                 <div class="form-floating">
-                  <input type="text" class="form-control" id="school-city" placeholder="Denver">
+                  <input type="text" class="form-control" name="school-city" id="school-city"
+                    placeholder="Denver" required
+                    {{ if .Data.Validated }}value="{{ .Data.SchoolCity }}"{{ end }}
+                    />
                   <label for="school-city">School City</label>
                 </div>
               </div>
@@ -44,8 +55,11 @@
             <div class="row">
               <div class="col-12">
                 <div class="form-floating">
-                  <input type="text" class="form-control" id="school-state" placeholder="Colorado">
-                  <label for="school-state">School State/Province</label>
+                  <input type="text" class="form-control" name="school-state" id="school-state"
+                    placeholder="Colorado" required
+                    {{ if .Data.Validated }}value="{{ .Data.SchoolState }}"{{ end }}
+                    />
+                  <label for="school-state">School State/Province (include country if not USA)</label>
                 </div>
               </div>
             </div>
