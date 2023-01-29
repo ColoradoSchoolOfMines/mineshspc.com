@@ -36,6 +36,7 @@ type Application struct {
 	TeacherCreateAccountRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 
 	TeacherSchoolInfoRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
+	TeacherTeamsRenderer      func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 
 	SendGridClient *sendgrid.Client
 }
@@ -80,6 +81,7 @@ func (a *Application) ServeTemplateExtra(logger *zerolog.Logger, templateName st
 			"PageName": parts[0],
 			"Data":     data,
 		}
+		log.Debug().Msg("serving template")
 		err := template.ExecuteTemplate(w, "base.html", templateData)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to execute the template")
@@ -128,20 +130,28 @@ func (a *Application) Start() {
 		"/register/parent":  "/register/parent/signforms",
 	}
 	for path, redirectPath := range redirects {
-		r.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
-			http.Redirect(w, r, redirectPath, http.StatusTemporaryRedirect)
-		}).Methods(http.MethodGet)
+		redirFn := func(redirectPath string) func(w http.ResponseWriter, r *http.Request) {
+			return func(w http.ResponseWriter, r *http.Request) {
+				http.Redirect(w, r, redirectPath, http.StatusTemporaryRedirect)
+			}
+		}
+		r.HandleFunc(path, redirFn(redirectPath)).Methods(http.MethodGet)
 	}
 
 	// Registration renderers
 	a.TeacherCreateAccountRenderer = a.ServeTemplateExtra(a.Log, "teachercreateaccount.html", a.GetTeacherRegistrationTemplate)
 	a.TeacherSchoolInfoRenderer = a.ServeTemplateExtra(a.Log, "schoolinfo.html", a.GetTeacherSchoolInfoTemplate)
+	a.TeacherTeamsRenderer = a.ServeTemplateExtra(a.Log, "teams.html", a.GetTeacherTeamsTemplate)
 	registrationPages := map[string]func(w http.ResponseWriter, r *http.Request, extraData map[string]any){
 		"/register/teacher/createaccount": a.TeacherCreateAccountRenderer,
 		"/register/teacher/schoolinfo":    a.TeacherSchoolInfoRenderer,
+		"/register/teacher/teams":         a.TeacherTeamsRenderer,
 	}
 	for path, renderer := range registrationPages {
-		r.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) { renderer(w, r, nil) }).Methods(http.MethodGet)
+		renderFn := func(renderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)) func(w http.ResponseWriter, r *http.Request) {
+			return func(w http.ResponseWriter, r *http.Request) { renderer(w, r, nil) }
+		}
+		r.HandleFunc(path, renderFn(renderer)).Methods(http.MethodGet)
 	}
 
 	// Email confirmation code handling

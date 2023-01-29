@@ -43,7 +43,28 @@ func (d *Database) RunMigrations() {
 				PRIMARY KEY (email, token)
 			);
 		`,
+		`
+			CREATE TABLE IF NOT EXISTS teams (
+				id           TEXT NOT NULL PRIMARY KEY,
+				teacheremail TEXT NOT NULL,
+				name         TEXT NOT NULL,
+				division     TEXT NOT NULL,
 
+				UNIQUE (teacheremail, name, division)
+			);
+		`,
+		`
+			CREATE TABLE IF NOT EXISTS students (
+				email                  TEXT NOT NULL PRIMARY KEY,
+				teamid                 TEXT NOT NULL,
+				name                   TEXT NOT NULL,
+				parentemail            TEXT NOT NULL,
+				previouslyparticipated BOOLEAN NOT NULL DEFAULT FALSE,
+				emailconfirmed         BOOLEAN NOT NULL DEFAULT FALSE,
+				computerusewaiver      BOOLEAN NOT NULL DEFAULT FALSE,
+				multimediareleaseform  BOOLEAN NOT NULL DEFAULT FALSE
+			)
+		`,
 	}
 	txn, err := d.Raw.BeginTx(context.TODO(), nil)
 	if err != nil {

@@ -11,6 +11,7 @@ import (
 	texttemplate "text/template"
 	"time"
 
+	"github.com/ColoradoSchoolOfMines/mineshspc.com/database"
 	"github.com/google/uuid"
 	"github.com/mattn/go-sqlite3"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
@@ -214,10 +215,7 @@ func (a *Application) GetTeacherSchoolInfoTemplate(r *http.Request) map[string]a
 	}
 	a.Log.Info().Interface("user", user).Msg("found user")
 
-	validated := ""
-	if user.SchoolName != "" || user.SchoolCity != "" || user.SchoolState != "" {
-		validated = "validated"
-	}
+	validated := user.SchoolName != "" || user.SchoolCity != "" || user.SchoolState != ""
 	return map[string]any{
 		"Username":    user.Name,
 		"Validated":   validated,
@@ -268,4 +266,47 @@ func (a *Application) HandleTeacherSchoolInfo(w http.ResponseWriter, r *http.Req
 	}
 
 	http.Redirect(w, r, "/teacher/register/teams", http.StatusSeeOther)
+}
+
+func (a *Application) GetTeacherTeamsTemplate(r *http.Request) map[string]any {
+	user, err := a.GetLoggedInTeacher(r)
+	if err != nil {
+		a.Log.Error().Err(err).Msg("Failed to get logged in user")
+		return nil
+	}
+	a.Log.Info().Interface("user", user).Msg("found user")
+
+	teams, err := a.DB.GetTeacherTeams(user.Email)
+	if err != nil {
+		a.Log.Error().Err(err).Msg("Failed to get teacher teams")
+		// TODO report this error to the user and email admin
+		return nil
+	}
+
+	teams = append(teams, database.Team{
+		ID:           uuid.New(),
+		TeacherEmail: "ohea@ohea.com",
+		Name:         "Foo Bar",
+		Division:     "Advanced",
+		Members: []database.Student{
+			{
+				TeamID:                  uuid.New(),
+				Email:                   "oqfuy@sntrsnt.com",
+				Name:                    "ABC DEF",
+				ParentEmail:             "oheac.dohea@rsnothraesntroeha.com",
+				PreviouslyParticipated:  false,
+				EmailConfirmed:          true,
+				ComputerUseWaiverSigned: true,
+				MultimediaReleaseForm:   false,
+			},
+		},
+	})
+
+	return map[string]any{
+		"Username":    user.Name,
+		"SchoolName":  user.SchoolName,
+		"SchoolCity":  user.SchoolCity,
+		"SchoolState": user.SchoolState,
+		"Teams":       teams,
+	}
 }
