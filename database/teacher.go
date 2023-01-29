@@ -6,6 +6,15 @@ import (
 	"github.com/google/uuid"
 )
 
+type Teacher struct {
+	Name           string
+	Email          string
+	EmailConfirmed bool
+	SchoolName     string
+	SchoolCity     string
+	SchoolState    string
+}
+
 func (d *Database) NewTeacher(name, email string) error {
 	_, err := d.Raw.Exec("INSERT INTO teachers (name, email) VALUES (?, ?)", name, email)
 	return err
@@ -24,13 +33,18 @@ func (d *Database) NewTeacherSession(email string, sessionToken uuid.UUID, expir
 	return err
 }
 
-type Teacher struct {
-	Name           string
-	Email          string
-	EmailConfirmed bool
-	SchoolName     string
-	SchoolCity     string
-	SchoolState    string
+func (d *Database) GetTeacherByEmail(email string) (*Teacher, error) {
+	row := d.Raw.QueryRow(`
+		SELECT t.name, t.email, t.emailconfirmed, t.schoolname, t.schoolcity, t.schoolstate
+		FROM teachers t
+		WHERE t.email = ?
+	`, email)
+
+	var t Teacher
+	if err := row.Scan(&t.Name, &t.Email, &t.EmailConfirmed, &t.SchoolName, &t.SchoolCity, &t.SchoolState); err != nil {
+		return nil, err
+	}
+	return &t, nil
 }
 
 func (d *Database) GetTeacherBySessionToken(sessionToken uuid.UUID) (*Teacher, error) {
@@ -42,12 +56,11 @@ func (d *Database) GetTeacherBySessionToken(sessionToken uuid.UUID) (*Teacher, e
 			AND s.expires >= ?
 	`, sessionToken.String(), time.Now().UnixMilli())
 
-	var teacher Teacher
-	if err := row.Scan(&teacher.Name, &teacher.Email, &teacher.EmailConfirmed,
-		&teacher.SchoolName, &teacher.SchoolCity, &teacher.SchoolState); err != nil {
+	var t Teacher
+	if err := row.Scan(&t.Name, &t.Email, &t.EmailConfirmed, &t.SchoolName, &t.SchoolCity, &t.SchoolState); err != nil {
 		return nil, err
 	}
-	return &teacher, nil
+	return &t, nil
 }
 
 func (d *Database) SetTeacherSchoolInfo(email, schoolName, schoolCity, schoolState string) error {

@@ -49,6 +49,7 @@ func (d *Database) RunMigrations() {
 				teacheremail TEXT NOT NULL,
 				name         TEXT NOT NULL,
 				division     TEXT NOT NULL,
+				inperson     BOOLEAN NOT NULL,
 
 				UNIQUE (teacheremail, name, division)
 			);
@@ -61,6 +62,7 @@ func (d *Database) RunMigrations() {
 				parentemail            TEXT NOT NULL,
 				previouslyparticipated BOOLEAN NOT NULL DEFAULT FALSE,
 				emailconfirmed         BOOLEAN NOT NULL DEFAULT FALSE,
+				liabilitywaiver        BOOLEAN NOT NULL DEFAULT FALSE,
 				computerusewaiver      BOOLEAN NOT NULL DEFAULT FALSE,
 				multimediareleaseform  BOOLEAN NOT NULL DEFAULT FALSE
 			)

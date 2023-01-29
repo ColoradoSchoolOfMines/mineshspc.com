@@ -18,12 +18,18 @@
         {{ with .Data.EmailNotFound }}
           <div class="alert alert-danger" role="alert">
             That email doesn't exist in our system. Did you want to
-            <a href="/register/teacher/createaccount">create an account</a> instead.
+            <a href="/register/teacher/createaccount">create an account</a> instead?
           </div>
         {{ else }}
-          <div class="alert alert-secondary" role="alert">
-            Don't have an account? <a href="/register/teacher/createaccount">Create an account</a> instead.
-          </div>
+          {{ with .Data.EmailNotConfirmed }}
+            <div class="alert alert-danger" role="alert">
+              That email hasn't been confirmed yet. Please confirm your email before logging in.
+            </div>
+          {{ else }}
+            <div class="alert alert-secondary" role="alert">
+              Don't have an account? <a href="/register/teacher/createaccount">Create an account</a> instead.
+            </div>
+          {{ end }}
         {{ end }}
       </div>
     </div>
@@ -35,7 +41,10 @@
             <div class="row">
               <div class="col-12">
                 <div class="form-floating">
-                  <input type="email" name="email-address" class="form-control" id="email-address" placeholder="you@example.com">
+                  <input type="email" name="email-address" class="form-control" id="email-address"
+                    placeholder="you@example.com" required 
+                    {{ with .Data.Email }}value="{{ . }}"{{ end }}
+                    />
                   <label for="email-address">Email address</label>
                 </div>
               </div>

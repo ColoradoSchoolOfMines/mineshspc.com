@@ -12,6 +12,16 @@
 </div>
 
 <div class="container page-content teacher">
+  <div class="row">
+    <div class="col m-4 mb-0 text-center">
+      <h4>
+        Welcome <b>{{ .Data.Username }}</b>. These are the teams for <b>{{ .Data.SchoolName }}</b>.
+        Click
+        <a href="/register/teacher/schoolinfo">here</a>
+        to change your school information.
+      </h4>
+    </div>
+  </div>
   {{ if .Data.Teams }}
     <div class="row">
       <div class="col m-4 mb-0">
@@ -22,7 +32,7 @@
       </div>
     </div>
   {{ end }}
-  {{ range .Data.Teams }}
+  {{ range $t := .Data.Teams }}
     <div class="row">
       <div class="col m-4">
         <div class="card">
@@ -30,9 +40,12 @@
             Team <b>{{ .Name }}</b>
           </div>
           <div class="card-body">
-            <p class="card-text">
-              <b>Division:</b> {{ .Division }}
-            </p>
+            <dl class="row">
+              <dt class="col-sm-2">Division:</dt>
+              <dd class="col-sm-2">{{ .Division }}</dd>
+              <dt class="col-sm-2">In Person:</dt>
+              <dd class="col-sm-2">{{ if .InPerson }}Yes{{ else }}No{{ end }}</dd>
+            </dl>
             <ul class="list-group">
               {{ range .Members }}
                 <li class="list-group-item">
@@ -55,14 +68,20 @@
                         <div class="step {{ if .EmailConfirmed }}completed{{ end }}">
                           <span><i class="fa {{ if .EmailConfirmed }}fa-check{{ else }}fa-times{{ end }}"></i></span>
                         </div>
-                        <span class="line {{ if .ComputerUseWaiverSigned }}completed{{ end }}"></span>
-                        <div class="step {{ if .ComputerUseWaiverSigned }}completed{{ end }}">
-                          <span><i class="fa {{ if .ComputerUseWaiverSigned }}fa-check{{ else }}fa-times{{ end }}"></i></span>
+                        <span class="line {{ if .LiabilitySigned }}completed{{ end }}"></span>
+                        <div class="step {{ if .LiabilitySigned }}completed{{ end }}">
+                          <span><i class="fa {{ if .LiabilitySigned }}fa-check{{ else }}fa-times{{ end }}"></i></span>
                         </div>
-                        <span class="line {{ if .MultimediaReleaseForm }}completed{{ end }}"></span>
-                        <div class="step {{ if .MultimediaReleaseForm }}completed{{ end }}">
-                          <span><i class="fa {{ if .MultimediaReleaseForm }}fa-check{{ else }}fa-times{{ end }}"></i></span>
-                        </div>
+                        {{ if $t.InPerson }}
+                          <span class="line {{ if .ComputerUseWaiverSigned }}completed{{ end }}"></span>
+                          <div class="step {{ if .ComputerUseWaiverSigned }}completed{{ end }}">
+                            <span><i class="fa {{ if .ComputerUseWaiverSigned }}fa-check{{ else }}fa-times{{ end }}"></i></span>
+                          </div>
+                          <span class="line {{ if .MultimediaReleaseForm }}completed{{ end }}"></span>
+                          <div class="step {{ if .MultimediaReleaseForm }}completed{{ end }}">
+                            <span><i class="fa {{ if .MultimediaReleaseForm }}fa-check{{ else }}fa-times{{ end }}"></i></span>
+                          </div>
+                        {{ end }}
                       </div>
                     </div>
                   </div>
@@ -71,9 +90,13 @@
                       <div class="registration-progress-text">
                         <div><small class="{{ if not .EmailConfirmed }}text-muted{{ end }}">Email Confirmed</small></div>
                         <span class="line"></span>
-                        <div><small class="{{ if not .ComputerUseWaiverSigned }}text-muted{{ end }}">Computer Use Waiver</small></div>
-                        <span class="line"></span>
-                        <div><small class="{{ if not .MultimediaReleaseForm }}text-muted{{ end }}">Multimedia Release</small></div>
+                        <div><small class="{{ if not .LiabilitySigned }}text-muted{{ end }}">Liability Waiver</small></div>
+                        {{ if $t.InPerson }}
+                          <span class="line"></span>
+                          <div><small class="{{ if not .ComputerUseWaiverSigned }}text-muted{{ end }}">Computer Use Waiver</small></div>
+                          <span class="line"></span>
+                          <div><small class="{{ if not .MultimediaReleaseForm }}text-muted{{ end }}">Multimedia Release</small></div>
+                        {{ end }}
                       </div>
                     </div>
                   </div>
@@ -82,7 +105,7 @@
             </ul>
           </div>
           <div class="card-footer">
-            <a href="/register/teacher/team/edit/{{ .ID }}" type="button" class="btn btn-primary">
+            <a href="/register/teacher/team/edit?teamid={{ .ID }}" type="button" class="btn btn-primary">
               Edit
             </a>
           </div>
@@ -92,7 +115,7 @@
   {{ end }}
   <div class="row text-center p-4">
     <div class="col-md-12">
-      <a href="/register/teacher/team/new" class="btn btn-lg btn-primary">New Team</a>
+      <a href="/register/teacher/team/edit" class="btn btn-lg btn-primary">New Team</a>
     </div>
   </div>
 </div>

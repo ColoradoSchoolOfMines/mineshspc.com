@@ -1,10 +1,10 @@
-{{ define "title" }}Confirm Email{{ end }}
+{{ define "title" }}Email Login{{ end }}
 
 {{ define "content" }}
 <div class="container">
   <div class="row page-header">
     <div class="col">
-      <h1>Confirm Email</h1>
+      <h1>Email Login</h1>
     </div>
   </div>
 </div>
@@ -12,12 +12,13 @@
 <div class="container page-content confirm-email">
   {{ with .Data.Error }}
     <div class="row">
-      <div class="alert alert-danger" role="alert">
+      <div class="col m-4 text-center">
         <p>That login code was expired or invalid.</p>
-        <p>
-          Forgot to confirm your email?
-          <a href="mailto:team@mineshspc.com">Contact the Mines HSPC Team</a>.
-        </p>
+      </div>
+    </div>
+    <div class="row text-center pb-4">
+      <div class="col-md-12">
+        <a href="/register/teacher/login" class="btn btn-lg btn-primary">Return to Login</a>
       </div>
     </div>
   {{ else }}
@@ -28,13 +29,7 @@
         </p>
         <p style="font-size: 10em; line-height: 0;"><i class="fa fa-envelope-o"></i></p>
         <p>
-          Please check your email and click the link to confirm your email address and log in.
-        </p>
-        <p>
-          <b>
-            You must confirm your email now, or you will have to contact the Mines HSPC team to get
-            your account activated.
-          </b>
+          Please check your email and click the link to log in.
         </p>
       </div>
     </div>

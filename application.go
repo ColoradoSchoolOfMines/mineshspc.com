@@ -31,6 +31,8 @@ type Application struct {
 
 	LoginCodes           map[string]uuid.UUID
 	ConfirmEmailRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
+	TeacherLoginRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
+	EmailLoginRenderer   func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 
 	TeacherRegistrationCaptchas  map[uuid.UUID]string
 	TeacherCreateAccountRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
@@ -112,7 +114,6 @@ func (a *Application) Start() {
 		"/faq":      {"faq.html", noArgs},
 		"/archive":  {"archive.html", a.GetArchiveTemplate},
 
-		"/register/teacher/login":       {"teacherlogin.html", noArgs},
 		"/register/student/confirminfo": {"student.html", noArgs},
 		"/register/parent/signforms":    {"parent.html", noArgs},
 	}
@@ -139,11 +140,13 @@ func (a *Application) Start() {
 	}
 
 	// Registration renderers
-	a.TeacherCreateAccountRenderer = a.ServeTemplateExtra(a.Log, "teachercreateaccount.html", a.GetTeacherRegistrationTemplate)
+	a.TeacherLoginRenderer = a.ServeTemplateExtra(a.Log, "teacherlogin.html", noArgs)
+	a.TeacherCreateAccountRenderer = a.ServeTemplateExtra(a.Log, "teachercreateaccount.html", a.GetTeacherCreateAccountTemplate)
 	a.TeacherSchoolInfoRenderer = a.ServeTemplateExtra(a.Log, "schoolinfo.html", a.GetTeacherSchoolInfoTemplate)
 	a.TeacherTeamsRenderer = a.ServeTemplateExtra(a.Log, "teams.html", a.GetTeacherTeamsTemplate)
 	registrationPages := map[string]func(w http.ResponseWriter, r *http.Request, extraData map[string]any){
 		"/register/teacher/createaccount": a.TeacherCreateAccountRenderer,
+		"/register/teacher/login":         a.TeacherLoginRenderer,
 		"/register/teacher/schoolinfo":    a.TeacherSchoolInfoRenderer,
 		"/register/teacher/teams":         a.TeacherTeamsRenderer,
 	}
@@ -157,6 +160,9 @@ func (a *Application) Start() {
 	// Email confirmation code handling
 	a.ConfirmEmailRenderer = a.ServeTemplateExtra(a.Log, "confirmemail.html", noArgs)
 	r.HandleFunc("/register/teacher/confirmemail", a.HandleTeacherEmailConfirmation).Methods(http.MethodGet)
+
+	a.EmailLoginRenderer = a.ServeTemplateExtra(a.Log, "emaillogin.html", noArgs)
+	r.HandleFunc("/register/teacher/emaillogin", a.HandleEmailLogin).Methods(http.MethodGet)
 
 	// Form Post Handlers
 	formHandlers := map[string]func(w http.ResponseWriter, r *http.Request){

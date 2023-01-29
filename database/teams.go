@@ -14,6 +14,7 @@ type Team struct {
 	TeacherEmail string
 	Name         string
 	Division     Division
+	InPerson     bool
 	Members      []Student
 }
 
@@ -24,6 +25,7 @@ type Student struct {
 	ParentEmail             string
 	PreviouslyParticipated  bool
 	EmailConfirmed          bool
+	LiabilitySigned         bool
 	ComputerUseWaiverSigned bool
 	MultimediaReleaseForm   bool
 }
