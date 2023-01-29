@@ -15,7 +15,7 @@
                         HSPC
                     </a>
                 </li>
-                <li class="nav-item">    
+                <li class="nav-item">
                     <a class='nav-link {{ if eq .PageName "rules"}}rules-link-active{{ end }}' id="rules-link" aria-current="page" href="/rules">Rules</a>
                 </li>
                 <li class="nav-item">
@@ -29,6 +29,11 @@
                 </li>
             </ul>
         </div>
+        {{ with .Data.Username }}
+            <div>
+                Welcome <b>{{ . }}</b> | <a href="/logout">Logout</a>
+            </div>
+        {{ end }}
     </div>
 </nav>
 {{ end }}

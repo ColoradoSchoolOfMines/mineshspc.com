@@ -91,6 +91,11 @@ func (a *Application) ServeTemplateExtra(logger *zerolog.Logger, templateName st
 	}
 }
 
+type renderInfo struct {
+	RenderFn           func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
+	RedirectIfLoggedIn bool
+}
+
 func (a *Application) Start() {
 	a.DB.RunMigrations()
 
@@ -124,7 +129,7 @@ func (a *Application) Start() {
 	// Serve static files
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/", http.FileServer(http.FS(staticFS)))).Methods(http.MethodGet)
 
-	// Registration pages
+	// Redirect pages
 	redirects := map[string]string{
 		"/register/teacher": "/register/teacher/createaccount",
 		"/register/student": "/register/student/confirminfo",
@@ -144,17 +149,28 @@ func (a *Application) Start() {
 	a.TeacherCreateAccountRenderer = a.ServeTemplateExtra(a.Log, "teachercreateaccount.html", a.GetTeacherCreateAccountTemplate)
 	a.TeacherSchoolInfoRenderer = a.ServeTemplateExtra(a.Log, "schoolinfo.html", a.GetTeacherSchoolInfoTemplate)
 	a.TeacherTeamsRenderer = a.ServeTemplateExtra(a.Log, "teams.html", a.GetTeacherTeamsTemplate)
-	registrationPages := map[string]func(w http.ResponseWriter, r *http.Request, extraData map[string]any){
-		"/register/teacher/createaccount": a.TeacherCreateAccountRenderer,
-		"/register/teacher/login":         a.TeacherLoginRenderer,
-		"/register/teacher/schoolinfo":    a.TeacherSchoolInfoRenderer,
-		"/register/teacher/teams":         a.TeacherTeamsRenderer,
+	registrationPages := map[string]renderInfo{
+		"/register/teacher/createaccount": {a.TeacherCreateAccountRenderer, true},
+		"/register/teacher/login":         {a.TeacherLoginRenderer, true},
+		"/register/teacher/schoolinfo":    {a.TeacherSchoolInfoRenderer, false},
+		"/register/teacher/teams":         {a.TeacherTeamsRenderer, false},
 	}
-	for path, renderer := range registrationPages {
-		renderFn := func(renderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)) func(w http.ResponseWriter, r *http.Request) {
-			return func(w http.ResponseWriter, r *http.Request) { renderer(w, r, nil) }
+	for path, rend := range registrationPages {
+		renderFn := func(rend renderInfo) func(w http.ResponseWriter, r *http.Request) {
+			return func(w http.ResponseWriter, r *http.Request) {
+				teacher, err := a.GetLoggedInTeacher(r)
+				if rend.RedirectIfLoggedIn && err == nil && teacher != nil {
+					if teacher.SchoolCity == "" || teacher.SchoolName == "" || teacher.SchoolState == "" {
+						http.Redirect(w, r, "/register/teacher/schoolinfo", http.StatusSeeOther)
+					} else {
+						http.Redirect(w, r, "/register/teacher/teams", http.StatusSeeOther)
+					}
+					return
+				}
+				rend.RenderFn(w, r, nil)
+			}
 		}
-		r.HandleFunc(path, renderFn(renderer)).Methods(http.MethodGet)
+		r.HandleFunc(path, renderFn(rend)).Methods(http.MethodGet)
 	}
 
 	// Email confirmation code handling

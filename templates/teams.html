@@ -14,12 +14,12 @@
 <div class="container page-content teacher">
   <div class="row">
     <div class="col m-4 mb-0 text-center">
-      <h4>
-        Welcome <b>{{ .Data.Username }}</b>. These are the teams for <b>{{ .Data.SchoolName }}</b>.
+      <p>
+        These are the teams for <b>{{ .Data.SchoolName }}</b>.
         Click
         <a href="/register/teacher/schoolinfo">here</a>
         to change your school information.
-      </h4>
+      </p>
     </div>
   </div>
   {{ if .Data.Teams }}
