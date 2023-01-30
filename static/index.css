@@ -219,19 +219,20 @@ h3 {
 .register-flow { 
   padding-left: 0;
   list-style: none;
+  padding-bottom: 2%;
 }
 
 .register-item {
+  z-index: 1;
   border-radius: 25px; 
-  background-color: skyblue; 
+  background-color: #0d6efd; 
   color: white;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 2rem;
+  height: 2rem;
+  line-height: 2rem;
+  position: relative;
   display: inline-block;
   text-align: center;
-  line-height: 1.7rem;
-  z-index: 1;
-  position: relative;
 }
 
 .completed {
@@ -239,41 +240,42 @@ h3 {
 }
 
 .register-text-header {
-  margin-left: 1%;
+  margin-left: 0.5%;
 }
 
 .register-text {
   display: block;
-  margin-left: 5%;
+  padding: 20px;
+  margin-top: 1%;
+  margin-left: 3.5%;
+  font-size: 18px;
+  border: 1px solid lightslategray;
+  border-radius: 10px;
 }
 
 .register-flow li {
   position: relative;
-  /* padding-left: 5%; */
   padding-right: 5%;
-  padding-top: 5%;
+  padding-top: 3%;
   margin-left: 3%;
 }
 
-/* .register-flow li::after {
-  top: 4rem;
-  left: 2.9rem;
-  height: calc(100% - 30px);
-  display: block;
-  border-left: 2px solid lightgray;
-  position: absolute;
-  content: "";
-} */
+.register-flow li:last-child {
+  padding-bottom: 2%;
+  border-bottom: 2px solid lightslategray;
+}
+
+.register-flow li:first-child::before {
+  top: 2.5rem;
+}
 
 .register-flow li::before {
-  background-color: black;
+  background-color: lightslategray;
   bottom: 0;
   content: "";
   display: block;
-  /* left: 0; */
-  left: 0.75rem;
   position: absolute;
-  /* top: 0; */
-  top: 5rem;
-  width: var(--primer-borderWidth-thick, 2px);
+  margin-left: 0.9rem;
+  top: 0rem;
+  width: 2px;
 }
