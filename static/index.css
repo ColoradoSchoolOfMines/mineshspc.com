@@ -170,7 +170,6 @@ h3 {
 }
 
 /* Registration Team Page */
-
 .registration-progress {
   display: flex;
   align-items: center;
@@ -214,4 +213,67 @@ h3 {
 .registration-progress .step.completed {
   background-color: #63d19e;
   color: white;
+}
+
+/* Scroll Thingy */
+.register-flow { 
+  padding-left: 0;
+  list-style: none;
+}
+
+.register-item {
+  border-radius: 25px; 
+  background-color: skyblue; 
+  color: white;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: inline-block;
+  text-align: center;
+  line-height: 1.7rem;
+  z-index: 1;
+  position: relative;
+}
+
+.completed {
+  background-color: green !important;
+}
+
+.register-text-header {
+  margin-left: 1%;
+}
+
+.register-text {
+  display: block;
+  margin-left: 5%;
+}
+
+.register-flow li {
+  position: relative;
+  /* padding-left: 5%; */
+  padding-right: 5%;
+  padding-top: 5%;
+  margin-left: 3%;
+}
+
+/* .register-flow li::after {
+  top: 4rem;
+  left: 2.9rem;
+  height: calc(100% - 30px);
+  display: block;
+  border-left: 2px solid lightgray;
+  position: absolute;
+  content: "";
+} */
+
+.register-flow li::before {
+  background-color: black;
+  bottom: 0;
+  content: "";
+  display: block;
+  /* left: 0; */
+  left: 0.75rem;
+  position: absolute;
+  /* top: 0; */
+  top: 5rem;
+  width: var(--primer-borderWidth-thick, 2px);
 }
