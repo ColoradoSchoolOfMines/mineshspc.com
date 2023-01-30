@@ -63,23 +63,23 @@ body {
 }
 
 #faq-link:hover {
-  color: #268282;
-  border-bottom: 5px solid #268282;
-}
-
-.faq-link-active {
-  color: #268282 !important;
-  border-bottom: 5px solid #268282;
-}
-
-#archive-link:hover {
   color: #9B6400;
   border-bottom: 5px solid #9B6400;
 }
 
-.archive-link-active {
+.faq-link-active {
   color: #9B6400 !important;
   border-bottom: 5px solid #9B6400;
+}
+
+#archive-link:hover {
+  color: #268282;
+  border-bottom: 5px solid #268282;
+}
+
+.archive-link-active {
+  color: #268282 !important;
+  border-bottom: 5px solid #268282;
 }
 
 /* Containers */
