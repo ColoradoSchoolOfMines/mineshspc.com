@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"flag"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -35,6 +37,7 @@ func main() {
 
 	// Make sure to exit cleanly
 	c := make(chan os.Signal, 1)
+	healthcheckCtx, healthcheckCancel := context.WithCancel(context.Background())
 	signal.Notify(c,
 		syscall.SIGABRT,
 		syscall.SIGHUP,
@@ -45,6 +48,7 @@ func main() {
 	go func() {
 		for range c { // when the process is killed
 			log.Info().Msg("Cleaning up")
+			healthcheckCancel()
 			db.Close()
 			os.Exit(0)
 		}
@@ -61,6 +65,31 @@ func main() {
 	if err := app.Configuration.Parse(configYaml); err != nil {
 		log.Fatal().Err(err).Msg("Failed to parse config")
 	}
+
+	// Healthcheck loop
+	healthcheckTimer := time.NewTimer(time.Second)
+	healthcheckURL := app.Configuration.HealthcheckURL
+	go func(log *zerolog.Logger) {
+		if healthcheckURL == "" {
+			log.Warn().Msg("Healthcheck URL not set, skipping healthcheck")
+			return
+		}
+		for {
+			select {
+			case <-healthcheckCtx.Done():
+				return
+			case <-healthcheckTimer.C:
+				log.Info().Msg("Sending healthcheck ping")
+				resp, err := http.Get(healthcheckURL)
+				if err != nil {
+					log.Error().Err(err).Msg("Failed to send healtheck ping")
+				} else if resp.StatusCode < 200 || 300 <= resp.StatusCode {
+					log.Error().Int("status", resp.StatusCode).Msg("non-200 status code from healthcheck ping")
+				}
+				healthcheckTimer.Reset(30 * time.Second)
+			}
+		}
+	}(&log)
 
 	app.Start()
 }

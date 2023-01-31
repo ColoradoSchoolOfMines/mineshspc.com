@@ -2,18 +2,20 @@
 
 Source code for the mineshspc.com website.
 
+![healthcheck](https://healthchecks.io/badge/fd6a8ec9-b3da-4bab-983a-183f2d/5Ll6vyEb-2/mineshspc.com.svg)
+
 ## Registration Flow
 
 The following information needs to be gathered:
 
 From teachers:
 
+* Teacher name
+* Teacher email
+
 * School name
 * School city
 * School state
-
-* Teacher name
-* Teacher email
 
 * For each team
 
@@ -28,19 +30,12 @@ From teachers:
 
     * Name
     * Email
+    * Parent's email
     * Have they participated in a previous competition?
-
-From students
-
-* Confirm Name
-* Confirm Email
-* Parent's email
-* Confirm whether they've participated in Mines HSPC in the past
-
-* Kattis Username
-* Interest in campus tour
+    * Interest in campus tour
 
 From students' parents
 
+* Competition waiver
 * Computer use waiver
 * Photo/multimedia release form
