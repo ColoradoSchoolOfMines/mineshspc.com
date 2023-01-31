@@ -25,6 +25,7 @@ func (a *Application) HandleTeacherSchoolInfo(w http.ResponseWriter, r *http.Req
 	user, err := a.GetLoggedInTeacher(r)
 	if err != nil {
 		// TODO indicate that they are logged out
+		log.Error().Err(err).Msg("Failed to get logged in user")
 		http.Redirect(w, r, "/register/teacher/login", http.StatusSeeOther)
 		return
 	}

@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -56,10 +57,22 @@ func (d *Database) GetTeacherBySessionToken(sessionToken uuid.UUID) (*Teacher, e
 			AND s.expires >= ?
 	`, sessionToken.String(), time.Now().UnixMilli())
 
+	var schoolName, schoolCity, schoolState sql.NullString
 	var t Teacher
-	if err := row.Scan(&t.Name, &t.Email, &t.EmailConfirmed, &t.SchoolName, &t.SchoolCity, &t.SchoolState); err != nil {
+	if err := row.Scan(&t.Name, &t.Email, &t.EmailConfirmed, &schoolName, &schoolCity, &schoolState); err != nil {
 		return nil, err
 	}
+
+	if schoolName.Valid {
+		t.SchoolName = schoolName.String
+	}
+	if schoolCity.Valid {
+		t.SchoolCity = schoolCity.String
+	}
+	if schoolState.Valid {
+		t.SchoolState = schoolState.String
+	}
+
 	return &t, nil
 }
 
