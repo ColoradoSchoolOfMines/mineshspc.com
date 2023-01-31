@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/rs/zerolog"
@@ -19,7 +20,10 @@ func main() {
 	flag.Parse()
 
 	// Configure logging
-	log := log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	log := log.Output(os.Stdout)
+	if os.Getenv("LOG_CONSOLE") != "" {
+		log = log.Output(zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339})
+	}
 	log.Info().Msg("mineshspc.com backend starting...")
 
 	// Open the database
