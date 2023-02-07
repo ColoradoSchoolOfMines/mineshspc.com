@@ -158,14 +158,9 @@ func (a *Application) Start() {
 	for path, rend := range registrationPages {
 		renderFn := func(rend renderInfo) func(w http.ResponseWriter, r *http.Request) {
 			return func(w http.ResponseWriter, r *http.Request) {
-				teacher, err := a.GetLoggedInTeacher(r)
-				if err != nil {
-					a.Log.Error().Err(err).Msg("Failed to get logged in teacher")
-					http.Redirect(w, r, "/register/teacher/login", http.StatusSeeOther)
-					return
-				}
-
-				if rend.RedirectIfLoggedIn && err == nil && teacher != nil {
+				if teacher, err := a.GetLoggedInTeacher(r); err != nil {
+					a.Log.Warn().Err(err).Msg("Failed to get logged in teacher")
+				} else if rend.RedirectIfLoggedIn && teacher != nil {
 					if teacher.SchoolCity == "" || teacher.SchoolName == "" || teacher.SchoolState == "" {
 						http.Redirect(w, r, "/register/teacher/schoolinfo", http.StatusSeeOther)
 					} else {
