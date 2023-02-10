@@ -28,12 +28,12 @@
                     <a class='nav-link {{ if eq .PageName "archive"}}archive-link-active{{ end }}' id="archive-link" aria-current="page" href="/archive">Archive</a>
                 </li>
             </ul>
+            {{ with .Data.Username }}
+                <div class="nav-link" style="font-size: 20px; margin-right: 2%;">
+                    Welcome <b>{{ . }}</b> | <a href="/logout">Logout</a>
+                </div>
+            {{ end }}
         </div>
-        {{ with .Data.Username }}
-            <div>
-                Welcome <b>{{ . }}</b> | <a href="/logout">Logout</a>
-            </div>
-        {{ end }}
     </div>
 </nav>
 {{ end }}
