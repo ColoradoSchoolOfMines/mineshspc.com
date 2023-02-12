@@ -34,29 +34,7 @@ func (d *Database) NewTeacherSession(email string, sessionToken uuid.UUID, expir
 	return err
 }
 
-func (d *Database) GetTeacherByEmail(email string) (*Teacher, error) {
-	row := d.Raw.QueryRow(`
-		SELECT t.name, t.email, t.emailconfirmed, t.schoolname, t.schoolcity, t.schoolstate
-		FROM teachers t
-		WHERE t.email = ?
-	`, email)
-
-	var t Teacher
-	if err := row.Scan(&t.Name, &t.Email, &t.EmailConfirmed, &t.SchoolName, &t.SchoolCity, &t.SchoolState); err != nil {
-		return nil, err
-	}
-	return &t, nil
-}
-
-func (d *Database) GetTeacherBySessionToken(sessionToken uuid.UUID) (*Teacher, error) {
-	row := d.Raw.QueryRow(`
-		SELECT t.name, t.email, t.emailconfirmed, t.schoolname, t.schoolcity, t.schoolstate
-		FROM teachers t
-		JOIN sessions s ON s.email = t.email
-		WHERE s.token = ?
-			AND s.expires >= ?
-	`, sessionToken.String(), time.Now().UnixMilli())
-
+func (d *Database) scanTeacher(row Scannable) (*Teacher, error) {
 	var schoolName, schoolCity, schoolState sql.NullString
 	var t Teacher
 	if err := row.Scan(&t.Name, &t.Email, &t.EmailConfirmed, &schoolName, &schoolCity, &schoolState); err != nil {
@@ -74,6 +52,26 @@ func (d *Database) GetTeacherBySessionToken(sessionToken uuid.UUID) (*Teacher, e
 	}
 
 	return &t, nil
+}
+
+func (d *Database) GetTeacherByEmail(email string) (*Teacher, error) {
+	row := d.Raw.QueryRow(`
+		SELECT t.name, t.email, t.emailconfirmed, t.schoolname, t.schoolcity, t.schoolstate
+		FROM teachers t
+		WHERE t.email = ?
+	`, email)
+	return d.scanTeacher(row)
+}
+
+func (d *Database) GetTeacherBySessionToken(sessionToken uuid.UUID) (*Teacher, error) {
+	row := d.Raw.QueryRow(`
+		SELECT t.name, t.email, t.emailconfirmed, t.schoolname, t.schoolcity, t.schoolstate
+		FROM teachers t
+		JOIN sessions s ON s.email = t.email
+		WHERE s.token = ?
+			AND s.expires >= ?
+	`, sessionToken.String(), time.Now().UnixMilli())
+	return d.scanTeacher(row)
 }
 
 func (d *Database) SetTeacherSchoolInfo(email, schoolName, schoolCity, schoolState string) error {

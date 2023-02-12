@@ -7,6 +7,10 @@ import (
 	"github.com/rs/zerolog"
 )
 
+type Scannable interface {
+	Scan(dest ...interface{}) error
+}
+
 type Database struct {
 	Raw *sql.DB
 	Log *zerolog.Logger
@@ -45,13 +49,14 @@ func (d *Database) RunMigrations() {
 		`,
 		`
 			CREATE TABLE IF NOT EXISTS teams (
-				id           TEXT NOT NULL PRIMARY KEY,
-				teacheremail TEXT NOT NULL,
-				name         TEXT NOT NULL,
-				division     TEXT NOT NULL,
-				inperson     BOOLEAN NOT NULL,
+				id                  TEXT NOT NULL,
+				teacheremail        TEXT NOT NULL,
+				name                TEXT NOT NULL,
+				division            TEXT NOT NULL,
+				divisionexplanation TEXT NOT NULL,
+				inperson            BOOLEAN NOT NULL,
 
-				UNIQUE (teacheremail, name, division)
+				PRIMARY KEY (id, teacheremail)
 			);
 		`,
 		`

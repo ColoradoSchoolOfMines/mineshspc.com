@@ -10,6 +10,16 @@ import (
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
+func (a *Application) GetEmailLoginTemplate(r *http.Request) map[string]any {
+	emailCookie, err := r.Cookie("email")
+	if err != nil {
+		return nil
+	}
+	return map[string]any{
+		"Email": emailCookie.Value,
+	}
+}
+
 func (a *Application) HandleTeacherLogin(w http.ResponseWriter, r *http.Request) {
 	log := a.Log.With().Str("page_name", "teacher_create_account").Logger()
 	if err := r.ParseForm(); err != nil {

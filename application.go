@@ -37,9 +37,6 @@ type Application struct {
 	TeacherRegistrationCaptchas  map[uuid.UUID]string
 	TeacherCreateAccountRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 
-	TeacherSchoolInfoRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
-	TeacherTeamsRenderer      func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
-
 	SendGridClient *sendgrid.Client
 }
 
@@ -145,15 +142,17 @@ func (a *Application) Start() {
 	}
 
 	// Registration renderers
-	a.TeacherLoginRenderer = a.ServeTemplateExtra(a.Log, "teacherlogin.html", noArgs)
+	a.TeacherLoginRenderer = a.ServeTemplateExtra(a.Log, "teacherlogin.html", a.GetEmailLoginTemplate)
 	a.TeacherCreateAccountRenderer = a.ServeTemplateExtra(a.Log, "teachercreateaccount.html", a.GetTeacherCreateAccountTemplate)
-	a.TeacherSchoolInfoRenderer = a.ServeTemplateExtra(a.Log, "schoolinfo.html", a.GetTeacherSchoolInfoTemplate)
-	a.TeacherTeamsRenderer = a.ServeTemplateExtra(a.Log, "teams.html", a.GetTeacherTeamsTemplate)
+	a.ConfirmEmailRenderer = a.ServeTemplateExtra(a.Log, "confirmemail.html", a.GetEmailLoginTemplate)
+	a.EmailLoginRenderer = a.ServeTemplateExtra(a.Log, "emaillogin.html", a.GetEmailLoginTemplate)
 	registrationPages := map[string]renderInfo{
-		"/register/teacher/createaccount": {a.TeacherCreateAccountRenderer, true},
-		"/register/teacher/login":         {a.TeacherLoginRenderer, true},
-		"/register/teacher/schoolinfo":    {a.TeacherSchoolInfoRenderer, false},
-		"/register/teacher/teams":         {a.TeacherTeamsRenderer, false},
+		"/register/teacher/confirmemail":  {a.ConfirmEmailRenderer, true},
+		"/register/teacher/createaccount": {a.TeacherCreateAccountRenderer, false},
+		"/register/teacher/login":         {a.TeacherLoginRenderer, false},
+		"/register/teacher/schoolinfo":    {a.ServeTemplateExtra(a.Log, "schoolinfo.html", a.GetTeacherSchoolInfoTemplate), false},
+		"/register/teacher/teams":         {a.ServeTemplateExtra(a.Log, "teams.html", a.GetTeacherTeamsTemplate), false},
+		"/register/teacher/team/edit":     {a.ServeTemplateExtra(a.Log, "teamedit.html", a.GetTeacherTeamEditTemplate), false},
 	}
 	for path, rend := range registrationPages {
 		renderFn := func(rend renderInfo) func(w http.ResponseWriter, r *http.Request) {
@@ -175,15 +174,15 @@ func (a *Application) Start() {
 	}
 
 	// Email confirmation code handling
-	a.ConfirmEmailRenderer = a.ServeTemplateExtra(a.Log, "confirmemail.html", noArgs)
-	a.EmailLoginRenderer = a.ServeTemplateExtra(a.Log, "emaillogin.html", noArgs)
 	r.HandleFunc("/register/teacher/emaillogin", a.HandleTeacherEmailLogin).Methods(http.MethodGet)
+	r.HandleFunc("/register/teacher/logout", a.HandleTeacherLogout).Methods(http.MethodGet)
 
 	// Form Post Handlers
 	formHandlers := map[string]func(w http.ResponseWriter, r *http.Request){
 		"/register/teacher/login":         a.HandleTeacherLogin,
 		"/register/teacher/createaccount": a.HandleTeacherCreateAccount,
 		"/register/teacher/schoolinfo":    a.HandleTeacherSchoolInfo,
+		"/register/teacher/team/edit":     a.HandleTeacherTeamEdit,
 	}
 	for path, fn := range formHandlers {
 		r.HandleFunc(path, fn).Methods(http.MethodPost)

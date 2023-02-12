@@ -1,0 +1,147 @@
+{{- define "title" -}}
+  {{- with .Data.Team -}}
+    Edit Team: {{ .Name }}
+  {{- else -}}
+    Create Team
+  {{- end -}}
+{{- end -}}
+
+{{ define "content" }}
+<div class="container page-header">
+  <div class="row">
+    <div class="col-md-2">
+      <a href="/register/teacher/teams" class="btn btn-primary">
+        <i class="fa fa-arrow-left"></i>
+        Back
+      </a>
+    </div>
+    <div class="col-md-8">
+      <div class="header">
+        <h1>
+          {{- with .Data.Team -}}
+            Edit Team: {{ .Name }}
+          {{- else -}}
+            Create Team
+          {{- end -}}
+        </h1>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container page-content teacher">
+  <form method="post" action="/register/teacher/team/edit{{ with .Data.Team }}?team_id={{ .ID }}{{ end }}"
+        class="form-floating {{ if .Data.Validated }}was-validated{{ end }}">
+    {{ with .Data.Error.General }}
+      <div class="alert alert-danger" role="alert">
+        {{ . }}
+      </div>
+    {{ end }}
+    <div class="row">
+      <div class="col text-center m-4">
+        <div class="alert alert-secondary" role="alert">
+          Questions? Email
+          <a href="mailto:admin@mineshspc.com">admin@mineshspc.com</a>.
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col m-4 mt-0">
+        <div class="card">
+          <h4 class="card-header">Team Information</h4>
+          <div class="card-body">
+            <div class="row mb-2">
+              <div class="col">
+                <div class="form-floating">
+                  <input type="text" class="form-control col-12" name="team-name" id="team-name"
+                    placeholder="Team Name" required
+                    {{ with .Data.Team }}value="{{ .Name }}"{{ end }}
+                  />
+                  <label for="team-name">Team Name</label>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                This team will compete
+                <div class="btn-group" role="group" aria-label="Select team division">
+                  <input type="radio" class="btn-check" name="team-location"
+                    value="in-person" id="in-person" autocomplete="off"
+                    {{ with .Data.Team }}{{ if .InPerson }}checked{{ end }}{{ end }}>
+                  <label class="btn btn-outline-primary" for="in-person">in person</label>
+
+                  <input type="radio" class="btn-check" name="team-location"
+                    value="remote" id="remote" autocomplete="off"
+                    {{ with .Data.Team }}{{ if not .InPerson }}checked{{ end }}{{ end }}>
+                  <label class="btn btn-outline-primary" for="remote">remotely</label>
+                </div>
+                <p class="text-secondary small">
+                  In-person competitors will have the opportunity to do a campus tour after the
+                  competition.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col m-4 mt-0">
+        <div class="card">
+          <h4 class="card-header">Team Division</h4>
+          <div class="card-body">
+            <div class="row mb-2">
+              <div class="col-md-12">
+                <div class="btn-group" role="group" aria-label="Select team division">
+                  <input type="radio" class="btn-check" name="team-division"
+                    value="beginner" id="beginner" autocomplete="off"
+                    {{ with .Data.Team }}{{ if eq .Division "beginner" }}checked{{ end }}{{ end }}>
+                  <label class="btn btn-outline-primary" for="beginner">
+                    <h5>Beginner</h5>
+                    <p>
+                      For students who have never competed in HSPC before and who do not know about
+                      data structures or algorithms.
+                    </p>
+                    <p>TODO ADD BETTER PROSE HERE</p>
+                  </label>
+
+                  <input type="radio" class="btn-check" name="team-division"
+                    value="advanced" id="advanced" autocomplete="off"
+                    {{ with .Data.Team }}{{ if eq .Division "advanced" }}checked{{ end }}{{ end }}>
+                  <label class="btn btn-outline-primary" for="advanced">
+                    <h5>Advanced</h5>
+                    <p>
+                      For students who know anything about data structures or algorithms.
+                    </p>
+                    <p>TODO ADD BETTER PROSE HERE</p>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-12">
+                <label for="team-division-explanation" class="form-label">
+                  Why do you think that the division you selected is the best fit for this team?
+                </label>
+                <textarea class="form-control" name="team-division-explanation"
+                  id="team-division-explanation" rows="4" required>{{ with .Data.Team }}{{ .DivisionExplanation }}{{ end }}</textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row text-center pb-4">
+      <div class="col-md-12">
+        <button type="submit" class="btn btn-lg btn-primary">
+          {{- if .Data.Team -}}
+            Save Team
+          {{- else -}}
+            Create Team
+          {{- end -}}
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+{{ end }}
