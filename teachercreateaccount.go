@@ -127,7 +127,7 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 
 	templateData := map[string]any{
 		"Name":       name,
-		"ConfirmURL": fmt.Sprintf("https://mineshspc.com/register/teacher/confirmemail?login_code=%s", a.CreateLoginCode(emailAddress)),
+		"ConfirmURL": fmt.Sprintf("https://mineshspc.com/register/teacher/emaillogin?login_code=%s", a.CreateLoginCode(emailAddress)),
 	}
 
 	var plainTextContent, htmlContent strings.Builder
@@ -159,7 +159,7 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 	}
 }
 
-func (a *Application) HandleTeacherEmailConfirmation(w http.ResponseWriter, r *http.Request) {
+func (a *Application) HandleTeacherEmailLogin(w http.ResponseWriter, r *http.Request) {
 	emailCookie, err := r.Cookie("email")
 	if err != nil {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -201,5 +201,16 @@ func (a *Application) HandleTeacherEmailConfirmation(w http.ResponseWriter, r *h
 		return
 	}
 	http.SetCookie(w, &http.Cookie{Name: "session_id", Value: sessionID.String(), Path: "/", Expires: expires})
-	http.Redirect(w, r, "/register/teacher/schoolinfo", http.StatusSeeOther)
+
+	teacher, err := a.DB.GetTeacherByEmail(emailCookie.Value)
+	if err != nil {
+		a.Log.Error().Err(err).Msg("failed to get teacher from DB")
+		return
+	}
+
+	if teacher.SchoolName == "" || teacher.SchoolCity == "" || teacher.SchoolState == "" {
+		http.Redirect(w, r, "/register/teacher/schoolinfo", http.StatusSeeOther)
+	} else {
+		http.Redirect(w, r, "/register/teacher/teams", http.StatusSeeOther)
+	}
 }

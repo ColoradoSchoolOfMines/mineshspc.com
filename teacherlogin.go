@@ -6,9 +6,7 @@ import (
 	"net/http"
 	"strings"
 	texttemplate "text/template"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
@@ -80,56 +78,5 @@ func (a *Application) HandleTeacherLogin(w http.ResponseWriter, r *http.Request)
 			Msg("successfully sent email")
 		http.SetCookie(w, &http.Cookie{Name: "email", Value: emailAddress, Path: "/"})
 		http.Redirect(w, r, "/register/teacher/emaillogin", http.StatusSeeOther)
-	}
-}
-
-func (a *Application) HandleEmailLogin(w http.ResponseWriter, r *http.Request) {
-	emailCookie, err := r.Cookie("email")
-	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
-
-	// If there is no login code, then this was a redirect from the login/create account page.
-	loginCode := r.URL.Query().Get("login_code")
-	if loginCode == "" {
-		a.EmailLoginRenderer(w, r, map[string]any{"Email": emailCookie.Value})
-		return
-	}
-
-	// Verify the login code and give them a session.
-	if loginCodeUUID, err := uuid.Parse(loginCode); err != nil {
-		a.Log.Error().Err(err).Msg("failed to parse login code")
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	} else if storedLoginCode, ok := a.LoginCodes[emailCookie.Value]; !ok || storedLoginCode != loginCodeUUID {
-		a.Log.Error().Err(err).Msg("invalid login code")
-		a.EmailLoginRenderer(w, r, map[string]any{
-			"Error": "Invalid or expired login code",
-		})
-		return
-	} else {
-		delete(a.LoginCodes, emailCookie.Value)
-	}
-
-	sessionID := uuid.New()
-	expires := time.Now().AddDate(0, 0, 1)
-	err = a.DB.NewTeacherSession(emailCookie.Value, sessionID, expires)
-	if err != nil {
-		a.Log.Error().Err(err).Msg("failed to create new teacher session")
-		return
-	}
-	http.SetCookie(w, &http.Cookie{Name: "session_id", Value: sessionID.String(), Path: "/", Expires: expires})
-
-	teacher, err := a.DB.GetTeacherByEmail(emailCookie.Value)
-	if err != nil {
-		a.Log.Error().Err(err).Msg("failed to get teacher from DB")
-		return
-	}
-
-	if teacher.SchoolName == "" || teacher.SchoolCity == "" || teacher.SchoolState == "" {
-		http.Redirect(w, r, "/register/teacher/schoolinfo", http.StatusSeeOther)
-	} else {
-		http.Redirect(w, r, "/register/teacher/teams", http.StatusSeeOther)
 	}
 }

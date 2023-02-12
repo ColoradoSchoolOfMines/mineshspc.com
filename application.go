@@ -176,10 +176,8 @@ func (a *Application) Start() {
 
 	// Email confirmation code handling
 	a.ConfirmEmailRenderer = a.ServeTemplateExtra(a.Log, "confirmemail.html", noArgs)
-	r.HandleFunc("/register/teacher/confirmemail", a.HandleTeacherEmailConfirmation).Methods(http.MethodGet)
-
 	a.EmailLoginRenderer = a.ServeTemplateExtra(a.Log, "emaillogin.html", noArgs)
-	r.HandleFunc("/register/teacher/emaillogin", a.HandleEmailLogin).Methods(http.MethodGet)
+	r.HandleFunc("/register/teacher/emaillogin", a.HandleTeacherEmailLogin).Methods(http.MethodGet)
 
 	// Form Post Handlers
 	formHandlers := map[string]func(w http.ResponseWriter, r *http.Request){
