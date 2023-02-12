@@ -5,6 +5,9 @@ token.json
 # Executables
 mineshspc.com
 
+# Database
+mineshspc.db
+
 # Generated files by hugo
 /frontend/public/
 /frontend/resources/_gen/
