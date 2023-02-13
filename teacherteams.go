@@ -3,8 +3,9 @@ package main
 import (
 	"net/http"
 
-	"github.com/ColoradoSchoolOfMines/mineshspc.com/database"
 	"github.com/google/uuid"
+
+	"github.com/ColoradoSchoolOfMines/mineshspc.com/database"
 )
 
 func (a *Application) GetTeacherTeamsTemplate(r *http.Request) map[string]any {

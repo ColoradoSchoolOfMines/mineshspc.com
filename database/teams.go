@@ -54,6 +54,9 @@ func (d *Database) scanTeam(row Scannable) (*Team, error) {
 
 func (d *Database) scanTeamWithStudents(row Scannable) (*Team, error) {
 	team, err := d.scanTeam(row)
+	if err != nil {
+		return nil, err
+	}
 
 	studentRows, err := d.Raw.Query(`
 		SELECT s.email, s.name, s.parentemail, s.previouslyparticipated, s.emailconfirmed,
