@@ -124,6 +124,10 @@ h3 {
   font-weight: bold;
 }
 
+.hero .csam-logo {
+  max-height: 50px;
+}
+
 /* Content */
 .content .page-header {
   text-align: center;

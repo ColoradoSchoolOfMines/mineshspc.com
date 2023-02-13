@@ -36,14 +36,16 @@
               <div class="accordion-body">
                 {{- range $j, $t := .Teams -}}
                 <li class="list-group-item">
-                  {{ if eq $j 0 }}
-                  <i class="fa fa-trophy" style="color: #FFD700;" role="img" aria-label="Trophy"></i>
-                  {{ else if eq $j 1 }}
-                  <i class="fa fa-trophy" style="color: #C0C0C0;" role="img" aria-label="Trophy"></i>
-                  {{ else }}
-                  <i class="fa fa-trophy" style="color: #CD7F32;" role="img" aria-label="Trophy"></i>
-                  {{ end }}
-                  <span class="badge bg-primary rounded-pill">{{ .Place }}</span>
+                  <span class="badge bg-primary rounded-pill">
+                    {{ if eq $j 0 }}
+                    <i class="fa fa-trophy" style="color: #FFD700;" role="img" aria-label="Trophy"></i>
+                    {{ else if eq $j 1 }}
+                    <i class="fa fa-trophy" style="color: #C0C0C0;" role="img" aria-label="Trophy"></i>
+                    {{ else }}
+                    <i class="fa fa-trophy" style="color: #CD7F32;" role="img" aria-label="Trophy"></i>
+                    {{ end }}
+                    {{ .Place }}
+                  </span>
                   <strong>{{ .Name }}</strong>
                   <p class="mb-1 text-secondary">
                     {{ .School }} &bull; {{ .Location }}
@@ -76,16 +78,4 @@
     </div>
   {{- end -}}
 </div>
-<script src="https://code.jquery.com/jquery-3.6.3.slim.min.js" integrity="sha256-ZwqZIVdD3iXNyGHbSYdsmWP//UBokj2FHAxKuSBKDSo=" crossorigin="anonymous"></script>
-<script>
-// $(document).ready(() => {
-//   const button = $('#test');
-//   const target = $('#collapseThree');
-//   button.on('click', () => {
-//     // target.toggleClass('d-none');
-//     console.log("hello")
-//     target.toggleClass('show');
-//   })
-// })
-</script>
 {{ end }}
