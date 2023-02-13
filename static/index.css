@@ -203,6 +203,15 @@ footer.footer .mines-logo {
   margin-block-end: 0.5em;
 }
 
+/* .collapse:not(.show) {
+
+} */
+
+.collapse:not(.show) {
+  /* display: flex; */
+  /* visibility: visible; */
+}
+
 /* Registration Team Page */
 .registration-progress {
   display: flex;

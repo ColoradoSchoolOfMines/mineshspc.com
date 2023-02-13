@@ -16,7 +16,7 @@
   </div>
 </div>
 
-<div class="container page-content archive pb-4">
+<div class="container page-content archive pb-5">
   {{- range $y := .Data.YearInfo -}}
     <div class="row">
       <div class="col mt-4 mx-4">
@@ -52,9 +52,7 @@
                         <i class="fa fa-trophy" style="color: #FFD700;" role="img" aria-label="Trophy"></i>
                         {{ else if eq $j 1 }}
                         <i class="fa fa-trophy" style="color: #C0C0C0;" role="img" aria-label="Trophy"></i>
-                        {{ else if eq $j 2 }}
-                        <i class="fa fa-trophy" style="color: #CD7F32;" role="img" aria-label="Trophy"></i>
-                        {{ else if eq $j 3 }}
+                        {{ else }}
                         <i class="fa fa-trophy" style="color: #CD7F32;" role="img" aria-label="Trophy"></i>
                         {{ end }}
                         <span class="badge bg-primary rounded-pill">{{ .Place }}</span>
@@ -72,11 +70,21 @@
         </div>
       </div>
     </div>
-    <div class="row m-4">
-      <div style="display: inline-block;">
-        {{- range .Links -}}
-        &bull; <a href="{{ .URL }}", target="_blank">{{- .Title -}}</a>
+    <div class="row">
+      <div class="col mx-4">
+        {{ $length := len .Links }}
+        {{- range $j, $r := .Links -}}
+        <a href="{{ .URL }}", target="_blank">{{- .Title -}}</a>
+        {{ if gt $length 1 }}
+        {{ if eq $j 0 }}
+        &bull;
+        {{ else if eq $j 1 }}
+          {{ if eq $length 3 }}
+            &bull;
+          {{ end }}
+        {{ end }}
         {{- end -}}
+        {{ end }}
       </div>
     </div>
   {{- end -}}
