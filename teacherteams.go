@@ -104,6 +104,20 @@ func (a *Application) HandleTeacherTeamEdit(w http.ResponseWriter, r *http.Reque
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+
+		// Verify that the in-person-ness of the team did not change
+		team, err := a.DB.GetTeam(user.Email, teamIDStr)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to get team")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		if team.InPerson != inPerson {
+			log.Error().Err(err).Msg("Cannot change in-person status of team")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 	}
 
 	if err := a.DB.UpsertTeam(user.Email, teamID, teamName, teamDivision, inPerson, teamDivisionExplanation); err != nil {

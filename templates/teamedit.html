@@ -67,17 +67,21 @@
                 <div class="btn-group" role="group" aria-label="Select team division">
                   <input type="radio" class="btn-check" name="team-location"
                     value="in-person" id="in-person" autocomplete="off" required
-                    {{ with .Data.Team }}{{ if .InPerson }}checked{{ end }}{{ end }}>
+                    {{ with .Data.Team }}{{ if .InPerson }}checked{{ end }} disabled{{ end }}>
                   <label class="btn btn-outline-primary" for="in-person">in person</label>
 
                   <input type="radio" class="btn-check" name="team-location"
                     value="remote" id="remote" autocomplete="off" required
-                    {{ with .Data.Team }}{{ if not .InPerson }}checked{{ end }}{{ end }}>
+                    {{ with .Data.Team }}{{ if not .InPerson }}checked{{ end }} disabled{{ end }}>
                   <label class="btn btn-outline-primary" for="remote">remotely</label>
                 </div>
                 <div class="form-text">
                   In-person competitors will have the opportunity to do a campus tour after the
                   competition.
+                  {{ with .Data.Team -}}
+                    If you need to change this, please email
+                    <a href="mailto:admin@mineshspc.com">admin@mineshspc.com</a>.
+                  {{- end -}}
                 </div>
               </div>
             </div>
