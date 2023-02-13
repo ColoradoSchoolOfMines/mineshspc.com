@@ -9,7 +9,7 @@
         Since 2018, the CS@Mines High School Programming
         Competition has provided high school students an opportunity to
         demonstrate their programming and problem solving skills in a
-        competitive environment. For more information on all of our competitions 
+        competitive environment. For more information on all of our competitions
         and past problems, view <a href="https://sumnerevans.com/tags/high-school-programming-competition/" target="_blank">competition summaries</a>.
       </p>
     </div>
@@ -25,13 +25,20 @@
       </div>
     </div>
     <div class="row m-4">
-      <div class="col-md-6">
+
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            {{- range .Links -}}
+            <li class="breadcrumb-item"><a href="{{ .URL }}", target="_blank">{{- .Title -}}</a></li>
+            {{- end -}}
+          </ol>
+        </nav>
+        <!-- <a href="{{ .URL }}" target="_blank" class="btn btn-outline-primary">{{- .Title -}}</a> -->
+
+      <!-- <div class="col-md-6">
         <div class="d-grid gap-2">
-          {{- range .Links -}}
-            <a href="{{ .URL }}" target="_blank" class="btn btn-outline-primary">{{- .Title -}}</a>
-          {{- end -}}
         </div>
-      </div>
+      </div> -->
       <div class="col-md-6">
         <div class="accordion" id="winners{{ .Year }}">
           {{- range $i, $r := .Results -}}
@@ -50,20 +57,18 @@
               </h2>
               <div
                 id="winners{{ $y.Year }}{{ .Name }}"
-                class="accordion-collapse collapse {{ if eq $i 0 }}show{{ end }}"
+                class="accordion-collapse collapse"
                 aria-labelledby="heading{{ $y.Year }}{{ .Name }}"
                 data-bs-parent="#winners{{ $y.Year }}">
                 <div class="accordion-body p-0">
                   <ul class="list-group list-group-flush">
-                    {{- range .Teams -}}
-                      <li class="list-group-item">
-                        <div class="d-flex w-100 justify-content-between">
-                          <h5 class="mb-1">{{ .Name }}</h5>
-                          <strong>
-                            <i class="bi bi-trophy-fill" role="img" aria-label="Trophy"></i>
-                            {{ .Place }} Place
-                          </strong>
-                        </div>
+                    {{- range $j, $t := .Teams -}}
+                    <li class="list-group-item">
+
+                        <!-- 1st: gold, second: C0C0C0 -->
+                        <i class="fa fa-trophy" style="color: #FFD700;" role="img" aria-label="Trophy"></i>
+                        <span class="badge bg-primary rounded-pill">{{ .Place }}</span>
+                        <strong>{{ .Name }}</strong>
                         <p class="mb-1 text-secondary">
                           {{ .School }} &bull; {{ .Location }}
                         </p>
