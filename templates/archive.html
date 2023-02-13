@@ -23,29 +23,13 @@
           <h2>{{ .Year }}</h2>
           {{- range .RecapParagraphs -}}<p>{{ . }}</p>{{- end -}}
       </div>
-    </div>
-    <div class="row m-4">
-
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb">
-            {{- range .Links -}}
-            <li class="breadcrumb-item"><a href="{{ .URL }}", target="_blank">{{- .Title -}}</a></li>
-            {{- end -}}
-          </ol>
-        </nav>
-        <!-- <a href="{{ .URL }}" target="_blank" class="btn btn-outline-primary">{{- .Title -}}</a> -->
-
-      <!-- <div class="col-md-6">
-        <div class="d-grid gap-2">
-        </div>
-      </div> -->
-      <div class="col-md-6">
+      <div class="col-md-6 mt-5 pt-3">
         <div class="accordion" id="winners{{ .Year }}">
           {{- range $i, $r := .Results -}}
             <div class="accordion-item">
               <h2 class="accordion-header" id="heading{{ $y.Year }}{{ .Name }}">
                 <button
-                  class="accordion-button {{ if gt $i 0 }}collapsed{{ end }}"
+                  class="accordion-button collapsed"
                   type="button"
                   data-bs-toggle="collapse"
                   data-bs-target="#winners{{ $y.Year }}{{ .Name }}"
@@ -64,9 +48,15 @@
                   <ul class="list-group list-group-flush">
                     {{- range $j, $t := .Teams -}}
                     <li class="list-group-item">
-
-                        <!-- 1st: gold, second: C0C0C0 -->
+                        {{ if eq $j 0 }}
                         <i class="fa fa-trophy" style="color: #FFD700;" role="img" aria-label="Trophy"></i>
+                        {{ else if eq $j 1 }}
+                        <i class="fa fa-trophy" style="color: #C0C0C0;" role="img" aria-label="Trophy"></i>
+                        {{ else if eq $j 2 }}
+                        <i class="fa fa-trophy" style="color: #CD7F32;" role="img" aria-label="Trophy"></i>
+                        {{ else if eq $j 3 }}
+                        <i class="fa fa-trophy" style="color: #CD7F32;" role="img" aria-label="Trophy"></i>
+                        {{ end }}
                         <span class="badge bg-primary rounded-pill">{{ .Place }}</span>
                         <strong>{{ .Name }}</strong>
                         <p class="mb-1 text-secondary">
@@ -80,6 +70,13 @@
             </div>
           {{- end -}}
         </div>
+      </div>
+    </div>
+    <div class="row m-4">
+      <div style="display: inline-block;">
+        {{- range .Links -}}
+        &bull; <a href="{{ .URL }}", target="_blank">{{- .Title -}}</a>
+        {{- end -}}
       </div>
     </div>
   {{- end -}}
