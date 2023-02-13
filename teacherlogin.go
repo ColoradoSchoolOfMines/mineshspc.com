@@ -45,7 +45,7 @@ func (a *Application) HandleTeacherLogin(w http.ResponseWriter, r *http.Request)
 		})
 		return
 	} else if !teacher.EmailConfirmed {
-		log.Error().Err(err).Msg("teacher email not confirmed, not sending login code to avoid mirror attacks")
+		log.Error().Err(err).Msg("teacher email not confirmed, not sending login code to avoid amplification attacks")
 		a.TeacherLoginRenderer(w, r, map[string]any{
 			"Email":             emailAddress,
 			"EmailNotConfirmed": true,
