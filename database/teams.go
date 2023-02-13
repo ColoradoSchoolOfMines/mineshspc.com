@@ -1,13 +1,28 @@
 package database
 
-import "github.com/google/uuid"
+import (
+	"fmt"
+
+	"github.com/google/uuid"
+)
 
 type Division string
 
 const (
-	DivisionBeginner Division = "beginner"
-	DivisionAdvanced Division = "advanced"
+	DivisionBeginner Division = "Beginner"
+	DivisionAdvanced Division = "Advanced"
 )
+
+func ParseDivision(s string) (Division, error) {
+	switch s {
+	case "Beginner":
+		return DivisionBeginner, nil
+	case "Advanced":
+		return DivisionAdvanced, nil
+	default:
+		return "", fmt.Errorf("invalid division: %s", s)
+	}
+}
 
 type Team struct {
 	ID                  uuid.UUID

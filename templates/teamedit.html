@@ -94,8 +94,8 @@
               <div class="col-md-12">
                 <div class="btn-group" role="group" aria-label="Select team division">
                   <input type="radio" class="btn-check" name="team-division"
-                    value="beginner" id="beginner" autocomplete="off"
-                    {{ with .Data.Team }}{{ if eq .Division "beginner" }}checked{{ end }}{{ end }}>
+                    value="Beginner" id="beginner" autocomplete="off"
+                    {{ with .Data.Team }}{{ if eq .Division "Beginner" }}checked{{ end }}{{ end }}>
                   <label class="btn w-100 btn-outline-primary" for="beginner">
                     <h4>Beginner</h4>
                     <p>
@@ -106,8 +106,8 @@
                   </label>
 
                   <input type="radio" class="btn-check" name="team-division"
-                    value="advanced" id="advanced" autocomplete="off"
-                    {{ with .Data.Team }}{{ if eq .Division "advanced" }}checked{{ end }}{{ end }}>
+                    value="Advanced" id="advanced" autocomplete="off"
+                    {{ with .Data.Team }}{{ if eq .Division "Advanced" }}checked{{ end }}{{ end }}>
                   <label class="btn w-100 btn-outline-primary" for="advanced">
                     <h4>Advanced</h4>
                     <p>
