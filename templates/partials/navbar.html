@@ -29,8 +29,8 @@
                 </li>
             </ul>
             {{ with .Data.Username }}
-                <div class="nav-link" style="font-size: 20px; margin-right: 2%;">
-                    Welcome <b>{{ . }}</b> | <a href="/register/teacher/logout">Logout</a>
+                <div class="logged-in-user nav-link small text-secondary me-4">
+                    Welcome <a href="/register/teacher/teams">{{ . }}</a> <span class="sep">|</span> <a href="/register/teacher/logout">Logout</a>
                 </div>
             {{ end }}
         </div>

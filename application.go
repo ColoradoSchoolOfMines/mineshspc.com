@@ -76,14 +76,18 @@ func (a *Application) ServeTemplateExtra(logger *zerolog.Logger, templateName st
 		for k, v := range extraData {
 			data[k] = v
 		}
+		user, err := a.GetLoggedInTeacher(r)
+		if err == nil {
+			data["Username"] = user.Name
+		}
+
 		templateData := map[string]any{
 			"PageName":     parts[0],
 			"Data":         data,
 			"HostedByHTML": a.Configuration.HostedByHTML,
 		}
 		log.Trace().Interface("template_data", templateData).Msg("serving template")
-		err := template.ExecuteTemplate(w, "base.html", templateData)
-		if err != nil {
+		if err := template.ExecuteTemplate(w, "base.html", templateData); err != nil {
 			log.Error().Err(err).Msg("Failed to execute the template")
 		}
 	}

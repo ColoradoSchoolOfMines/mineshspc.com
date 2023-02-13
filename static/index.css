@@ -7,8 +7,24 @@
   font-style: bold;
 }
 
+html {
+  background-color: #AAAAAA;
+}
+
 body {
   background-color: rgba(256, 256, 256, 0.7);
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a.btn:hover {
+  text-decoration: none;
 }
 
 /* Navigation */
@@ -17,15 +33,11 @@ body {
   background-color: white;
 }
 
-.navbar-brand {
+.navbar .navbar-brand {
   color: #24314b;
-  padding-bottom: 0.75rem;
-  padding-top: 0;
-  font-size: 25px;
-  font-family: "Montserrat", sans-serif;
 }
 
-.nav-link {
+.navbar .nav-link {
   color: #24314b;
   font-size: 25px;
   height: 100%;
@@ -33,60 +45,64 @@ body {
   font-family: "Montserrat", sans-serif;
 }
 
-.home-link-active {
+.navbar a.nav-link:hover {
+  text-decoration: none;
+}
+
+.navbar .nav-link.small {
+  font-size: .875em;
+}
+
+.navbar .home-link-active {
   border-bottom: 5px solid #24314b;
 }
 
-#home-link:hover {
+.navbar #home-link:hover {
   color: #24314b;
   border-bottom: 5px solid #24314b;
 }
 
-#rules-link:hover {
+.navbar #rules-link:hover {
   color: #B44A88;
   border-bottom: 5px solid #B44A88;
 }
 
-.rules-link-active {
+.navbar .rules-link-active {
   color: #B44A88 !important;
   border-bottom: 5px solid #B44A88;
 }
 
-#registration-link:hover {
+.navbar #registration-link:hover {
   color: #008234;
   border-bottom: 5px solid #008234;
 }
 
-.registration-link-active {
+.navbar .registration-link-active {
   color: #008234 !important;
   border-bottom: 5px solid #008234;
 }
 
-#faq-link:hover {
+.navbar #faq-link:hover {
   color: #9B6400;
   border-bottom: 5px solid #9B6400;
 }
 
-.faq-link-active {
+.navbar .faq-link-active {
   color: #9B6400 !important;
   border-bottom: 5px solid #9B6400;
 }
 
-#archive-link:hover {
+.navbar #archive-link:hover {
   color: #268282;
   border-bottom: 5px solid #268282;
 }
 
-.archive-link-active {
+.navbar .archive-link-active {
   color: #268282 !important;
   border-bottom: 5px solid #268282;
 }
 
 /* Containers */
-.container-fluid {
-  padding-top: 0.75rem;
-}
-
 .archive-row {
   background-color: white;
   padding-left: 25px;
@@ -145,10 +161,6 @@ h3 {
 .content .page-content.teams,
 .content .page-content.faq {
   background-color: white;
-}
-
-html {
-  background-color: #AAAAAA;
 }
 
 footer.footer {
