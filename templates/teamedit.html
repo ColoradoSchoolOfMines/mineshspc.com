@@ -131,17 +131,6 @@
         </div>
       </div>
     </div>
-    <div class="row text-center pb-4">
-      <div class="col-md-12">
-        <button type="submit" class="btn btn-lg btn-primary">
-          {{- if .Data.Team -}}
-            Save Team
-          {{- else -}}
-            Create Team
-          {{- end -}}
-        </button>
-      </div>
-    </div>
     {{ with $t := .Data.Team }}
       <div class="row">
         <div class="col m-4 mt-0">
@@ -185,6 +174,17 @@
         </div>
       </div>
     {{ end }}
+    <div class="row text-center pb-4">
+      <div class="col-md-12">
+        <button type="submit" class="btn btn-lg btn-primary">
+          {{- if .Data.Team -}}
+            Save Team
+          {{- else -}}
+            Create Team
+          {{- end -}}
+        </button>
+      </div>
+    </div>
   </form>
 </div>
 {{ end }}
