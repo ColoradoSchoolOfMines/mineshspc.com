@@ -1,41 +1,55 @@
 # mineshspc.com
 
-Source code for the mineshspc.com website.
+Source code for the [mineshspc.com](https://mineshspc.com) website.
 
 ![healthcheck](https://healthchecks.io/badge/fd6a8ec9-b3da-4bab-983a-183f2d/5Ll6vyEb-2/mineshspc.com.svg)
+
+## Development Workflow
+
+Install Go and [gow](https://github.com/mitranim/gow). Then run:
+```
+$ LOG_CONSOLE=1 gow -e=yaml,go,html,css run .
+```
+which will automatically restart the app whenever you make a change.
 
 ## Registration Flow
 
 The following information needs to be gathered:
 
-From teachers:
+- For each teacher:
 
-* Teacher name
-* Teacher email
+  - [x] Teacher name
+  - [x] Teacher email
 
-* School name
-* School city
-* School state
+  - [x] School name
+  - [x] School city
+  - [x] School state
 
-* For each team
+- For each team
 
-  * Team name
-  * Team division
-  * Team location (remote/in-person)
-  * Explanation of why the chosen division is correct
+  - [x] Team name
+  - [x] Team division
+  - [x] Team location (remote/in-person)
+  - [x] Explanation of why the chosen division is correct
 
-  * Questions
+  - [ ] Team members
+    - [ ] Name
+    - [ ] Age
+    - [ ] Email
+    - [ ] Parent's Email
+    - [ ] Have they participated in a previous competition?
 
-  * For each student
+- For each student when they confirm their email...
 
-    * Name
-    * Email
-    * Parent's email
-    * Have they participated in a previous competition?
-    * Interest in campus tour
+  Show them their Name, Email, Parent's Email, and whether they've participated
+  before or not. (Show a thing saying they need to tell their teacher if they
+  need to change something.)
 
-From students' parents
+  - [ ] Interest in campus tour
+  - [ ] Dietary restrictions
 
-* Competition waiver
-* Computer use waiver
-* Photo/multimedia release form
+- From students' parents (or student if old enough)
+
+  - [ ] Competition waiver
+  - [ ] Computer use waiver
+  - [ ] Photo/multimedia release form
