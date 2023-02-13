@@ -77,9 +77,15 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 	}
 
 	// Ensure the team exists and that the user is the owner
-	_, err = a.DB.GetTeam(user.Email, teamIDStr)
+	team, err := a.DB.GetTeam(user.Email, teamIDStr)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to get team")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if len(team.Members) >= 4 {
+		log.Error().Err(err).Msg("Team already has 4 members")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

@@ -174,9 +174,13 @@
               {{ end }}
             </div>
             <div class="card-footer">
-              <a href="/register/teacher/team/addmember?team_id={{ .ID }}" type="button" class="btn btn-primary">
-                Add Member
-              </a>
+              {{ if lt (len .Members) 4 }}
+                <a href="/register/teacher/team/addmember?team_id={{ .ID }}" type="button" class="btn btn-primary">
+                  Add Member
+                </a>
+              {{ else }}
+                You cannot add more than 4 members to a team. Please delete a member to add a new one.
+              {{ end }}
             </div>
           </div>
         </div>
