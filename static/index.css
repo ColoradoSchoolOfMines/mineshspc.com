@@ -8,7 +8,7 @@
 }
 
 body {
-  background-color: rgba(105, 88, 130, 0.15);
+  background-color: rgba(256, 256, 256, 0.7);
 }
 
 /* Navigation */
@@ -147,19 +147,29 @@ h3 {
   background-color: white;
 }
 
-/* Footer */
-.footer {
-  margin-bottom: 20px;
-  padding: 20px;
+html {
+  background-color: #AAAAAA;
+}
+
+footer.footer {
+  background-color: #AAAAAA;
+  box-shadow: inset 0 5px 5px #888;
+}
+
+footer.footer .acm-logo {
+  margin-left: 10px;
+  max-width: 150px;
+}
+
+footer.footer .hosted-at {
+  margin: 0 5px 0 8px;
+}
+
+footer.footer .mines-logo {
+  max-width: 200px;
 }
 
 /* Text & Utilities */
-.center-image {
-  margin-left: auto;
-  margin-right: auto;
-  display: block;
-}
-
 #registration-info {
   font-size: 20px;
 }

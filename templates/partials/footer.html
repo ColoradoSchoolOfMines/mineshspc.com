@@ -1,10 +1,20 @@
 {{ define "footer" }}
-<footer class="footer">
-  <a href="https://www.mines.edu" target="_blank">
-    <img class="center-image img-fluid" style="max-width: 300px;" src="/static/mines.png" alt="Mines" />
-  </a>
-  <a href="https://acm.mines.edu" target="_blank">
-    <img class="center-image img-fluid" style="max-width: 250px;" src="/static/acm.png" alt="ACM" />
-  </a>
+<footer class="footer mt-4 pt-4 ps-4 pe-4">
+  <div class="row">
+    <div class="col text-center text-secondary">
+      <p>
+        <span>Organized by</span>
+        <a href="https://acm.mines.edu" target="_blank"><img class="img-fluid acm-logo" src="/static/acm.png" alt="Mines ACM" /></a>
+
+        <span class="hosted-at">and hosted at</span>
+        <a href="https://www.mines.edu" target="_blank"><img class="img-fluid mines-logo" src="/static/mines.png" alt="Mines" /></a>
+      </p>
+      <p class="small">
+        &copy; 2023 Mines ACM.
+        <a href="https://github.com/ColoradoSchoolOfMines/mineshspc.com" target="_blank">Source code</a>.
+        {{ .HostedByHTML }}
+      </p>
+    </div>
+  </div>
 </footer>
 {{ end }}

@@ -77,10 +77,11 @@ func (a *Application) ServeTemplateExtra(logger *zerolog.Logger, templateName st
 			data[k] = v
 		}
 		templateData := map[string]any{
-			"PageName": parts[0],
-			"Data":     data,
+			"PageName":     parts[0],
+			"Data":         data,
+			"HostedByHTML": a.Configuration.HostedByHTML,
 		}
-		log.Debug().Msg("serving template")
+		log.Trace().Interface("template_data", templateData).Msg("serving template")
 		err := template.ExecuteTemplate(w, "base.html", templateData)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to execute the template")
