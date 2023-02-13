@@ -53,3 +53,8 @@ The following information needs to be gathered:
   - [ ] Competition waiver
   - [ ] Computer use waiver
   - [ ] Photo/multimedia release form
+
+## License
+
+The code is licensed under AGPLv3+. All of the content of the website (besides
+the Colorado School of Mines logo) is Copyright (c) Mines ACM.

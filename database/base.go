@@ -66,6 +66,8 @@ func (d *Database) RunMigrations() {
 				name                   TEXT NOT NULL,
 				age                    INTEGER NOT NULL,
 				parentemail            TEXT NOT NULL,
+				dietaryrestrictions    TEXT,
+				campustour             BOOLEAN NOT NULL,
 				previouslyparticipated BOOLEAN NOT NULL DEFAULT FALSE,
 				emailconfirmed         BOOLEAN NOT NULL DEFAULT FALSE,
 				liabilitywaiver        BOOLEAN NOT NULL DEFAULT FALSE,

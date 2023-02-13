@@ -1,21 +1,100 @@
-{{ define "title" }}Confirm Information{{ end }}
+{{ define "title" }}Confirm Registration{{ end }}
 
 {{ define "content" }}
 <div class="container">
   <div class="row page-header">
     <div class="col">
-      <h1>Confirm Information</h1>
+      <h1>Confirm Registration</h1>
     </div>
   </div>
 </div>
 
-<div class="container page-content register-parent">
+<div class="container page-content register-student p-4">
   <div class="row">
-    <div class="col m-4">
-      <h2>
-
-      </h2>
+    <div class="col">
+      <p>
+        You have been registered for the CS@Mines HSPC by your teacher. Please confirm that the
+        following information is correct.
+      </p>
     </div>
   </div>
+  <div class="row">
+    <div class="col-md-6">
+      {{ with .Data.Student }}
+        <dl class="row">
+          <dt class="col-sm-4">Name:</dt>
+          <dd class="col-sm-8">{{ .Name }}</dd>
+          <dt class="col-sm-4">Email:</dt>
+          <dd class="col-sm-8">{{ .Email }}</dd>
+          <dt class="col-sm-4">Age:</dt>
+          <dd class="col-sm-8">{{ .Age }}</dd>
+          <dt class="col-sm-4">Previously Participated in HSPC:</dt>
+          <dd class="col-sm-8">{{ if .PreviouslyParticipated }}Yes{{ else }}No{{ end }}</dd>
+          {{ with .ParentEmail }}
+            <dt class="col-sm-4">Parent/Guardian Email:</dt>
+            <dd class="col-sm-8">{{ . }}</dd>
+          {{ end }}
+        </dl>
+      {{ end }}
+    </div>
+    <div class="col-md-6">
+      {{ with .Data.Team }}
+        <dl class="row">
+          <dt class="col-sm-4">Team Name:</dt>
+          <dd class="col-sm-8">{{ .Name }}</dd>
+          <dt class="col-sm-2">Division:</dt>
+          <dd class="col-sm-2">{{ .Division }}</dd>
+          <dt class="col-sm-2">In Person:</dt>
+          <dd class="col-sm-2">{{ if .InPerson }}Yes{{ else }}No{{ end }}</dd>
+        </dl>
+      {{ end }}
+    </div>
+  </div>
+  <form method="post" action="/register/student/confirminfo?confirmation_id={{ .Data.ConfirmationID }}" class="form-floating">
+    <div class="row my-4">
+      <div class="col">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="" id="confirm-info-correct">
+          <label class="form-check-label" for="confirm-info-correct">
+            The above information is correct.
+          </label>
+          <div class="form-text">
+            If the information above is incorrect, please contact your teacher.
+          </div>
+        </div>
+      </div>
+    </div>
+    {{ if .Data.Team.InPerson }}
+      <div class="row my-4">
+        <div class="col">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="" id="campus-tour">
+            <label class="form-check-label" for="campus-tour">
+              I would like to participate in a campus tour after the competition.
+            </label>
+            <div class="form-text">
+              The tour will be held from 3:00 PM to 4:00 PM.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row my-4">
+        <div class="col">
+          <label for="dietary-restrictions" class="form-label">
+            Please enter any dietary restrictions you have here:
+          </label>
+          <textarea class="form-control" name="dietary-restrictions"
+            id="dietary-restrictions" rows="2" required></textarea>
+        </div>
+      </div>
+    {{ end }}
+    <div class="row text-center mt-4">
+      <div class="col-md-12">
+        <button type="submit" class="btn btn-lg btn-primary">
+          Confirm Registration
+        </button>
+      </div>
+    </div>
+  </form>
 </div>
 {{ end }}
