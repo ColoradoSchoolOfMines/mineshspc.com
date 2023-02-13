@@ -1,0 +1,137 @@
+{{- define "title" -}}
+  Add Member to {{ .Data.Team.Name }}
+{{- end -}}
+
+{{ define "content" }}
+<div class="container page-header">
+  <div class="row">
+    <div class="col-md-2">
+      <a href="/register/teacher/team/edit?team_id={{ .Data.Team.ID }}" class="btn btn-primary">
+        <i class="fa fa-arrow-left"></i>
+        Cancel
+      </a>
+    </div>
+    <div class="col-md-8">
+      <div class="header">
+        <h1>Add Member to {{ .Data.Team.Name }}</h1>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container page-content teacher">
+  <form method="post" action="/register/teacher/team/addmember?team_id={{ .Data.Team.ID }}"
+        class="form-floating {{ if .Data.Validated }}was-validated{{ end }}">
+    {{ with .Data.Error.General }}
+      <div class="alert alert-danger" role="alert">
+        {{ . }}
+      </div>
+    {{ end }}
+    <div class="row">
+      <div class="col text-center m-4">
+        <div class="alert alert-secondary" role="alert">
+          Questions? Email
+          <a href="mailto:admin@mineshspc.com">admin@mineshspc.com</a>.
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col m-4 mt-0">
+        <div class="card">
+          <h4 class="card-header">Student Information</h4>
+          <div class="card-body">
+            <div class="row mb-2">
+              <div class="col">
+                <div class="form-floating">
+                  <input type="text" class="form-control col-12" name="student-name" id="student-name"
+                    placeholder="Student Name" required
+                  />
+                  <label for="team-name">Student Name</label>
+                </div>
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col">
+                <div class="form-floating">
+                  <input type="number" class="form-control col-12" name="student-age" id="student-age"
+                    placeholder="Student Age" required
+                  />
+                  <label for="team-name">Student Age</label>
+                </div>
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col">
+                <div class="form-floating">
+                  <input type="email" class="form-control col-12" name="student-email" id="student-email"
+                    placeholder="Student Email" required
+                  />
+                  <label for="team-name">Student Email</label>
+                  <div id="student-email-help" class="form-text">
+                    If this student already has a Kattis account, enter the email associated with
+                    that account here.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                This student
+                <div class="btn-group" role="group" aria-label="Select team division">
+                  <input type="radio" class="btn-check" name="student-previously-participated"
+                    value="has" id="has" autocomplete="off" required />
+                  <label class="btn btn-outline-primary" for="has">has</label>
+
+                  <input type="radio" class="btn-check" name="student-previously-participated"
+                    value="has-not" id="has-not" autocomplete="off" required />
+                  <label class="btn btn-outline-primary" for="has-not">has not</label>
+                </div>
+                previously participated in a Mines HSPC competition.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row d-none" id="parent-information">
+      <div class="col m-4 mt-0">
+        <div class="card">
+          <h4 class="card-header">Parent Information</h4>
+          <div class="card-body">
+            <div class="row mb-2">
+              <div class="col">
+                <div class="form-floating">
+                  <input type="email" class="form-control col-12" name="parent-email" id="parent-email"
+                    placeholder="Parent Email"
+                  />
+                  <label for="team-name">Parent/Guardian Email</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row text-center pb-4">
+      <div class="col-md-12">
+        <button type="submit" class="btn btn-lg btn-primary">
+          Add Member to {{ .Data.Team.Name }}
+        </button>
+      </div>
+    </div>
+  </form>
+  <script>
+    var studentAge = document.getElementById("student-age");
+    studentAge.addEventListener("change", function(e) {
+      console.log("student age is: ", studentAge.value);
+      if (parseInt(studentAge.value) < 18) {
+        document.getElementById("parent-information").classList.remove("d-none");
+        document.getElementById("parent-email").required = true;
+      } else {
+        document.getElementById("parent-information").classList.add("d-none");
+        document.getElementById("parent-email").required = false;
+      }
+    })
+  </script>
+</div>
+{{ end }}

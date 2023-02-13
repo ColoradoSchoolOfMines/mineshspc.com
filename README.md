@@ -32,12 +32,12 @@ The following information needs to be gathered:
   - [x] Team location (remote/in-person)
   - [x] Explanation of why the chosen division is correct
 
-  - [ ] Team members
-    - [ ] Name
-    - [ ] Age
-    - [ ] Email
-    - [ ] Parent's Email
-    - [ ] Have they participated in a previous competition?
+  - [x] Team members
+    - [x] Name
+    - [x] Age
+    - [x] Email
+    - [x] Parent's Email (if under 18)
+    - [x] Have they participated in a previous competition?
 
 - For each student when they confirm their email...
 

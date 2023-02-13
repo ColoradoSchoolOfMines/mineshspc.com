@@ -152,12 +152,13 @@ func (a *Application) Start() {
 	a.ConfirmEmailRenderer = a.ServeTemplateExtra(a.Log, "confirmemail.html", a.GetEmailLoginTemplate)
 	a.EmailLoginRenderer = a.ServeTemplateExtra(a.Log, "emaillogin.html", a.GetEmailLoginTemplate)
 	registrationPages := map[string]renderInfo{
-		"/register/teacher/confirmemail":  {a.ConfirmEmailRenderer, true},
-		"/register/teacher/createaccount": {a.TeacherCreateAccountRenderer, false},
-		"/register/teacher/login":         {a.TeacherLoginRenderer, false},
-		"/register/teacher/schoolinfo":    {a.ServeTemplateExtra(a.Log, "schoolinfo.html", a.GetTeacherSchoolInfoTemplate), false},
-		"/register/teacher/teams":         {a.ServeTemplateExtra(a.Log, "teams.html", a.GetTeacherTeamsTemplate), false},
-		"/register/teacher/team/edit":     {a.ServeTemplateExtra(a.Log, "teamedit.html", a.GetTeacherTeamEditTemplate), false},
+		"/register/teacher/confirmemail":   {a.ConfirmEmailRenderer, true},
+		"/register/teacher/createaccount":  {a.TeacherCreateAccountRenderer, false},
+		"/register/teacher/login":          {a.TeacherLoginRenderer, false},
+		"/register/teacher/schoolinfo":     {a.ServeTemplateExtra(a.Log, "schoolinfo.html", a.GetTeacherSchoolInfoTemplate), false},
+		"/register/teacher/teams":          {a.ServeTemplateExtra(a.Log, "teams.html", a.GetTeacherTeamsTemplate), false},
+		"/register/teacher/team/edit":      {a.ServeTemplateExtra(a.Log, "teamedit.html", a.GetTeacherTeamEditTemplate), false},
+		"/register/teacher/team/addmember": {a.ServeTemplateExtra(a.Log, "teamaddmember.html", a.GetTeacherAddMemberTemplate), false},
 	}
 	for path, rend := range registrationPages {
 		renderFn := func(rend renderInfo) func(w http.ResponseWriter, r *http.Request) {
@@ -178,16 +179,22 @@ func (a *Application) Start() {
 		r.HandleFunc(path, renderFn(rend)).Methods(http.MethodGet)
 	}
 
+	// Delete Team member
+	r.HandleFunc("/register/teacher/team/delete", a.HandleTeacherDeleteMember).Methods(http.MethodGet)
+
 	// Email confirmation code handling
 	r.HandleFunc("/register/teacher/emaillogin", a.HandleTeacherEmailLogin).Methods(http.MethodGet)
+
+	// Logout
 	r.HandleFunc("/register/teacher/logout", a.HandleTeacherLogout).Methods(http.MethodGet)
 
 	// Form Post Handlers
 	formHandlers := map[string]func(w http.ResponseWriter, r *http.Request){
-		"/register/teacher/login":         a.HandleTeacherLogin,
-		"/register/teacher/createaccount": a.HandleTeacherCreateAccount,
-		"/register/teacher/schoolinfo":    a.HandleTeacherSchoolInfo,
-		"/register/teacher/team/edit":     a.HandleTeacherTeamEdit,
+		"/register/teacher/login":          a.HandleTeacherLogin,
+		"/register/teacher/createaccount":  a.HandleTeacherCreateAccount,
+		"/register/teacher/schoolinfo":     a.HandleTeacherSchoolInfo,
+		"/register/teacher/team/edit":      a.HandleTeacherTeamEdit,
+		"/register/teacher/team/addmember": a.HandleTeacherAddMember,
 	}
 	for path, fn := range formHandlers {
 		r.HandleFunc(path, fn).Methods(http.MethodPost)

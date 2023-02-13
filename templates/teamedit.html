@@ -66,19 +66,19 @@
                 This team will compete
                 <div class="btn-group" role="group" aria-label="Select team division">
                   <input type="radio" class="btn-check" name="team-location"
-                    value="in-person" id="in-person" autocomplete="off"
+                    value="in-person" id="in-person" autocomplete="off" required
                     {{ with .Data.Team }}{{ if .InPerson }}checked{{ end }}{{ end }}>
                   <label class="btn btn-outline-primary" for="in-person">in person</label>
 
                   <input type="radio" class="btn-check" name="team-location"
-                    value="remote" id="remote" autocomplete="off"
+                    value="remote" id="remote" autocomplete="off" required
                     {{ with .Data.Team }}{{ if not .InPerson }}checked{{ end }}{{ end }}>
                   <label class="btn btn-outline-primary" for="remote">remotely</label>
                 </div>
-                <p class="text-secondary small">
+                <div class="form-text">
                   In-person competitors will have the opportunity to do a campus tour after the
                   competition.
-                </p>
+                </div>
               </div>
             </div>
           </div>
@@ -94,7 +94,7 @@
               <div class="col-md-12">
                 <div class="btn-group" role="group" aria-label="Select team division">
                   <input type="radio" class="btn-check" name="team-division"
-                    value="Beginner" id="beginner" autocomplete="off"
+                    value="Beginner" id="beginner" autocomplete="off" required
                     {{ with .Data.Team }}{{ if eq .Division "Beginner" }}checked{{ end }}{{ end }}>
                   <label class="btn w-100 btn-outline-primary" for="beginner">
                     <h4>Beginner</h4>
@@ -106,7 +106,7 @@
                   </label>
 
                   <input type="radio" class="btn-check" name="team-division"
-                    value="Advanced" id="advanced" autocomplete="off"
+                    value="Advanced" id="advanced" autocomplete="off" required
                     {{ with .Data.Team }}{{ if eq .Division "Advanced" }}checked{{ end }}{{ end }}>
                   <label class="btn w-100 btn-outline-primary" for="advanced">
                     <h4>Advanced</h4>
@@ -142,6 +142,49 @@
         </button>
       </div>
     </div>
+    {{ with $t := .Data.Team }}
+      <div class="row">
+        <div class="col m-4 mt-0">
+          <div class="card">
+            <h4 class="card-header">Team Members</h4>
+            <div class="list-group list-group-flush">
+              {{ range .Members }}
+                <div class="list-group-item">
+                  <div class="row">
+                    <div class="col">
+                      <h4>
+                        <b>{{ .Name }}</b>
+                        <a href="/register/teacher/team/delete?team_id={{ $t.ID }}&email={{ .Email }}" class="btn btn-danger ms-4">
+                          <i class="fa fa-times"></i>
+                          Delete
+                        </a>
+                      </h4>
+                      <dl class="row">
+                        <dt class="col-sm-4">Email:</dt>
+                        <dd class="col-sm-8">{{ .Email }}</dd>
+                        <dt class="col-sm-4">Age:</dt>
+                        <dd class="col-sm-8">{{ .Age }}</dd>
+                        <dt class="col-sm-4">Previously Participated:</dt>
+                        <dd class="col-sm-8">{{ if .PreviouslyParticipated }}Yes{{ else }}No{{ end }}</dd>
+                        {{ with .ParentEmail }}
+                        <dt class="col-sm-4">Parent/Guardian Email:</dt>
+                        <dd class="col-sm-8">{{ . }}</dd>
+                        {{ end }}
+                      </dl>
+                    </div>
+                  </div>
+                </div>
+              {{ end }}
+            </div>
+            <div class="card-footer">
+              <a href="/register/teacher/team/addmember?team_id={{ .ID }}" type="button" class="btn btn-primary">
+                Add Member
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {{ end }}
   </form>
 </div>
 {{ end }}

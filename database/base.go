@@ -64,6 +64,7 @@ func (d *Database) RunMigrations() {
 				email                  TEXT NOT NULL PRIMARY KEY,
 				teamid                 TEXT NOT NULL,
 				name                   TEXT NOT NULL,
+				age                    INTEGER NOT NULL,
 				parentemail            TEXT NOT NULL,
 				previouslyparticipated BOOLEAN NOT NULL DEFAULT FALSE,
 				emailconfirmed         BOOLEAN NOT NULL DEFAULT FALSE,

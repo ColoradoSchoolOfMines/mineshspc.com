@@ -66,7 +66,7 @@ func (a *Application) GetTeacherTeamEditTemplate(r *http.Request) map[string]any
 }
 
 func (a *Application) HandleTeacherTeamEdit(w http.ResponseWriter, r *http.Request) {
-	log := a.Log.With().Str("page_name", "teacher_school_info").Logger()
+	log := a.Log.With().Str("page_name", "teacher_team_edit").Logger()
 	user, err := a.GetLoggedInTeacher(r)
 	if err != nil {
 		// TODO indicate that they are logged out
@@ -80,8 +80,6 @@ func (a *Application) HandleTeacherTeamEdit(w http.ResponseWriter, r *http.Reque
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-
-	log.Info().Str("team_location", r.Form.Get("team-location")).Msg("ohea")
 
 	teamName := r.Form.Get("team-name")
 	inPerson := r.Form.Get("team-location") == "in-person"

@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -38,6 +39,7 @@ type Student struct {
 	TeamID                  uuid.UUID
 	Email                   string
 	Name                    string
+	Age                     int
 	ParentEmail             string
 	PreviouslyParticipated  bool
 	EmailConfirmed          bool
@@ -59,7 +61,7 @@ func (d *Database) scanTeamWithStudents(row Scannable) (*Team, error) {
 	}
 
 	studentRows, err := d.Raw.Query(`
-		SELECT s.email, s.name, s.parentemail, s.previouslyparticipated, s.emailconfirmed,
+		SELECT s.email, s.name, s.age, s.parentemail, s.previouslyparticipated, s.emailconfirmed,
 			s.computerusewaiver, s.multimediareleaseform
 		FROM students s
 		WHERE s.teamid = ?
@@ -70,7 +72,7 @@ func (d *Database) scanTeamWithStudents(row Scannable) (*Team, error) {
 	defer studentRows.Close()
 	for studentRows.Next() {
 		var student Student
-		if err := studentRows.Scan(&student.Email, &student.Name, &student.ParentEmail, &student.PreviouslyParticipated,
+		if err := studentRows.Scan(&student.Email, &student.Name, &student.Age, &student.ParentEmail, &student.PreviouslyParticipated,
 			&student.EmailConfirmed, &student.ComputerUseWaiverSigned, &student.MultimediaReleaseForm); err != nil {
 			return nil, err
 		}
@@ -123,4 +125,29 @@ func (d *Database) UpsertTeam(teacherEmail string, teamID uuid.UUID, name string
 		VALUES (?, ?, ?, ?, ?, ?)
 	`, teamID, teacherEmail, name, division, inPerson, divisionExplanation)
 	return err
+}
+
+func (d *Database) AddTeamMember(teamID uuid.UUID, name string, studentAge int, studentEmail string, previouslyParticipated bool, parentEmail string) error {
+	_, err := d.Raw.Exec(`
+		INSERT INTO students (teamid, name, age, email, previouslyparticipated, parentemail)
+		VALUES (?, ?, ?, ?, ?, ?)
+	`, teamID, name, studentAge, studentEmail, previouslyParticipated, parentEmail)
+	return err
+}
+
+func (d *Database) RemoveTeamMember(teamID uuid.UUID, studentEmail string) error {
+	res, err := d.Raw.Exec(`
+		DELETE FROM students
+		WHERE teamid = ?
+			AND email = ?
+	`, teamID, studentEmail)
+	if err != nil {
+		return err
+	}
+	if affected, err := res.RowsAffected(); err != nil {
+		return err
+	} else if affected != 1 {
+		return errors.New("incorrect number of rows affected on delete from students table")
+	}
+	return nil
 }
