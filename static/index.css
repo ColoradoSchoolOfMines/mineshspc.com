@@ -14,6 +14,7 @@ html {
 body {
   background-color: #E2E2E2;
   margin: 0 0 140px 0;
+  box-shadow: 0 5px 5px #888;
 }
 
 a {
@@ -176,7 +177,6 @@ h3 {
 
 footer.footer {
   background-color: #AAAAAA;
-  box-shadow: inset 0 5px 5px #888;
   position: fixed;
   bottom: 0;
   width: 100%;
