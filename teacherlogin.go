@@ -59,7 +59,7 @@ func (a *Application) HandleTeacherLogin(w http.ResponseWriter, r *http.Request)
 
 	templateData := map[string]any{
 		"Name":     teacher.Name,
-		"LoginURL": fmt.Sprintf("https://mineshspc.com/register/teacher/emaillogin?login_code=%s", a.CreateLoginCode(emailAddress)),
+		"LoginURL": fmt.Sprintf("%s/register/teacher/emaillogin?login_code=%s", a.Config.Domain, a.CreateLoginCode(emailAddress)),
 	}
 
 	var plainTextContent, htmlContent strings.Builder

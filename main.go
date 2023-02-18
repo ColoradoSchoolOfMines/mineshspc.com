@@ -62,13 +62,13 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to read config")
 	}
-	if err := app.Configuration.Parse(configYaml); err != nil {
+	if err := app.Config.Parse(configYaml); err != nil {
 		log.Fatal().Err(err).Msg("Failed to parse config")
 	}
 
 	// Healthcheck loop
 	healthcheckTimer := time.NewTimer(time.Second)
-	healthcheckURL := app.Configuration.HealthcheckURL
+	healthcheckURL := app.Config.HealthcheckURL
 	go func(log *zerolog.Logger) {
 		if healthcheckURL == "" {
 			log.Warn().Msg("Healthcheck URL not set, skipping healthcheck")

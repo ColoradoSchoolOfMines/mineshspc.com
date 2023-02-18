@@ -127,7 +127,7 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 
 	templateData := map[string]any{
 		"Name":       name,
-		"ConfirmURL": fmt.Sprintf("https://mineshspc.com/register/teacher/emaillogin?login_code=%s", a.CreateLoginCode(emailAddress)),
+		"ConfirmURL": fmt.Sprintf("%s/register/teacher/emaillogin?login_code=%s", a.Config.Domain, a.CreateLoginCode(emailAddress)),
 	}
 
 	var plainTextContent, htmlContent strings.Builder

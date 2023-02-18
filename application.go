@@ -24,10 +24,10 @@ var templateFS embed.FS
 var staticFS embed.FS
 
 type Application struct {
-	Log           *zerolog.Logger
-	DB            *database.Database
-	EmailRegex    *regexp.Regexp
-	Configuration Configuration
+	Log        *zerolog.Logger
+	DB         *database.Database
+	EmailRegex *regexp.Regexp
+	Config     Configuration
 
 	LoginCodes           map[string]uuid.UUID
 	ConfirmEmailRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
@@ -84,7 +84,7 @@ func (a *Application) ServeTemplateExtra(logger *zerolog.Logger, templateName st
 		templateData := map[string]any{
 			"PageName":     parts[0],
 			"Data":         data,
-			"HostedByHTML": a.Configuration.HostedByHTML,
+			"HostedByHTML": a.Config.HostedByHTML,
 		}
 		log.Trace().Interface("template_data", templateData).Msg("serving template")
 		if err := template.ExecuteTemplate(w, "base.html", templateData); err != nil {
@@ -102,7 +102,7 @@ func (a *Application) Start() {
 	a.DB.RunMigrations()
 
 	a.Log.Info().Msg("connecting to sendgrid")
-	a.SendGridClient = sendgrid.NewSendClient(a.Configuration.SendGridAPIKey)
+	a.SendGridClient = sendgrid.NewSendClient(a.Config.SendGridAPIKey)
 
 	a.Log.Info().Msg("Starting router")
 	r := mux.NewRouter().StrictSlash(true)
