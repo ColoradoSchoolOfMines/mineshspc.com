@@ -29,7 +29,6 @@ type Application struct {
 	EmailRegex *regexp.Regexp
 	Config     Configuration
 
-	LoginCodes           map[string]uuid.UUID
 	ConfirmEmailRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 	TeacherLoginRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 	EmailLoginRenderer   func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
@@ -46,7 +45,6 @@ func NewApplication(log *zerolog.Logger, db *sql.DB) *Application {
 		DB:         database.NewDatabase(db, log.With().Str("module", "database").Logger()),
 		EmailRegex: regexp.MustCompile(`(?i)^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$`),
 
-		LoginCodes:                  map[string]uuid.UUID{},
 		TeacherRegistrationCaptchas: map[uuid.UUID]string{},
 	}
 }

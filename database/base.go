@@ -40,14 +40,6 @@ func (d *Database) RunMigrations() {
 			);
 		`,
 		`
-			CREATE TABLE IF NOT EXISTS sessions (
-				email   TEXT NOT NULL,
-				token   TEXT NOT NULL,
-				expires INTEGER NOT NULL,
-				PRIMARY KEY (email, token)
-			);
-		`,
-		`
 			CREATE TABLE IF NOT EXISTS teams (
 				id                  TEXT NOT NULL,
 				teacheremail        TEXT NOT NULL,

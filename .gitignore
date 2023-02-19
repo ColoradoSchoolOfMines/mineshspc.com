@@ -1,6 +1,7 @@
 config.yaml
 credentials.json
 token.json
+secret_key
 
 # Executables
 mineshspc.com

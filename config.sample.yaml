@@ -1,1 +1,11 @@
 sendgrid_api_key: SENDGRID_API_KEY
+
+# This will be shown in the footer right after the link to the source code.
+hosted_by_html: |
+  Hosting provided by YOUR COMPANY HERE.
+
+# Use the following domain for email links.
+domain: http://localhost:8090
+
+# The file that contains the HMAC secret key for signing the JWT tokens.
+secret_key_file: secret_key

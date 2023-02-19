@@ -1,28 +1,46 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
-	"github.com/google/uuid"
+	"github.com/golang-jwt/jwt/v4"
 
 	"github.com/ColoradoSchoolOfMines/mineshspc.com/database"
 )
 
 func (a *Application) GetLoggedInTeacher(r *http.Request) (*database.Teacher, error) {
-	sessionTokenStr, err := r.Cookie("session_id")
+	jwtStr, err := r.Cookie("tok")
 	if err != nil {
-		a.Log.Warn().Err(err).Msg("Failed to get session cookie")
+		a.Log.Warn().Err(err).Msg("Failed to get jwt cookie")
 		return nil, err
 	}
-	sessionToken, err := uuid.Parse(sessionTokenStr.Value)
+
+	token, err := jwt.ParseWithClaims(jwtStr.Value, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+
+		return a.Config.ReadGetSecretKey(), nil
+	})
 	if err != nil {
-		a.Log.Warn().Err(err).Msg("Failed to parse session cookie")
 		return nil, err
 	}
-	user, err := a.DB.GetTeacherBySessionToken(sessionToken)
+
+	claims, ok := token.Claims.(*jwt.RegisteredClaims)
+	if !token.Valid || !ok {
+		return nil, fmt.Errorf("invalid token")
+	}
+
+	if claims.Issuer != string(IssuerSessionToken) {
+		return nil, fmt.Errorf("token is not a session token")
+	}
+
+	user, err := a.DB.GetTeacherByEmail(claims.Subject)
 	if err != nil {
 		a.Log.Warn().Err(err).
-			Str("token", sessionToken.String()).
+			Interface("claims", claims).
 			Msg("couldn't find teacher with that session token")
 		return nil, err
 	}

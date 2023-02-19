@@ -6,8 +6,17 @@ import (
 	"net/http"
 	"strings"
 	texttemplate "text/template"
+	"time"
 
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
+)
+
+type Issuer string
+
+const (
+	IssuerEmailLogin   Issuer = "email_login"
+	IssuerSessionToken Issuer = "session_token"
 )
 
 func (a *Application) GetEmailLoginTemplate(r *http.Request) map[string]any {
@@ -18,6 +27,15 @@ func (a *Application) GetEmailLoginTemplate(r *http.Request) map[string]any {
 	return map[string]any{
 		"Email": emailCookie.Value,
 	}
+}
+
+func (a *Application) CreateEmailLoginJWT(email string) *jwt.Token {
+	// TODO invent some way to make this a one-time token
+	return jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.RegisteredClaims{
+		Issuer:    string(IssuerEmailLogin),
+		Subject:   email,
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)),
+	})
 }
 
 func (a *Application) HandleTeacherLogin(w http.ResponseWriter, r *http.Request) {
@@ -57,9 +75,16 @@ func (a *Application) HandleTeacherLogin(w http.ResponseWriter, r *http.Request)
 	to := mail.NewEmail(teacher.Name, emailAddress)
 	subject := "Log In to Mines HSPC Registration"
 
+	tok := a.CreateEmailLoginJWT(emailAddress)
+	signedTok, err := tok.SignedString(a.Config.ReadGetSecretKey())
+	if err != nil {
+		log.Error().Err(err).Msg("failed to sign email login token")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	templateData := map[string]any{
 		"Name":     teacher.Name,
-		"LoginURL": fmt.Sprintf("%s/register/teacher/emaillogin?login_code=%s", a.Config.Domain, a.CreateLoginCode(emailAddress)),
+		"LoginURL": fmt.Sprintf("%s/register/teacher/emaillogin?tok=%s", a.Config.Domain, signedTok),
 	}
 
 	var plainTextContent, htmlContent strings.Builder

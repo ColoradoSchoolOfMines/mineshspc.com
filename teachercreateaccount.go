@@ -11,6 +11,7 @@ import (
 	texttemplate "text/template"
 	"time"
 
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"github.com/mattn/go-sqlite3"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
@@ -59,20 +60,6 @@ func (a *Application) GetTeacherCreateAccountTemplate(r *http.Request) map[strin
 		"CaptchaElements": captchaElements,
 		"CaptchaIndexes":  captchaIndexes,
 	}
-}
-
-func (a *Application) CreateLoginCode(emailAddress string) uuid.UUID {
-	loginCode := uuid.New()
-	a.LoginCodes[emailAddress] = loginCode
-	a.Log.Info().Str("email", emailAddress).Interface("login_code", loginCode).Msg("created a login code")
-	go func() {
-		time.Sleep(time.Hour)
-		if _, ok := a.LoginCodes[emailAddress]; ok {
-			a.Log.Info().Str("email", emailAddress).Msg("expiring login code")
-			delete(a.LoginCodes, emailAddress)
-		}
-	}()
-	return loginCode
 }
 
 func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.Request) {
@@ -125,9 +112,16 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 	to := mail.NewEmail(name, emailAddress)
 	subject := "Confirm Email to Log In to Mines HSPC Registration"
 
+	tok := a.CreateEmailLoginJWT(emailAddress)
+	signedTok, err := tok.SignedString(a.Config.ReadGetSecretKey())
+	if err != nil {
+		log.Error().Err(err).Msg("failed to sign email login token")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	templateData := map[string]any{
 		"Name":       name,
-		"ConfirmURL": fmt.Sprintf("%s/register/teacher/emaillogin?login_code=%s", a.Config.Domain, a.CreateLoginCode(emailAddress)),
+		"ConfirmURL": fmt.Sprintf("%s/register/teacher/emaillogin?tok=%s", a.Config.Domain, signedTok),
 	}
 
 	var plainTextContent, htmlContent strings.Builder
@@ -160,57 +154,82 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 }
 
 func (a *Application) HandleTeacherEmailLogin(w http.ResponseWriter, r *http.Request) {
-	emailCookie, err := r.Cookie("email")
-	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
+	tokenStr := r.URL.Query().Get("tok")
+	if tokenStr == "" {
+		emailCookie, err := r.Cookie("email")
+		if err != nil {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
 
-	// If there is no login code, then this was a redirect from the login/create account page.
-	loginCode := r.URL.Query().Get("login_code")
-	if loginCode == "" {
+		// Just render the "check your email" page
 		a.ConfirmEmailRenderer(w, r, map[string]any{"Email": emailCookie.Value})
 		return
 	}
 
-	// Verify the login code and give them a session.
-	if loginCodeUUID, err := uuid.Parse(loginCode); err != nil {
-		a.Log.Error().Err(err).Msg("failed to parse login code")
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	} else if storedLoginCode, ok := a.LoginCodes[emailCookie.Value]; !ok || storedLoginCode != loginCodeUUID {
-		a.Log.Error().Err(err).Msg("invalid login code")
-		a.ConfirmEmailRenderer(w, r, map[string]any{
-			"Error": "Invalid or expired login code",
-		})
-		return
-	} else {
-		a.Log.Info().Str("email", emailCookie.Value).Msg("confirmed email")
-		err = a.DB.SetEmailConfirmed(emailCookie.Value)
-		if err != nil {
-			a.Log.Error().Err(err).Msg("failed to set email confirmed")
+	token, err := jwt.ParseWithClaims(tokenStr, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		delete(a.LoginCodes, emailCookie.Value)
-	}
 
-	sessionID := uuid.New()
-	expires := time.Now().AddDate(0, 0, 1)
-	err = a.DB.NewTeacherSession(emailCookie.Value, sessionID, expires)
+		return a.Config.ReadGetSecretKey(), nil
+	})
 	if err != nil {
-		a.Log.Error().Err(err).Msg("failed to create new teacher session")
+		a.Log.Error().Err(err).Msg("failed to parse email login token")
+		// TODO check if the error is that it is expired, and if so, then do
+		// something nicer for the user.
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	http.SetCookie(w, &http.Cookie{Name: "session_id", Value: sessionID.String(), Path: "/", Expires: expires})
 
-	teacher, err := a.DB.GetTeacherByEmail(emailCookie.Value)
+	claims, ok := token.Claims.(*jwt.RegisteredClaims)
+	if !token.Valid || !ok {
+		a.Log.Error().Interface("token", token).Msg("failed to validate token")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	if claims.Issuer != string(IssuerEmailLogin) {
+		a.Log.Error().Interface("token", token).Msg("invalid token issuer, should be login")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	a.Log.Info().Str("sub", claims.Subject).Msg("confirmed email")
+	err = a.DB.SetEmailConfirmed(claims.Subject)
+	if err != nil {
+		a.Log.Error().Err(err).Msg("failed to set email confirmed")
+	}
+
+	teacher, err := a.DB.GetTeacherByEmail(claims.Subject)
 	if err != nil {
 		a.Log.Error().Err(err).Msg("failed to get teacher from DB")
 		return
 	}
+
+	jwt, expires := a.CreateSessionJWT(claims.Subject)
+	jwtStr, err := jwt.SignedString(a.Config.ReadGetSecretKey())
+	if err != nil {
+		a.Log.Error().Err(err).Msg("failed to sign JWT")
+		return
+	}
+	a.Log.Info().Interface("jwt", jwt).Str("jwt_str", jwtStr).Msg("signed JWT")
+	http.SetCookie(w, &http.Cookie{Name: "tok", Value: jwtStr, Path: "/", Expires: expires})
 
 	if teacher.SchoolName == "" || teacher.SchoolCity == "" || teacher.SchoolState == "" {
 		http.Redirect(w, r, "/register/teacher/schoolinfo", http.StatusSeeOther)
 	} else {
 		http.Redirect(w, r, "/register/teacher/teams", http.StatusSeeOther)
 	}
+}
+
+func (a *Application) CreateSessionJWT(email string) (*jwt.Token, time.Time) {
+	// TODO invent some way to make this a one-time token
+	expires := time.Now().Add(24 * time.Hour)
+	return jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.RegisteredClaims{
+		Issuer:    string(IssuerSessionToken),
+		Subject:   email,
+		ExpiresAt: jwt.NewNumericDate(expires),
+	}), expires
 }

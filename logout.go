@@ -6,6 +6,6 @@ import (
 )
 
 func (a *Application) HandleTeacherLogout(w http.ResponseWriter, r *http.Request) {
-	http.SetCookie(w, &http.Cookie{Name: "session_id", Value: "", Path: "/", Expires: time.Unix(0, 0)})
+	http.SetCookie(w, &http.Cookie{Name: "tok", Value: "", Path: "/", Expires: time.Unix(0, 0)})
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

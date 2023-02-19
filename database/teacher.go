@@ -2,9 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"time"
-
-	"github.com/google/uuid"
 )
 
 type Teacher struct {
@@ -23,14 +20,6 @@ func (d *Database) NewTeacher(name, email string) error {
 
 func (d *Database) SetEmailConfirmed(email string) error {
 	_, err := d.Raw.Exec("UPDATE teachers SET emailconfirmed = TRUE WHERE email = ?", email)
-	return err
-}
-
-func (d *Database) NewTeacherSession(email string, sessionToken uuid.UUID, expiresAt time.Time) error {
-	_, err := d.Raw.Exec(`
-		INSERT INTO sessions (email, token, expires)
-		VALUES (?, ?, ?)
-	`, email, sessionToken.String(), expiresAt.UnixMilli())
 	return err
 }
 
@@ -60,17 +49,6 @@ func (d *Database) GetTeacherByEmail(email string) (*Teacher, error) {
 		FROM teachers t
 		WHERE t.email = ?
 	`, email)
-	return d.scanTeacher(row)
-}
-
-func (d *Database) GetTeacherBySessionToken(sessionToken uuid.UUID) (*Teacher, error) {
-	row := d.Raw.QueryRow(`
-		SELECT t.name, t.email, t.emailconfirmed, t.schoolname, t.schoolcity, t.schoolstate
-		FROM teachers t
-		JOIN sessions s ON s.email = t.email
-		WHERE s.token = ?
-			AND s.expires >= ?
-	`, sessionToken.String(), time.Now().UnixMilli())
 	return d.scanTeacher(row)
 }
 
