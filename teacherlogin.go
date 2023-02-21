@@ -15,8 +15,9 @@ import (
 type Issuer string
 
 const (
-	IssuerEmailLogin   Issuer = "email_login"
-	IssuerSessionToken Issuer = "session_token"
+	IssuerEmailLogin    Issuer = "email_login"
+	IssuerSessionToken  Issuer = "session_token"
+	IssuerStudentVerify Issuer = "student_verify"
 )
 
 func (a *Application) GetEmailLoginTemplate(r *http.Request) map[string]any {
@@ -71,10 +72,6 @@ func (a *Application) HandleTeacherLogin(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	from := mail.NewEmail("Mines HSPC", "noreply@mineshspc.com")
-	to := mail.NewEmail(teacher.Name, emailAddress)
-	subject := "Log In to Mines HSPC Registration"
-
 	tok := a.CreateEmailLoginJWT(emailAddress)
 	signedTok, err := tok.SignedString(a.Config.ReadGetSecretKey())
 	if err != nil {
@@ -91,26 +88,16 @@ func (a *Application) HandleTeacherLogin(w http.ResponseWriter, r *http.Request)
 	texttemplate.Must(texttemplate.ParseFS(emailTemplates, "emailtemplates/teacherlogin.txt")).Execute(&plainTextContent, templateData)
 	htmltemplate.Must(htmltemplate.ParseFS(emailTemplates, "emailtemplates/teacherlogin.html")).Execute(&htmlContent, templateData)
 
-	message := mail.NewSingleEmail(from, subject, to, plainTextContent.String(), htmlContent.String())
-	message.ReplyTo = mail.NewEmail("Mines HSPC Team", "team@mineshspc.com")
-	resp, err := a.SendGridClient.Send(message)
+	err = a.SendEmail(log, "Log in to Mines HSPC Registration",
+		mail.NewEmail(teacher.Name, emailAddress),
+		plainTextContent.String(),
+		htmlContent.String())
 	if err != nil {
 		log.Error().Err(err).Msg("failed to send email")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
-	} else if resp.StatusCode != http.StatusAccepted {
-		log.Error().
-			Int("status_code", resp.StatusCode).
-			Str("to", emailAddress).
-			Str("response_body", resp.Body).
-			Msg("error sending email")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
 	} else {
-		log.Info().
-			Int("status_code", resp.StatusCode).
-			Str("to", emailAddress).
-			Msg("successfully sent email")
+		log.Info().Msg("sent email")
 		http.SetCookie(w, &http.Cookie{Name: "email", Value: emailAddress, Path: "/"})
 		http.Redirect(w, r, "/register/teacher/emaillogin", http.StatusSeeOther)
 	}

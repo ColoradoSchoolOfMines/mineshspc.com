@@ -84,7 +84,7 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 	defer delete(a.TeacherRegistrationCaptchas, registrationID)
 
 	if captcha, ok := a.TeacherRegistrationCaptchas[registrationID]; !ok || captcha != r.Form.Get("captcha") {
-		log.Error().Err(err).Msg("invalid captcha")
+		log.Warn().Err(err).Msg("invalid captcha")
 		a.TeacherCreateAccountRenderer(w, r, map[string]any{
 			"Name":         name,
 			"Email":        emailAddress,
@@ -95,7 +95,7 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 
 	err = a.DB.NewTeacher(name, emailAddress)
 	if errors.Is(err, sqlite3.ErrConstraintUnique) {
-		log.Error().Err(err).Msg("account already exists")
+		log.Warn().Err(err).Msg("account already exists")
 		a.TeacherCreateAccountRenderer(w, r, map[string]any{
 			"Name":        name,
 			"Email":       emailAddress,
@@ -107,10 +107,6 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
-	from := mail.NewEmail("Mines HSPC", "noreply@mineshspc.com")
-	to := mail.NewEmail(name, emailAddress)
-	subject := "Confirm Email to Log In to Mines HSPC Registration"
 
 	tok := a.CreateEmailLoginJWT(emailAddress)
 	signedTok, err := tok.SignedString(a.Config.ReadGetSecretKey())
@@ -128,26 +124,16 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 	texttemplate.Must(texttemplate.ParseFS(emailTemplates, "emailtemplates/teachercreateaccount.txt")).Execute(&plainTextContent, templateData)
 	htmltemplate.Must(htmltemplate.ParseFS(emailTemplates, "emailtemplates/teachercreateaccount.html")).Execute(&htmlContent, templateData)
 
-	message := mail.NewSingleEmail(from, subject, to, plainTextContent.String(), htmlContent.String())
-	message.ReplyTo = mail.NewEmail("Mines HSPC Team", "team@mineshspc.com")
-	resp, err := a.SendGridClient.Send(message)
+	err = a.SendEmail(log, "Confirm Email to Log In to Mines HSPC Registration",
+		mail.NewEmail(name, emailAddress),
+		plainTextContent.String(),
+		htmlContent.String())
 	if err != nil {
 		log.Error().Err(err).Msg("failed to send email")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
-	} else if resp.StatusCode != http.StatusAccepted {
-		log.Error().
-			Int("status_code", resp.StatusCode).
-			Str("to", emailAddress).
-			Str("response_body", resp.Body).
-			Msg("error sending email")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
 	} else {
-		log.Info().
-			Int("status_code", resp.StatusCode).
-			Str("to", emailAddress).
-			Msg("successfully sent email")
+		log.Info().Msg("successfully sent email")
 		http.SetCookie(w, &http.Cookie{Name: "email", Value: emailAddress, Path: "/"})
 		http.Redirect(w, r, "/register/teacher/confirmemail", http.StatusSeeOther)
 	}

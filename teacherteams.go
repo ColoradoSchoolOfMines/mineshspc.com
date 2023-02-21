@@ -47,9 +47,14 @@ func (a *Application) GetTeacherTeamEditTemplate(r *http.Request) map[string]any
 		"SchoolState": user.SchoolState,
 	}
 
-	teamID := r.URL.Query().Get("team_id")
-	a.Log.Debug().Str("team_id", teamID).Msg("getting team")
-	if teamID != "" {
+	teamIDStr := r.URL.Query().Get("team_id")
+	teamID, err := uuid.Parse(teamIDStr)
+	if err != nil {
+		a.Log.Error().Err(err).Msg("Failed to parse team id")
+		return nil
+	}
+	a.Log.Debug().Str("team_id", teamIDStr).Msg("getting team")
+	if teamIDStr != "" {
 		team, err := a.DB.GetTeam(user.Email, teamID)
 		if err != nil {
 			a.Log.Error().Err(err).Msg("Failed to get teacher teams")
@@ -106,7 +111,7 @@ func (a *Application) HandleTeacherTeamEdit(w http.ResponseWriter, r *http.Reque
 		}
 
 		// Verify that the in-person-ness of the team did not change
-		team, err := a.DB.GetTeam(user.Email, teamIDStr)
+		team, err := a.DB.GetTeam(user.Email, teamID)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to get team")
 			w.WriteHeader(http.StatusInternalServerError)

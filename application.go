@@ -29,9 +29,10 @@ type Application struct {
 	EmailRegex *regexp.Regexp
 	Config     Configuration
 
-	ConfirmEmailRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
-	TeacherLoginRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
-	EmailLoginRenderer   func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
+	ConfirmEmailRenderer       func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
+	TeacherLoginRenderer       func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
+	EmailLoginRenderer         func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
+	StudentConfirmInfoRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 
 	TeacherRegistrationCaptchas  map[uuid.UUID]string
 	TeacherCreateAccountRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
@@ -119,8 +120,7 @@ func (a *Application) Start() {
 		"/faq":      {"faq.html", noArgs},
 		"/archive":  {"archive.html", a.GetArchiveTemplate},
 
-		"/register/student/confirminfo": {"student.html", noArgs},
-		"/register/parent/signforms":    {"parent.html", noArgs},
+		"/register/parent/signforms": {"parent.html", noArgs},
 	}
 	for path, templateInfo := range staticPages {
 		r.HandleFunc(path, a.ServeTemplate(a.Log, templateInfo.Template, templateInfo.ArgGenerator)).Methods(http.MethodGet)
@@ -132,8 +132,8 @@ func (a *Application) Start() {
 	// Redirect pages
 	redirects := map[string]string{
 		"/register/teacher": "/register/teacher/createaccount",
-		"/register/student": "/register/student/confirminfo",
-		"/register/parent":  "/register/parent/signforms",
+		"/register/student": "/",
+		"/register/parent":  "/",
 	}
 	for path, redirectPath := range redirects {
 		redirFn := func(redirectPath string) func(w http.ResponseWriter, r *http.Request) {
@@ -149,6 +149,7 @@ func (a *Application) Start() {
 	a.TeacherCreateAccountRenderer = a.ServeTemplateExtra(a.Log, "teachercreateaccount.html", a.GetTeacherCreateAccountTemplate)
 	a.ConfirmEmailRenderer = a.ServeTemplateExtra(a.Log, "confirmemail.html", a.GetEmailLoginTemplate)
 	a.EmailLoginRenderer = a.ServeTemplateExtra(a.Log, "emaillogin.html", a.GetEmailLoginTemplate)
+	a.StudentConfirmInfoRenderer = a.ServeTemplateExtra(a.Log, "student.html", a.GetStudentConfirmInfoTemplate)
 	registrationPages := map[string]renderInfo{
 		"/register/teacher/confirmemail":   {a.ConfirmEmailRenderer, true},
 		"/register/teacher/createaccount":  {a.TeacherCreateAccountRenderer, false},
@@ -157,6 +158,9 @@ func (a *Application) Start() {
 		"/register/teacher/teams":          {a.ServeTemplateExtra(a.Log, "teams.html", a.GetTeacherTeamsTemplate), false},
 		"/register/teacher/team/edit":      {a.ServeTemplateExtra(a.Log, "teamedit.html", a.GetTeacherTeamEditTemplate), false},
 		"/register/teacher/team/addmember": {a.ServeTemplateExtra(a.Log, "teamaddmember.html", a.GetTeacherAddMemberTemplate), false},
+
+		// Student
+		"/register/student/confirminfo": {a.StudentConfirmInfoRenderer, false},
 	}
 	for path, rend := range registrationPages {
 		renderFn := func(rend renderInfo) func(w http.ResponseWriter, r *http.Request) {
@@ -193,6 +197,7 @@ func (a *Application) Start() {
 		"/register/teacher/schoolinfo":     a.HandleTeacherSchoolInfo,
 		"/register/teacher/team/edit":      a.HandleTeacherTeamEdit,
 		"/register/teacher/team/addmember": a.HandleTeacherAddMember,
+		"/register/student/confirminfo":    a.HandleStudentConfirmEmail,
 	}
 	for path, fn := range formHandlers {
 		r.HandleFunc(path, fn).Methods(http.MethodPost)

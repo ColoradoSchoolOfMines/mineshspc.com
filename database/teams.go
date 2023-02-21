@@ -108,7 +108,7 @@ func (d *Database) GetTeacherTeams(email string) ([]*Team, error) {
 	return teams, err
 }
 
-func (d *Database) GetTeam(email string, teamID string) (*Team, error) {
+func (d *Database) GetTeam(email string, teamID uuid.UUID) (*Team, error) {
 	row := d.Raw.QueryRow(`
 		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation
 		FROM teams t
@@ -117,6 +117,15 @@ func (d *Database) GetTeam(email string, teamID string) (*Team, error) {
 		  AND t.id = ?
 	`, email, teamID)
 	return d.scanTeamWithStudents(row)
+}
+
+func (d *Database) GetTeamNoMembers(teamID uuid.UUID) (*Team, error) {
+	row := d.Raw.QueryRow(`
+		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation
+		FROM teams t
+		WHERE t.id = ?
+	`, teamID)
+	return d.scanTeam(row)
 }
 
 func (d *Database) UpsertTeam(teacherEmail string, teamID uuid.UUID, name string, division Division, inPerson bool, divisionExplanation string) error {

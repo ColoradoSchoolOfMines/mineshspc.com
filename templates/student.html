@@ -10,6 +10,13 @@
 </div>
 
 <div class="container page-content register-student p-4">
+  {{ with .Data.Confirmed }}
+    <div class="row">
+      <div class="alert alert-primary" role="alert">
+        Thank you for confirming! You may edit your responses below.
+      </div>
+    </div>
+  {{ end }}
   <div class="row">
     <div class="col">
       <p>
@@ -42,19 +49,20 @@
         <dl class="row">
           <dt class="col-sm-4">Team Name:</dt>
           <dd class="col-sm-8">{{ .Name }}</dd>
-          <dt class="col-sm-2">Division:</dt>
-          <dd class="col-sm-2">{{ .Division }}</dd>
-          <dt class="col-sm-2">In Person:</dt>
-          <dd class="col-sm-2">{{ if .InPerson }}Yes{{ else }}No{{ end }}</dd>
+          <dt class="col-sm-4">Division:</dt>
+          <dd class="col-sm-8">{{ .Division }}</dd>
+          <dt class="col-sm-4">In Person:</dt>
+          <dd class="col-sm-8">{{ if .InPerson }}Yes{{ else }}No{{ end }}</dd>
         </dl>
       {{ end }}
     </div>
   </div>
-  <form method="post" action="/register/student/confirminfo?confirmation_id={{ .Data.ConfirmationID }}" class="form-floating">
+  <form method="post" action="/register/student/confirminfo?tok={{ .Data.Token }}" class="form-floating">
     <div class="row my-4">
       <div class="col">
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="" id="confirm-info-correct">
+          <input class="form-check-input" type="checkbox" value="" id="confirm-info-correct"
+            {{ if .Data.Confirmed }}checked disabled{{ end }} />
           <label class="form-check-label" for="confirm-info-correct">
             The above information is correct.
           </label>
