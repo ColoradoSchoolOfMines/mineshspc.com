@@ -12,7 +12,6 @@ import (
 func (a *Application) GetLoggedInTeacher(r *http.Request) (*database.Teacher, error) {
 	jwtStr, err := r.Cookie("tok")
 	if err != nil {
-		a.Log.Warn().Err(err).Msg("Failed to get jwt cookie")
 		return nil, err
 	}
 

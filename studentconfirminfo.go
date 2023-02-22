@@ -49,7 +49,7 @@ func (a *Application) GetStudentConfirmInfoTemplate(r *http.Request) map[string]
 
 	team, err := a.DB.GetTeamNoMembers(student.TeamID)
 	if err != nil {
-		a.Log.Warn().Err(err).Msg("failed to get student's team")
+		a.Log.Error().Err(err).Msg("failed to get student's team")
 		return nil
 	}
 
@@ -62,7 +62,51 @@ func (a *Application) GetStudentConfirmInfoTemplate(r *http.Request) map[string]
 }
 
 func (a *Application) HandleStudentConfirmEmail(w http.ResponseWriter, r *http.Request) {
-	student, err := a.getStudentByToken(r.URL.Query().Get("tok"))
+	log := a.Log.With().Str("page_name", "student_confirm_email").Logger()
+	tok := r.URL.Query().Get("tok")
+	student, err := a.getStudentByToken(tok)
+	if err != nil {
+		log.Warn().Err(err).Msg("failed to get student from token")
+		a.StudentConfirmInfoRenderer(w, r, map[string]any{
+			"Error": "Failed to find any such student.",
+		})
+		return
+	}
 
-	a.Log.Debug().Interface("student", student).Err(err).Msg("student confirm email")
+	if err := r.ParseForm(); err != nil {
+		log.Error().Err(err).Msg("failed to parse form")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	team, err := a.DB.GetTeamNoMembers(student.TeamID)
+	if err != nil {
+		log.Error().Err(err).Msg("failed to get student's team")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if r.Form.Has("confirm-info-correct") {
+		student.EmailConfirmed = true
+	}
+
+	if team.InPerson {
+		student.CampusTour = r.Form.Has("campus-tour")
+		student.DietaryRestrictions = r.Form.Get("dietary-restrictions")
+	}
+
+	if err = a.DB.ConfirmStudent(student.Email, student.CampusTour, student.DietaryRestrictions); err != nil {
+		log.Error().Err(err).Msg("failed to confirm student")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	log.Info().Interface("s", student).Msg("student confirmed")
+
+	a.StudentConfirmInfoRenderer(w, r, map[string]any{
+		"Confirmed": student.EmailConfirmed,
+		"Student":   student,
+		"Team":      team,
+		"Token":     tok,
+	})
 }

@@ -12,8 +12,11 @@
 <div class="container page-content register-student p-4">
   {{ with .Data.Confirmed }}
     <div class="row">
-      <div class="alert alert-primary" role="alert">
-        Thank you for confirming! You may edit your responses below.
+      <div class="col">
+        <div class="alert alert-success" role="alert">
+          <b>Your information has been confirmed!</b> You may edit your responses below. If you need
+          to modify your registration information, please contact your teacher.
+        </div>
       </div>
     </div>
   {{ end }}
@@ -21,12 +24,13 @@
     <div class="col">
       <p>
         You have been registered for the CS@Mines HSPC by your teacher. Please confirm that the
-        following information is correct.
+        following information is correct. If you need to make any changes, please contact your
+        teacher.
       </p>
     </div>
   </div>
   <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-12">
       {{ with .Data.Student }}
         <dl class="row">
           <dt class="col-sm-4">Name:</dt>
@@ -44,24 +48,25 @@
         </dl>
       {{ end }}
     </div>
-    <div class="col-md-6">
-      {{ with .Data.Team }}
-        <dl class="row">
-          <dt class="col-sm-4">Team Name:</dt>
-          <dd class="col-sm-8">{{ .Name }}</dd>
-          <dt class="col-sm-4">Division:</dt>
-          <dd class="col-sm-8">{{ .Division }}</dd>
-          <dt class="col-sm-4">In Person:</dt>
-          <dd class="col-sm-8">{{ if .InPerson }}Yes{{ else }}No{{ end }}</dd>
-        </dl>
-      {{ end }}
-    </div>
+    <!-- <div class="col-md-6"> -->
+    <!--   {{ with .Data.Team }} -->
+    <!--     <dl class="row"> -->
+    <!--       <dt class="col-sm-4">Team Name:</dt> -->
+    <!--       <dd class="col-sm-8">{{ .Name }}</dd> -->
+    <!--       <dt class="col-sm-4">Division:</dt> -->
+    <!--       <dd class="col-sm-8">{{ .Division }}</dd> -->
+    <!--       <dt class="col-sm-4">In Person:</dt> -->
+    <!--       <dd class="col-sm-8">{{ if .InPerson }}Yes{{ else }}No{{ end }}</dd> -->
+    <!--     </dl> -->
+    <!--   {{ end }} -->
+    <!-- </div> -->
   </div>
   <form method="post" action="/register/student/confirminfo?tok={{ .Data.Token }}" class="form-floating">
     <div class="row my-4">
       <div class="col">
         <div class="form-check">
           <input class="form-check-input" type="checkbox" value="" id="confirm-info-correct"
+            name="confirm-info-correct" required
             {{ if .Data.Confirmed }}checked disabled{{ end }} />
           <label class="form-check-label" for="confirm-info-correct">
             The above information is correct.
@@ -76,7 +81,9 @@
       <div class="row my-4">
         <div class="col">
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="" id="campus-tour">
+            <input class="form-check-input" type="checkbox" value="" id="campus-tour"
+              name="campus-tour"
+              {{ if .Data.Student.CampusTour }}checked{{ end }} />
             <label class="form-check-label" for="campus-tour">
               I would like to participate in a campus tour after the competition.
             </label>
@@ -91,8 +98,9 @@
           <label for="dietary-restrictions" class="form-label">
             Please enter any dietary restrictions you have here:
           </label>
-          <textarea class="form-control" name="dietary-restrictions"
-            id="dietary-restrictions" rows="2" required></textarea>
+          <textarea class="form-control" name="dietary-restrictions" id="dietary-restrictions" rows="2">
+            {{- with .Data.Student.DietaryRestrictions -}}{{ . }}{{- end -}}
+          </textarea>
         </div>
       </div>
     {{ end }}

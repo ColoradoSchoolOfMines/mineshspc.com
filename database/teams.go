@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 
@@ -46,6 +47,9 @@ type Student struct {
 	LiabilitySigned         bool
 	ComputerUseWaiverSigned bool
 	MultimediaReleaseForm   bool
+
+	CampusTour          bool
+	DietaryRestrictions string
 }
 
 func (d *Database) scanTeam(row Scannable) (*Team, error) {
@@ -62,7 +66,7 @@ func (d *Database) scanTeamWithStudents(row Scannable) (*Team, error) {
 
 	studentRows, err := d.Raw.Query(`
 		SELECT s.email, s.name, s.age, s.parentemail, s.previouslyparticipated, s.emailconfirmed,
-			s.computerusewaiver, s.multimediareleaseform
+			s.computerusewaiver, s.multimediareleaseform, s.campustour, s.dietaryrestrictions
 		FROM students s
 		WHERE s.teamid = ?
 	`, team.ID)
@@ -71,13 +75,18 @@ func (d *Database) scanTeamWithStudents(row Scannable) (*Team, error) {
 	}
 	defer studentRows.Close()
 	for studentRows.Next() {
-		var student Student
-		if err := studentRows.Scan(&student.Email, &student.Name, &student.Age, &student.ParentEmail, &student.PreviouslyParticipated,
-			&student.EmailConfirmed, &student.ComputerUseWaiverSigned, &student.MultimediaReleaseForm); err != nil {
+		var s Student
+		var dietaryRestrictions sql.NullString
+		if err := studentRows.Scan(&s.Email, &s.Name, &s.Age, &s.ParentEmail, &s.PreviouslyParticipated,
+			&s.EmailConfirmed, &s.ComputerUseWaiverSigned, &s.MultimediaReleaseForm, &s.CampusTour, &dietaryRestrictions); err != nil {
 			return nil, err
 		}
 
-		team.Members = append(team.Members, student)
+		if dietaryRestrictions.Valid {
+			s.DietaryRestrictions = dietaryRestrictions.String
+		}
+
+		team.Members = append(team.Members, s)
 	}
 
 	return team, err
