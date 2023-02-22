@@ -11,9 +11,10 @@
   </div>
 </div>
 
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
 <div class="container page-content teacher">
   <form method="post" action="/register/teacher/createaccount" class="form-floating">
-    <input type="hidden" name="registration-id" value="{{ .Data.RegistrationID }}" />
     <div class="row">
       <div class="col m-4 mb-0">
         {{ with .Data.EmailExists }}
@@ -59,33 +60,16 @@
         <div class="card">
           <h4 class="card-header">Prove You Are Human</h4>
           <div class="card-body">
-            {{ with .Data.CaptchaError }}
+            {{ if .Data.CaptchaError }}
               <div class="alert alert-danger" role="alert">
-                Incorrect captcha response. Please try again. Remember that in Python, indexes are zero-based.
+                Please complete the captcha.
               </div>
             {{ end }}
-
-            <div class="row mb-2">
-              <div class="col">
-                <p>What is the output of the following Python code snippet?</p>
-                <pre>L = [
-                  {{- range $i, $s := .Data.CaptchaElements -}}
-                    <span style="color: green;">"{{ $s }}"</span>{{ if lt $i 4 }}, {{ end }}
-                  {{- end -}}
-                  ]
-<span style="color: blue;">print</span>({{- range $i, $s := .Data.CaptchaIndexes -}}
-                  L[<span style="color: red;">{{ $s }}</span>]{{ if lt $i 2 }} + {{ end }}{{ end -}})</pre>
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col-12">
-                <div class="form-floating">
-                  <input type="text" class="form-control" name="captcha" id="captcha" placeholder="A">
-                  <label for="captcha">Output of the above snippet</label>
-                </div>
-              </div>
-            </div>
+            <div class="g-recaptcha" data-sitekey="{{ .Data.ReCaptchaSiteKey }}"></div>
+            <noscript>
+              <b>This site is protected by reCAPTCHA.</b>
+              Please enable JavaScript to create an account.
+            </noscript>
           </div>
         </div>
       </div>

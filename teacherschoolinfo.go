@@ -36,9 +36,9 @@ func (a *Application) HandleTeacherSchoolInfo(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	schoolName := r.Form.Get("school-name")
-	schoolCity := r.Form.Get("school-city")
-	schoolState := r.Form.Get("school-state")
+	schoolName := r.FormValue("school-name")
+	schoolCity := r.FormValue("school-city")
+	schoolState := r.FormValue("school-state")
 
 	if schoolName == "" || schoolCity == "" || schoolState == "" {
 		a.ConfirmEmailRenderer(w, r, map[string]any{

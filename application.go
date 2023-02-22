@@ -9,7 +9,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog"
 	"github.com/sendgrid/sendgrid-go"
@@ -34,7 +33,6 @@ type Application struct {
 	EmailLoginRenderer         func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 	StudentConfirmInfoRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 
-	TeacherRegistrationCaptchas  map[uuid.UUID]string
 	TeacherCreateAccountRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 
 	SendGridClient *sendgrid.Client
@@ -45,8 +43,6 @@ func NewApplication(log *zerolog.Logger, db *sql.DB) *Application {
 		Log:        log,
 		DB:         database.NewDatabase(db, log.With().Str("module", "database").Logger()),
 		EmailRegex: regexp.MustCompile(`(?i)^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$`),
-
-		TeacherRegistrationCaptchas: map[uuid.UUID]string{},
 	}
 }
 

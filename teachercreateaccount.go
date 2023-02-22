@@ -2,64 +2,62 @@ package main
 
 import (
 	"embed"
+	"encoding/json"
 	"errors"
 	"fmt"
 	htmltemplate "html/template"
-	"math/rand"
 	"net/http"
+	"net/url"
 	"strings"
 	texttemplate "text/template"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/google/uuid"
 	"github.com/mattn/go-sqlite3"
+	"github.com/rs/zerolog/log"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
 //go:embed emailtemplates/*
 var emailTemplates embed.FS
 
-const alphabet = "abcdefghijklmnopqrstuvwxyz"
-
 func (a *Application) GetTeacherCreateAccountTemplate(r *http.Request) map[string]any {
-	captchaElements := make([]string, 5)
-	for i := range captchaElements {
-		captchaElements[i] = string(alphabet[rand.Intn(len(alphabet))]) + string(alphabet[rand.Intn(len(alphabet))])
-	}
-
-	captchaAnswer := ""
-	captchaIndexes := make([]int, 3)
-	for i := range captchaIndexes {
-		index := rand.Intn(5)
-		captchaIndexes[i] = index
-		captchaAnswer += captchaElements[index]
-	}
-
-	registrationID := uuid.New()
-	a.TeacherRegistrationCaptchas[registrationID] = captchaAnswer
-	a.Log.Info().
-		Str("registration_id", registrationID.String()).
-		Interface("captcha_elements", captchaElements).
-		Interface("captcha_indexes", captchaIndexes).
-		Interface("captcha_answer", captchaAnswer).
-		Msg("created captcha for teacher registration")
-
-	go func() {
-		time.Sleep(24 * time.Hour)
-		if _, ok := a.TeacherRegistrationCaptchas[registrationID]; ok {
-			a.Log.Info().
-				Str("registration_id", registrationID.String()).
-				Msg("expiring registration")
-			delete(a.TeacherRegistrationCaptchas, registrationID)
-		}
-	}()
-
 	return map[string]any{
-		"RegistrationID":  registrationID,
-		"CaptchaElements": captchaElements,
-		"CaptchaIndexes":  captchaIndexes,
+		"ReCaptchaSiteKey": a.Config.ReCapchaSiteKey,
 	}
+}
+
+type captchaResponse struct {
+	Success     bool      `json:"success"`
+	ChallengeTS time.Time `json:"challenge_ts"`
+	Hostname    string    `json:"hostname"`
+	ErrorCodes  []string  `json:"error-codes"`
+}
+
+func (a *Application) verifyCaptcha(response string) error {
+	form := url.Values{}
+	form.Add("secret", a.Config.ReCapchaSecretKey)
+	form.Add("response", response)
+	req, err := http.NewRequest(http.MethodPost, "https://www.google.com/recaptcha/api/siteverify", strings.NewReader(form.Encode()))
+	if err != nil {
+		return err
+	}
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	var captchaResponse captchaResponse
+	err = json.NewDecoder(resp.Body).Decode(&captchaResponse)
+	if err != nil {
+		return err
+	}
+	log.Info().Interface("resp", captchaResponse).Msg("captcha response")
+	if !captchaResponse.Success {
+		return errors.New("captcha failed")
+	}
+	return nil
 }
 
 func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.Request) {
@@ -70,30 +68,22 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 		return
 	}
 
-	registrationIDString := r.Form.Get("registration-id")
+	emailAddress := r.FormValue("email-address")
+	name := r.FormValue("your-name")
 
-	emailAddress := r.Form.Get("email-address")
-	name := r.Form.Get("your-name")
-
-	registrationID, err := uuid.Parse(registrationIDString)
-	if err != nil {
-		log.Error().Err(err).Msg("failed to parse registration id")
+	captchaResponse := r.FormValue("g-recaptcha-response")
+	if err := a.verifyCaptcha(captchaResponse); err != nil {
+		log.Error().Err(err).Msg("failed to verify captcha")
 		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	defer delete(a.TeacherRegistrationCaptchas, registrationID)
-
-	if captcha, ok := a.TeacherRegistrationCaptchas[registrationID]; !ok || captcha != r.Form.Get("captcha") {
-		log.Warn().Err(err).Msg("invalid captcha")
 		a.TeacherCreateAccountRenderer(w, r, map[string]any{
 			"Name":         name,
 			"Email":        emailAddress,
-			"CaptchaError": "Invalid captcha",
+			"CaptchaError": true,
 		})
 		return
 	}
 
-	err = a.DB.NewTeacher(name, emailAddress)
+	err := a.DB.NewTeacher(name, emailAddress)
 	if errors.Is(err, sqlite3.ErrConstraintUnique) {
 		log.Warn().Err(err).Msg("account already exists")
 		a.TeacherCreateAccountRenderer(w, r, map[string]any{

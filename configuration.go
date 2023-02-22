@@ -15,6 +15,9 @@ type Configuration struct {
 	HealthcheckURL string        `yaml:"healthcheck_url"`
 	HostedByHTML   template.HTML `yaml:"hosted_by_html"`
 	SecretKeyFile  string        `yaml:"secret_key_file"`
+
+	ReCapchaSiteKey   string `yaml:"recaptcha_site_key"`
+	ReCapchaSecretKey string `yaml:"recaptcha_secret_key"`
 }
 
 func (c *Configuration) Parse(data []byte) error {

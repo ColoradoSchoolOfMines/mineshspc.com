@@ -47,7 +47,7 @@ func (a *Application) HandleTeacherLogin(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	emailAddress := r.Form.Get("email-address")
+	emailAddress := r.FormValue("email-address")
 	if emailAddress == "" {
 		a.Log.Error().Msg("no email address provided in request")
 		w.WriteHeader(http.StatusBadRequest)

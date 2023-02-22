@@ -92,7 +92,7 @@ func (a *Application) HandleStudentConfirmEmail(w http.ResponseWriter, r *http.R
 
 	if team.InPerson {
 		student.CampusTour = r.Form.Has("campus-tour")
-		student.DietaryRestrictions = r.Form.Get("dietary-restrictions")
+		student.DietaryRestrictions = r.FormValue("dietary-restrictions")
 	}
 
 	if err = a.DB.ConfirmStudent(student.Email, student.CampusTour, student.DietaryRestrictions); err != nil {

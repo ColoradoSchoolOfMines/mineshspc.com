@@ -60,10 +60,10 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	studentName := r.Form.Get("student-name")
-	studentAgeStr := r.Form.Get("student-age")
-	studentEmail := r.Form.Get("student-email")
-	previouslyParticipated := r.Form.Get("previously-participated") == "has"
+	studentName := r.FormValue("student-name")
+	studentAgeStr := r.FormValue("student-age")
+	studentEmail := r.FormValue("student-email")
+	previouslyParticipated := r.FormValue("previously-participated") == "has"
 
 	studentAge, err := strconv.Atoi(studentAgeStr)
 	if err != nil {
@@ -72,7 +72,7 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	parentEmail := r.Form.Get("parent-email")
+	parentEmail := r.FormValue("parent-email")
 	if studentAge < 18 && parentEmail == "" {
 		log.Error().Err(err).Msg("parent email is required for students under 18")
 		w.WriteHeader(http.StatusInternalServerError)

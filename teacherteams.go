@@ -86,15 +86,15 @@ func (a *Application) HandleTeacherTeamEdit(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	teamName := r.Form.Get("team-name")
-	inPerson := r.Form.Get("team-location") == "in-person"
-	teamDivision, err := database.ParseDivision(r.Form.Get("team-division"))
+	teamName := r.FormValue("team-name")
+	inPerson := r.FormValue("team-location") == "in-person"
+	teamDivision, err := database.ParseDivision(r.FormValue("team-division"))
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to parse team division")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	teamDivisionExplanation := r.Form.Get("team-division-explanation")
+	teamDivisionExplanation := r.FormValue("team-division-explanation")
 
 	teamIDStr := r.URL.Query().Get("team_id")
 	var teamID uuid.UUID
