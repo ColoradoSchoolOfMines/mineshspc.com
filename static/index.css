@@ -197,6 +197,14 @@ footer.footer .mines-logo {
   max-width: 200px;
 }
 
+footer.footer a {
+  color: #526b91;
+}
+
+footer.footer a:hover {
+  color: #435c81;
+}
+
 /* Text & Utilities */
 #registration-info {
   font-size: 20px;
