@@ -45,8 +45,8 @@ The following information needs to be gathered:
   before or not. (Show a thing saying they need to tell their teacher if they
   need to change something.)
 
-  - [ ] Interest in campus tour
-  - [ ] Dietary restrictions
+  - [x] Interest in campus tour
+  - [x] Dietary restrictions
 
 - From students' parents (or student if old enough)
 
