@@ -18,12 +18,12 @@
 
 <div class="container page-content archive pb-5">
   {{- range $y := .Data.YearInfo -}}
-    <div class="row">
-      <div class="col mt-4 mx-4">
+    <div class="row mb-4">
+      <div class="col-lg-5 mt-4 mx-4">
           <h2>{{ .Year }}</h2>
           {{- range .RecapParagraphs -}}<p>{{ . }}</p>{{- end -}}
       </div>
-      <div class="col-md-6 mt-5 pt-3">
+      <div class="col mt-5">
         <div class="accordion">
           {{- range $i, $r := .Results -}}
           <div class="accordion-item">
