@@ -13,8 +13,14 @@ html {
 
 body {
   background-color: #E2E2E2;
-  margin: 0 0 140px 0;
+  margin: 0 0 130px 0;
   box-shadow: 0 5px 5px #888;
+}
+
+@media (max-width: 800px) {
+  body {
+    margin-bottom: 170px;
+  }
 }
 
 a {
