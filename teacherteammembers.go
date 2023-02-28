@@ -118,7 +118,7 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 
 	// Send email to student
 	tok := a.CreateStudentVerifyJWT(studentEmail)
-	signedTok, err := tok.SignedString(a.Config.ReadGetSecretKey())
+	signedTok, err := tok.SignedString(a.Config.ReadSecretKey())
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create student verify url")
 		// TODO report this error to the user and email admin

@@ -7,6 +7,16 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type RecaptchaConfig struct {
+	SiteKey   string `yaml:"site_key"`
+	SecretKey string `yaml:"secret_key"`
+}
+
+type DocusignConfig struct {
+	APIAccountID                 string `yaml:"api_account_id"`
+	ComputerUserWaiverTemplateID string `yaml:"computer_user_waiver_template_id"`
+}
+
 type Configuration struct {
 	secretKeyBytes []byte
 
@@ -16,15 +26,15 @@ type Configuration struct {
 	HostedByHTML   template.HTML `yaml:"hosted_by_html"`
 	SecretKeyFile  string        `yaml:"secret_key_file"`
 
-	ReCapchaSiteKey   string `yaml:"recaptcha_site_key"`
-	ReCapchaSecretKey string `yaml:"recaptcha_secret_key"`
+	Recaptcha RecaptchaConfig `yaml:"recaptcha"`
+	Docusign  DocusignConfig  `yaml:"docusign"`
 }
 
 func (c *Configuration) Parse(data []byte) error {
 	return yaml.Unmarshal(data, c)
 }
 
-func (c *Configuration) ReadGetSecretKey() []byte {
+func (c *Configuration) ReadSecretKey() []byte {
 	if len(c.secretKeyBytes) == 0 {
 		var err error
 		c.secretKeyBytes, err = os.ReadFile(c.SecretKeyFile)

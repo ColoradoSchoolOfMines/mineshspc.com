@@ -23,7 +23,7 @@ var emailTemplates embed.FS
 
 func (a *Application) GetTeacherCreateAccountTemplate(r *http.Request) map[string]any {
 	return map[string]any{
-		"ReCaptchaSiteKey": a.Config.ReCapchaSiteKey,
+		"ReCaptchaSiteKey": a.Config.Recaptcha.SiteKey,
 	}
 }
 
@@ -36,7 +36,7 @@ type captchaResponse struct {
 
 func (a *Application) verifyCaptcha(response string) error {
 	form := url.Values{}
-	form.Add("secret", a.Config.ReCapchaSecretKey)
+	form.Add("secret", a.Config.Recaptcha.SecretKey)
 	form.Add("response", response)
 	req, err := http.NewRequest(http.MethodPost, "https://www.google.com/recaptcha/api/siteverify", strings.NewReader(form.Encode()))
 	if err != nil {
@@ -99,7 +99,7 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 	}
 
 	tok := a.CreateEmailLoginJWT(emailAddress)
-	signedTok, err := tok.SignedString(a.Config.ReadGetSecretKey())
+	signedTok, err := tok.SignedString(a.Config.ReadSecretKey())
 	if err != nil {
 		log.Error().Err(err).Msg("failed to sign email login token")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -149,7 +149,7 @@ func (a *Application) HandleTeacherEmailLogin(w http.ResponseWriter, r *http.Req
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return a.Config.ReadGetSecretKey(), nil
+		return a.Config.ReadSecretKey(), nil
 	})
 	if err != nil {
 		a.Log.Error().Err(err).Msg("failed to parse email login token")
@@ -185,7 +185,7 @@ func (a *Application) HandleTeacherEmailLogin(w http.ResponseWriter, r *http.Req
 	}
 
 	jwt, expires := a.CreateSessionJWT(claims.Subject)
-	jwtStr, err := jwt.SignedString(a.Config.ReadGetSecretKey())
+	jwtStr, err := jwt.SignedString(a.Config.ReadSecretKey())
 	if err != nil {
 		a.Log.Error().Err(err).Msg("failed to sign JWT")
 		return

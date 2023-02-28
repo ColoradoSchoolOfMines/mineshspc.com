@@ -21,7 +21,7 @@ func (a *Application) GetLoggedInTeacher(r *http.Request) (*database.Teacher, er
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return a.Config.ReadGetSecretKey(), nil
+		return a.Config.ReadSecretKey(), nil
 	})
 	if err != nil {
 		return nil, err

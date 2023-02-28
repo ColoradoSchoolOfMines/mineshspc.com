@@ -73,7 +73,7 @@ func (a *Application) HandleTeacherLogin(w http.ResponseWriter, r *http.Request)
 	}
 
 	tok := a.CreateEmailLoginJWT(emailAddress)
-	signedTok, err := tok.SignedString(a.Config.ReadGetSecretKey())
+	signedTok, err := tok.SignedString(a.Config.ReadSecretKey())
 	if err != nil {
 		log.Error().Err(err).Msg("failed to sign email login token")
 		w.WriteHeader(http.StatusInternalServerError)

@@ -21,7 +21,7 @@ func (a *Application) getStudentByToken(tokenStr string) (*database.Student, err
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return a.Config.ReadGetSecretKey(), nil
+		return a.Config.ReadSecretKey(), nil
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse student confirmation token: %w", err)
