@@ -67,7 +67,6 @@ func main() {
 	}()
 
 	app := NewApplication(&log, db)
-	log.Info().Interface("config", app.Config).Msg("configuration loaded")
 
 	// Healthcheck loop
 	healthcheckTimer := time.NewTimer(time.Second)
