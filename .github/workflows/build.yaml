@@ -93,12 +93,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          repository: sumnerevans/nixos-configuration
+          repository: nevarro-space/infrastructure
 
       - name: Edit the hash
         run: |
-          sed 's|"${{ env.GHCR_REGISTRY_IMAGE }}:.*"|"${{ env.GHCR_REGISTRY_IMAGE }}:${{ github.sha }}"|g' modules/services/mineshspc.com.nix
-          sed -i 's|"${{ env.GHCR_REGISTRY_IMAGE }}:.*"|"${{ env.GHCR_REGISTRY_IMAGE }}:${{ github.sha }}"|g' modules/services/mineshspc.com.nix
+          sed 's|"${{ env.GHCR_REGISTRY_IMAGE }}:.*"|"${{ env.GHCR_REGISTRY_IMAGE }}:${{ github.sha }}"|g' flake.nix
+          sed -i 's|"${{ env.GHCR_REGISTRY_IMAGE }}:.*"|"${{ env.GHCR_REGISTRY_IMAGE }}:${{ github.sha }}"|g' flake.nix
 
       - name: Create PR against Sumner's infrastructure repository
         id: cpr
