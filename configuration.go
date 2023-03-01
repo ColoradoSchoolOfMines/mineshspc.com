@@ -14,7 +14,6 @@ type Configuration struct {
 	SendGridAPIKey string
 	HealthcheckURL string
 	HostedByHTML   template.HTML
-	SecretKeyFile  string
 
 	Recaptcha struct {
 		SiteKey   string
@@ -28,7 +27,6 @@ func InitConfiguration() Configuration {
 		SendGridAPIKey: viper.GetString("sendgrid_api_key"),
 		HealthcheckURL: viper.GetString("healthcheck_url"),
 		HostedByHTML:   template.HTML(viper.GetString("hosted_by_html")),
-		SecretKeyFile:  viper.GetString("secret_key_file"),
 		Recaptcha: struct {
 			SiteKey   string
 			SecretKey string
@@ -41,8 +39,13 @@ func InitConfiguration() Configuration {
 
 func (c *Configuration) ReadSecretKey() []byte {
 	if len(c.secretKeyBytes) == 0 {
+		secretKey := viper.GetString("jwt_secret_key")
+		if secretKey != "" {
+			return []byte(secretKey)
+		}
+
 		var err error
-		c.secretKeyBytes, err = os.ReadFile(c.SecretKeyFile)
+		c.secretKeyBytes, err = os.ReadFile(viper.GetString("jwt_secret_key_file"))
 		if err != nil {
 			panic(err)
 		}

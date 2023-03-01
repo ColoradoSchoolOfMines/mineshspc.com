@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -25,6 +26,7 @@ func main() {
 
 	// Setup configuration parsing
 	viper.SetEnvPrefix("mineshspc")
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
@@ -65,6 +67,7 @@ func main() {
 	}()
 
 	app := NewApplication(&log, db)
+	log.Info().Interface("config", app.Config).Msg("configuration loaded")
 
 	// Healthcheck loop
 	healthcheckTimer := time.NewTimer(time.Second)

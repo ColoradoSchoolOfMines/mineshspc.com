@@ -1,3 +1,11 @@
+# All of these configuration values can be specified via environment variables
+# as well. Just prefix them with "MINESHSPC_" and upper-case the keys.
+#
+# For example:
+#
+#   domain -> MINESHSPC_DOMAIN
+#   recaptcha.site_key -> MINESHSPC_RECAPTCHA_SITE_KEY
+
 sendgrid_api_key: SENDGRID_API_KEY
 
 # This will be shown in the footer right after the link to the source code.
@@ -7,8 +15,11 @@ hosted_by_html: |
 # Use the following domain for email links.
 domain: http://localhost:8090
 
-# The file that contains the HMAC secret key for signing the JWT tokens.
-secret_key_file: secret_key
+# A file that contains the HMAC secret key for signing the JWT tokens.
+jwt_secret_key_file: secret_key_file
+
+# The actual text of the secret key.
+jwt_secret_key: YOUR_VERY_SECURE_KEY
 
 recaptcha:
   site_key: RECAPTCHA_SITE_KEY
