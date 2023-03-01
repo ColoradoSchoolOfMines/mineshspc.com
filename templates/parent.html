@@ -9,14 +9,88 @@
   </div>
 </div>
 
-<div class="container page-content register-parent">
+<div class="container page-content register-parent p-4">
   <div class="row">
-    <div class="col m-4">
-      <h2>
-        You need to sign some forms in order for your student to participate in the Mines High
-        School Programming Competition
-      </h2>
+    <div class="col">
+      <p>
+        <b>Student Name</b> has been registered for the CS@Mines HSPC by <b>Teacher Name</b>.
+        In order to participate, you need to accept the following forms.
+      </p>
     </div>
   </div>
+  <form method="post" action="/register/student/confirminfo?tok={{ .Data.Token }}" class="form-floating">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Form</th>
+          <th scope="col">Accept</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <a href="">Waiver of Liability with Photo Release</a>
+          </td>
+          <td>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="" id="liability"
+                name="confirm-info-correct" required
+                {{ if .Data.Confirmed }}checked disabled{{ end }} />
+              <label class="form-check-label" for="confirm-info-correct">
+                Accept
+              </label>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <a href="">Minor Technology Use Waiver</a>
+          </td>
+          <td>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="" id="technology"
+                name="confirm-info-correct" required
+                {{ if .Data.Confirmed }}checked disabled{{ end }} />
+              <label class="form-check-label" for="confirm-info-correct">
+                Accept
+              </label>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <a href="">Technology Resource Access Agreement for Affiliated Programs</a>
+          </td>
+          <td>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="" id="technology"
+                name="confirm-info-correct" required
+                {{ if .Data.Confirmed }}checked disabled{{ end }} />
+              <label class="form-check-label" for="confirm-info-correct">
+                Accept
+              </label>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="row my-4">
+      <div class="col">
+        <div class="form-floating">
+          <input type="text" class="form-control col-12" name="parent-name" id="parent-name"
+            placeholder="Parent/Guardian Name" required
+          />
+          <label for="team-name">Parent/Guardian Name</label>
+        </div>
+      </div>
+    </div>
+    <div class="row text-center mt-4">
+      <div class="col-md-12">
+        <button type="submit" class="btn btn-lg btn-primary">
+          Sign
+        </button>
+      </div>
+    </div>
+  </form>
 </div>
 {{ end }}

@@ -12,11 +12,6 @@ type RecaptchaConfig struct {
 	SecretKey string `yaml:"secret_key"`
 }
 
-type DocusignConfig struct {
-	APIAccountID                 string `yaml:"api_account_id"`
-	ComputerUserWaiverTemplateID string `yaml:"computer_user_waiver_template_id"`
-}
-
 type Configuration struct {
 	secretKeyBytes []byte
 
@@ -27,7 +22,6 @@ type Configuration struct {
 	SecretKeyFile  string        `yaml:"secret_key_file"`
 
 	Recaptcha RecaptchaConfig `yaml:"recaptcha"`
-	Docusign  DocusignConfig  `yaml:"docusign"`
 }
 
 func (c *Configuration) Parse(data []byte) error {

@@ -13,7 +13,3 @@ secret_key_file: secret_key
 recaptcha:
   site_key: RECAPTCHA_SITE_KEY
   secret_key: RECAPTCHA_SECRET_KEY
-
-docusign:
-  api_account_id: 00000000-0000-0000-0000-000000000000
-  computer_use_waiver_template_id: 00000000-0000-0000-0000-000000000000
