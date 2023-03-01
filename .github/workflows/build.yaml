@@ -100,7 +100,7 @@ jobs:
           sed 's|"${{ env.GHCR_REGISTRY_IMAGE }}:.*"|"${{ env.GHCR_REGISTRY_IMAGE }}:${{ github.sha }}"|g' flake.nix
           sed -i 's|"${{ env.GHCR_REGISTRY_IMAGE }}:.*"|"${{ env.GHCR_REGISTRY_IMAGE }}:${{ github.sha }}"|g' flake.nix
 
-      - name: Create PR against Sumner's infrastructure repository
+      - name: Create PR against Nevarro's infrastructure repository
         id: cpr
         uses: peter-evans/create-pull-request@v4
         with:
@@ -109,6 +109,8 @@ jobs:
           title: "mineshspc.com: update to ${{ github.sha }}"
           body: |
             Automated changes by [create-pull-request](https://github.com/peter-evans/create-pull-request) GitHub action in the [mineshspc.com](https://github.com/ColoradoSchoolOfMines/mineshspc.com) repository.
+
+            **Changes:** https://github.com/ColoradoSchoolOfMines/mineshspc.com/commits/${{ github.sha }}
           branch: update-mineshspc
           delete-branch: true
           assignees: sumnerevans
