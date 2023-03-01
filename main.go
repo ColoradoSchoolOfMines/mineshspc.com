@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"database/sql"
-	"flag"
 	"net/http"
 	"os"
 	"os/signal"
@@ -13,14 +12,10 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/spf13/viper"
 )
 
 func main() {
-	// Arg parsing
-	configPath := flag.String("config", "./config.yaml", "config file location")
-	dbPath := flag.String("db", "./mineshspc.db", "SQLite database file location")
-	flag.Parse()
-
 	// Configure logging
 	log := log.Output(os.Stdout)
 	if os.Getenv("LOG_CONSOLE") != "" {
@@ -28,9 +23,24 @@ func main() {
 	}
 	log.Info().Msg("mineshspc.com backend starting...")
 
+	// Setup configuration parsing
+	viper.SetEnvPrefix("mineshspc")
+	viper.AutomaticEnv()
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(".")
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			// Config file was found but another error was produced
+			log.Fatal().Err(err).Msg("couldn't read viper config")
+		}
+	}
+
 	// Open the database
-	log.Info().Str("db_path", *dbPath).Msg("opening database...")
-	db, err := sql.Open("sqlite3", *dbPath)
+	viper.SetDefault("db", "./mineshspc.db")
+	dbPath := viper.GetString("db")
+	log.Info().Str("db_path", dbPath).Msg("opening database...")
+	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to open database")
 	}
@@ -55,16 +65,6 @@ func main() {
 	}()
 
 	app := NewApplication(&log, db)
-
-	// Load configuration
-	log.Info().Str("config_path", *configPath).Msg("Reading config")
-	configYaml, err := os.ReadFile(*configPath)
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to read config")
-	}
-	if err := app.Config.Parse(configYaml); err != nil {
-		log.Fatal().Err(err).Msg("Failed to parse config")
-	}
 
 	// Healthcheck loop
 	healthcheckTimer := time.NewTimer(time.Second)

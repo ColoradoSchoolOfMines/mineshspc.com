@@ -4,28 +4,39 @@ import (
 	"html/template"
 	"os"
 
-	"gopkg.in/yaml.v3"
+	"github.com/spf13/viper"
 )
-
-type RecaptchaConfig struct {
-	SiteKey   string `yaml:"site_key"`
-	SecretKey string `yaml:"secret_key"`
-}
 
 type Configuration struct {
 	secretKeyBytes []byte
 
-	Domain         string        `yaml:"domain"`
-	SendGridAPIKey string        `yaml:"sendgrid_api_key"`
-	HealthcheckURL string        `yaml:"healthcheck_url"`
-	HostedByHTML   template.HTML `yaml:"hosted_by_html"`
-	SecretKeyFile  string        `yaml:"secret_key_file"`
+	Domain         string
+	SendGridAPIKey string
+	HealthcheckURL string
+	HostedByHTML   template.HTML
+	SecretKeyFile  string
 
-	Recaptcha RecaptchaConfig `yaml:"recaptcha"`
+	Recaptcha struct {
+		SiteKey   string
+		SecretKey string
+	}
 }
 
-func (c *Configuration) Parse(data []byte) error {
-	return yaml.Unmarshal(data, c)
+func InitConfiguration() Configuration {
+	return Configuration{
+		Domain:         viper.GetString("domain"),
+		SendGridAPIKey: viper.GetString("sendgrid_api_key"),
+		HealthcheckURL: viper.GetString("healthcheck_url"),
+		HostedByHTML:   template.HTML(viper.GetString("hosted_by_html")),
+		SecretKeyFile:  viper.GetString("secret_key_file"),
+		Recaptcha: struct {
+			SiteKey   string
+			SecretKey string
+		}{
+			SiteKey:   viper.GetString("recaptcha.site_key"),
+			SecretKey: viper.GetString("recaptcha.secret_key"),
+		},
+	}
 }
 
 func (c *Configuration) ReadSecretKey() []byte {

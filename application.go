@@ -43,6 +43,7 @@ func NewApplication(log *zerolog.Logger, db *sql.DB) *Application {
 		Log:        log,
 		DB:         database.NewDatabase(db, log.With().Str("module", "database").Logger()),
 		EmailRegex: regexp.MustCompile(`(?i)^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$`),
+		Config:     InitConfiguration(),
 	}
 }
 
