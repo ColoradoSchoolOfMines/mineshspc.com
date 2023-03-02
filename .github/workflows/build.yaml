@@ -107,6 +107,7 @@ jobs:
           token: ${{ secrets.PR_CREATOR_TOKEN }}
           commit-message: "mineshspc.com: update to ${{ github.sha }}"
           title: "mineshspc.com: update to ${{ github.sha }}"
+          author: "Nevarro Bot <nevarro-bot@users.noreply.github.com>"
           body: |
             Automated changes by [create-pull-request](https://github.com/peter-evans/create-pull-request) GitHub action in the [mineshspc.com](https://github.com/ColoradoSchoolOfMines/mineshspc.com) repository.
 
