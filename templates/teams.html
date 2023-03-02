@@ -59,9 +59,9 @@
                         <dd class="col-sm-8">{{ .Age }}</dd>
                         <dt class="col-sm-4">Previously Participated:</dt>
                         <dd class="col-sm-8">{{ if .PreviouslyParticipated }}Yes{{ else }}No{{ end }}</dd>
-                        {{ with .ParentEmail }}
+                        {{ if lt .Age 18 }}
                         <dt class="col-sm-4">Parent/Guardian Email:</dt>
-                        <dd class="col-sm-8">{{ . }}</dd>
+                        <dd class="col-sm-8">{{ .ParentEmail }}</dd>
                         {{ end }}
                       </dl>
                     </div>

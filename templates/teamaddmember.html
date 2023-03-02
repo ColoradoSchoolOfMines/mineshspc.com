@@ -93,25 +93,6 @@
         </div>
       </div>
     </div>
-    <div class="row d-none" id="parent-information">
-      <div class="col m-4 mt-0">
-        <div class="card">
-          <h4 class="card-header">Parent Information</h4>
-          <div class="card-body">
-            <div class="row mb-2">
-              <div class="col">
-                <div class="form-floating">
-                  <input type="email" class="form-control col-12" name="parent-email" id="parent-email"
-                    placeholder="Parent Email"
-                  />
-                  <label for="team-name">Parent/Guardian Email</label>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
     <div class="row text-center pb-4">
       <div class="col-md-12">
         <button type="submit" class="btn btn-lg btn-primary">
@@ -120,18 +101,5 @@
       </div>
     </div>
   </form>
-  <script>
-    var studentAge = document.getElementById("student-age");
-    studentAge.addEventListener("change", function(e) {
-      console.log("student age is: ", studentAge.value);
-      if (parseInt(studentAge.value) < 18) {
-        document.getElementById("parent-information").classList.remove("d-none");
-        document.getElementById("parent-email").required = true;
-      } else {
-        document.getElementById("parent-information").classList.add("d-none");
-        document.getElementById("parent-email").required = false;
-      }
-    })
-  </script>
 </div>
 {{ end }}

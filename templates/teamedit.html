@@ -64,15 +64,15 @@
             <div class="row">
               <div class="col">
                 This team will compete
-                <div class="btn-group" role="group" aria-label="Select team division">
+                <div class="btn-group" role="group" aria-label="Select team location">
                   <input type="radio" class="btn-check" name="team-location"
                     value="in-person" id="in-person" autocomplete="off" required
-                    {{ with .Data.Team }}{{ if .InPerson }}checked{{ end }} disabled{{ end }}>
+                    {{ with .Data.Team }}{{ if .InPerson }}checked{{ else }}disabled{{ end }}{{ end }}>
                   <label class="btn btn-outline-primary" for="in-person">in person</label>
 
                   <input type="radio" class="btn-check" name="team-location"
                     value="remote" id="remote" autocomplete="off" required
-                    {{ with .Data.Team }}{{ if not .InPerson }}checked{{ end }} disabled{{ end }}>
+                    {{ with .Data.Team }}{{ if not .InPerson }}checked{{ else }}disabled{{ end }}{{ end }}>
                   <label class="btn btn-outline-primary" for="remote">remotely</label>
                 </div>
                 <div class="form-text">
@@ -161,9 +161,9 @@
                         <dd class="col-sm-8">{{ .Age }}</dd>
                         <dt class="col-sm-4">Previously Participated:</dt>
                         <dd class="col-sm-8">{{ if .PreviouslyParticipated }}Yes{{ else }}No{{ end }}</dd>
-                        {{ with .ParentEmail }}
+                        {{ if lt .Age 18 }}
                         <dt class="col-sm-4">Parent/Guardian Email:</dt>
-                        <dd class="col-sm-8">{{ . }}</dd>
+                        <dd class="col-sm-8">{{ .ParentEmail }}</dd>
                         {{ end }}
                       </dl>
                     </div>

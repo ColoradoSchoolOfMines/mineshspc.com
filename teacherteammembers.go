@@ -72,13 +72,6 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	parentEmail := r.FormValue("parent-email")
-	if studentAge < 18 && parentEmail == "" {
-		log.Error().Err(err).Msg("parent email is required for students under 18")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
 	teamIDStr := r.URL.Query().Get("team_id")
 	teamID, err := uuid.Parse(teamIDStr)
 	if err != nil {
@@ -105,11 +98,10 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 		Str("student_name", studentName).
 		Int("student_age", studentAge).
 		Str("student_email", studentEmail).
-		Str("parent_email", parentEmail).
 		Str("team_id", teamIDStr).
 		Logger()
 	log.Info().Msg("adding student")
-	if err := a.DB.AddTeamMember(teamID, studentName, studentAge, studentEmail, previouslyParticipated, parentEmail); err != nil {
+	if err := a.DB.AddTeamMember(teamID, studentName, studentAge, studentEmail, previouslyParticipated); err != nil {
 		log.Error().Err(err).Msg("Failed to add team member")
 		// TODO report this error to the user and email admin
 		w.WriteHeader(http.StatusInternalServerError)
@@ -147,8 +139,6 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 	} else {
 		log.Info().Msg("sent email")
 	}
-
-	// TODO Send email to parent if necessary
 
 	http.Redirect(w, r, "/register/teacher/team/edit?team_id="+teamID.String(), http.StatusSeeOther)
 }

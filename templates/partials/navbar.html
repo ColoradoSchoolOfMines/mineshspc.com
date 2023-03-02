@@ -28,13 +28,13 @@
                     <a class='nav-link {{ if eq .PageName "archive"}}archive-link-active{{ end }}' id="archive-link" aria-current="page" href="/archive">Archive</a>
                 </li>
             </ul>
-            <div class="logged-in-user nav-link small text-secondary me-4">
-                {{ with .Data.Username }}
-                    Welcome <a href="/register/teacher/teams">{{ . }}</a> <span class="mx-2">|</span> <a href="/register/teacher/logout">Logout</a>
-                {{ else }}
-                    <a href="/register/teacher/login">Teacher login</a>
-                {{ end }}
-            </div>
+            <!-- <div class="logged-in-user nav-link small text-secondary me-4"> -->
+            <!--     {{ with .Data.Username }} -->
+            <!--         Welcome <a href="/register/teacher/teams">{{ . }}</a> <span class="mx-2">|</span> <a href="/register/teacher/logout">Logout</a> -->
+            <!--     {{ else }} -->
+            <!--         <a href="/register/teacher/login">Teacher login</a> -->
+            <!--     {{ end }} -->
+            <!-- </div> -->
         </div>
     </div>
 </nav>

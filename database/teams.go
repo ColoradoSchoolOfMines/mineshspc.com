@@ -76,14 +76,23 @@ func (d *Database) scanTeamWithStudents(row Scannable) (*Team, error) {
 	defer studentRows.Close()
 	for studentRows.Next() {
 		var s Student
-		var dietaryRestrictions sql.NullString
-		if err := studentRows.Scan(&s.Email, &s.Name, &s.Age, &s.ParentEmail, &s.PreviouslyParticipated,
-			&s.EmailConfirmed, &s.ComputerUseWaiverSigned, &s.MultimediaReleaseForm, &s.CampusTour, &dietaryRestrictions); err != nil {
+		var parentEmail, dietaryRestrictions sql.NullString
+		var campusTour sql.NullBool
+		if err := studentRows.Scan(&s.Email, &s.Name, &s.Age, &parentEmail, &s.PreviouslyParticipated,
+			&s.EmailConfirmed, &s.ComputerUseWaiverSigned, &s.MultimediaReleaseForm, &campusTour, &dietaryRestrictions); err != nil {
 			return nil, err
+		}
+
+		if parentEmail.Valid {
+			s.ParentEmail = parentEmail.String
 		}
 
 		if dietaryRestrictions.Valid {
 			s.DietaryRestrictions = dietaryRestrictions.String
+		}
+
+		if campusTour.Valid {
+			s.CampusTour = campusTour.Bool
 		}
 
 		team.Members = append(team.Members, s)
@@ -145,11 +154,11 @@ func (d *Database) UpsertTeam(teacherEmail string, teamID uuid.UUID, name string
 	return err
 }
 
-func (d *Database) AddTeamMember(teamID uuid.UUID, name string, studentAge int, studentEmail string, previouslyParticipated bool, parentEmail string) error {
+func (d *Database) AddTeamMember(teamID uuid.UUID, name string, studentAge int, studentEmail string, previouslyParticipated bool) error {
 	_, err := d.Raw.Exec(`
-		INSERT INTO students (teamid, name, age, email, previouslyparticipated, parentemail)
-		VALUES (?, ?, ?, ?, ?, ?)
-	`, teamID, name, studentAge, studentEmail, previouslyParticipated, parentEmail)
+		INSERT INTO students (teamid, name, age, email, previouslyparticipated)
+		VALUES (?, ?, ?, ?, ?)
+	`, teamID, name, studentAge, studentEmail, previouslyParticipated)
 	return err
 }
 

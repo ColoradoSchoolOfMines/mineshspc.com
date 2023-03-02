@@ -149,8 +149,8 @@ func (a *Application) Start() {
 	a.StudentConfirmInfoRenderer = a.ServeTemplateExtra(a.Log, "student.html", a.GetStudentConfirmInfoTemplate)
 	registrationPages := map[string]renderInfo{
 		"/register/teacher/confirmemail":   {a.ConfirmEmailRenderer, true},
-		"/register/teacher/createaccount":  {a.TeacherCreateAccountRenderer, false},
-		"/register/teacher/login":          {a.TeacherLoginRenderer, false},
+		"/register/teacher/createaccount":  {a.TeacherCreateAccountRenderer, true},
+		"/register/teacher/login":          {a.TeacherLoginRenderer, true},
 		"/register/teacher/schoolinfo":     {a.ServeTemplateExtra(a.Log, "schoolinfo.html", a.GetTeacherSchoolInfoTemplate), false},
 		"/register/teacher/teams":          {a.ServeTemplateExtra(a.Log, "teams.html", a.GetTeacherTeamsTemplate), false},
 		"/register/teacher/team/edit":      {a.ServeTemplateExtra(a.Log, "teamedit.html", a.GetTeacherTeamEditTemplate), false},

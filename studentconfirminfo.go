@@ -95,13 +95,26 @@ func (a *Application) HandleStudentConfirmEmail(w http.ResponseWriter, r *http.R
 		student.DietaryRestrictions = r.FormValue("dietary-restrictions")
 	}
 
-	if err = a.DB.ConfirmStudent(student.Email, student.CampusTour, student.DietaryRestrictions); err != nil {
+	if student.Age < 18 && student.ParentEmail == "" {
+		parentEmail := r.FormValue("parent-email")
+		if parentEmail == "" {
+			log.Error().Err(err).Msg("parent email is required for students under 18")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		} else {
+			student.ParentEmail = parentEmail
+		}
+	}
+
+	if err = a.DB.ConfirmStudent(student.Email, student.CampusTour, student.DietaryRestrictions, student.ParentEmail); err != nil {
 		log.Error().Err(err).Msg("failed to confirm student")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	log.Info().Interface("s", student).Msg("student confirmed")
+
+	// TODO Send email to parent or student with the forms
 
 	a.StudentConfirmInfoRenderer(w, r, map[string]any{
 		"Confirmed": student.EmailConfirmed,
