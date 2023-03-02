@@ -270,7 +270,6 @@ footer.footer a:hover {
 .register-flow {
   padding-left: 0;
   list-style: none;
-  padding-bottom: 2%;
 }
 
 .register-item {
@@ -292,7 +291,6 @@ footer.footer a:hover {
 
 .register-text {
   display: block;
-  padding: 20px;
   margin-top: 1%;
   margin-left: 3.5%;
   font-size: 18px;
@@ -302,18 +300,10 @@ footer.footer a:hover {
 
 .register-flow li {
   position: relative;
-  padding-right: 5%;
-  padding-top: 3%;
-  margin-left: 3%;
-}
-
-.register-flow li:last-child {
-  padding-bottom: 2%;
-  border-bottom: 2px solid lightslategray;
 }
 
 .register-flow li:first-child::before {
-  top: 2.5rem;
+  top: 2rem;
 }
 
 .register-flow li::before {
