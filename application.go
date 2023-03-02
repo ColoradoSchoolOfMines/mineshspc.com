@@ -164,6 +164,9 @@ func (a *Application) Start() {
 			return func(w http.ResponseWriter, r *http.Request) {
 				if teacher, err := a.GetLoggedInTeacher(r); err != nil {
 					a.Log.Warn().Err(err).Msg("Failed to get logged in teacher")
+					if !rend.RedirectIfLoggedIn {
+						http.Redirect(w, r, "/register/teacher/login", http.StatusTemporaryRedirect)
+					}
 				} else if rend.RedirectIfLoggedIn && teacher != nil {
 					if teacher.SchoolCity == "" || teacher.SchoolName == "" || teacher.SchoolState == "" {
 						http.Redirect(w, r, "/register/teacher/schoolinfo", http.StatusSeeOther)
