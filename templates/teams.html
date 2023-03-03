@@ -128,13 +128,11 @@
               {{ end }}
             </ul>
           </div>
-          {{ if .RegistrationEnabled }}
-            <div class="card-footer">
-              <a href="/register/teacher/team/edit?team_id={{ .ID }}" type="button" class="btn btn-primary">
-                Edit
-              </a>
-            </div>
-          {{ end }}
+          <div class="card-footer">
+            <a href="/register/teacher/team/edit?team_id={{ .ID }}" type="button" class="btn btn-primary">
+              Edit
+            </a>
+          </div>
         </div>
       </div>
     </div>
