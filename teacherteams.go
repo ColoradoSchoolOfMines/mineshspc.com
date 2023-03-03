@@ -24,11 +24,12 @@ func (a *Application) GetTeacherTeamsTemplate(r *http.Request) map[string]any {
 	}
 
 	return map[string]any{
-		"Username":    user.Name,
-		"SchoolName":  user.SchoolName,
-		"SchoolCity":  user.SchoolCity,
-		"SchoolState": user.SchoolState,
-		"Teams":       teams,
+		"Username":         user.Name,
+		"SchoolName":       user.SchoolName,
+		"SchoolCity":       user.SchoolCity,
+		"SchoolState":      user.SchoolState,
+		"Teams":            teams,
+		"AllowanceReached": user.EmailAllowance == 0,
 	}
 }
 

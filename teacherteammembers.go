@@ -74,6 +74,30 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	if user.EmailAllowance <= 0 {
+		log.Error().Msg("User has no email allowance")
+		a.TeamAddMemberRenderer(w, r, map[string]any{
+			"Error": map[string]any{
+				"General": htmltemplate.HTML(
+					`You have reached your quota for sent emails. Please email
+					<a href="mailto:support@mineshspc.com">support@mineshspc.com</a>
+					if you need to add more members to any of your teams.`),
+			},
+			"StudentName":            studentName,
+			"StudentAge":             studentAge,
+			"StudentEmail":           studentEmail,
+			"PreviouslyParticipated": previouslyParticipated,
+		})
+		return
+	}
+
+	err = a.DB.DecrementEmailAllowance(user.Email)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to decrement email allowance")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	teamIDStr := r.URL.Query().Get("team_id")
 	teamID, err := uuid.Parse(teamIDStr)
 	if err != nil {

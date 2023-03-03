@@ -67,7 +67,7 @@ func (d *Database) scanTeamWithStudents(row Scannable) (*Team, error) {
 
 	studentRows, err := d.Raw.Query(`
 		SELECT s.email, s.name, s.age, s.parentemail, s.signatory, s.previouslyparticipated, s.emailconfirmed,
-			s.computerusewaiver, s.multimediareleaseform, s.campustour, s.dietaryrestrictions
+			s.liabilitywaiver, s.computerusewaiver, s.multimediareleaseform, s.campustour, s.dietaryrestrictions
 		FROM students s
 		WHERE s.teamid = ?
 	`, team.ID)
@@ -80,7 +80,7 @@ func (d *Database) scanTeamWithStudents(row Scannable) (*Team, error) {
 		var parentEmail, signatory, dietaryRestrictions sql.NullString
 		var campusTour sql.NullBool
 		if err := studentRows.Scan(&s.Email, &s.Name, &s.Age, &parentEmail, &signatory, &s.PreviouslyParticipated,
-			&s.EmailConfirmed, &s.ComputerUseWaiverSigned, &s.MultimediaReleaseForm, &campusTour, &dietaryRestrictions); err != nil {
+			&s.EmailConfirmed, &s.LiabilitySigned, &s.ComputerUseWaiverSigned, &s.MultimediaReleaseForm, &campusTour, &dietaryRestrictions); err != nil {
 			return nil, err
 		}
 

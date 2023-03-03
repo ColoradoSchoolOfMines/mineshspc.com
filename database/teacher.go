@@ -8,6 +8,7 @@ type Teacher struct {
 	Name           string
 	Email          string
 	EmailConfirmed bool
+	EmailAllowance int
 	SchoolName     string
 	SchoolCity     string
 	SchoolState    string
@@ -26,7 +27,7 @@ func (d *Database) SetEmailConfirmed(email string) error {
 func (d *Database) scanTeacher(row Scannable) (*Teacher, error) {
 	var schoolName, schoolCity, schoolState sql.NullString
 	var t Teacher
-	if err := row.Scan(&t.Name, &t.Email, &t.EmailConfirmed, &schoolName, &schoolCity, &schoolState); err != nil {
+	if err := row.Scan(&t.Name, &t.Email, &t.EmailConfirmed, &t.EmailAllowance, &schoolName, &schoolCity, &schoolState); err != nil {
 		return nil, err
 	}
 
@@ -45,7 +46,7 @@ func (d *Database) scanTeacher(row Scannable) (*Teacher, error) {
 
 func (d *Database) GetTeacherByEmail(email string) (*Teacher, error) {
 	row := d.Raw.QueryRow(`
-		SELECT t.name, t.email, t.emailconfirmed, t.schoolname, t.schoolcity, t.schoolstate
+		SELECT t.name, t.email, t.emailconfirmed, t.emailallowance, t.schoolname, t.schoolcity, t.schoolstate
 		FROM teachers t
 		WHERE t.email = ?
 	`, email)
@@ -58,5 +59,14 @@ func (d *Database) SetTeacherSchoolInfo(email, schoolName, schoolCity, schoolSta
 		SET schoolname = ?, schoolcity = ?, schoolstate = ?
 		WHERE email = ?
 	`, schoolName, schoolCity, schoolState, email)
+	return err
+}
+
+func (d *Database) DecrementEmailAllowance(email string) error {
+	_, err := d.Raw.Exec(`
+		UPDATE teachers
+		SET emailallowance = emailallowance - 1
+		WHERE email = ?
+	`, email)
 	return err
 }

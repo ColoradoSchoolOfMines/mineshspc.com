@@ -32,6 +32,7 @@ func (d *Database) RunMigrations() {
 				email          TEXT NOT NULL PRIMARY KEY,
 				name           TEXT NOT NULL,
 				emailconfirmed BOOLEAN NOT NULL DEFAULT FALSE,
+				emailallowance INTEGER NOT NULL DEFAULT 16,
 
 				-- school info is 1:1 with teachers
 				schoolname     TEXT,

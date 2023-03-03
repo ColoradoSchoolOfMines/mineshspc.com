@@ -93,7 +93,7 @@
 
                   <input type="radio" class="btn-check" name="previously-participated"
                     value="has-not" id="has-not" autocomplete="off" required
-                    {{ if not .Data.PreviouslyParticipated }}checked{{ end }}
+                    {{ if and (not .Data.PreviouslyParticipated) .Data.Error }}checked{{ end }}
                     />
                   <label class="btn btn-outline-primary" for="has-not">has not</label>
                 </div>

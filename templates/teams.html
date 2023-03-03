@@ -12,6 +12,17 @@
 </div>
 
 <div class="container page-content teacher">
+  {{ if .Data.AllowanceReached }}
+    <div class="row">
+      <div class="col m-4 mb-0">
+        <div class="alert alert-warning" role="alert">
+          You have reached your quota for sent emails. Please email
+          <a href="mailto:support@mineshspc.com">support@mineshspc.com</a>
+          if you need to add more members to any of your teams.
+        </div>
+      </div>
+    </div>
+  {{ end }}
   <div class="row">
     <div class="col m-4 mb-0 text-center">
       <p>
