@@ -130,6 +130,11 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 }
 
 func (a *Application) HandleTeacherEmailLogin(w http.ResponseWriter, r *http.Request) {
+	if !a.Config.RegistrationEnabled {
+		http.Redirect(w, r, "/register", http.StatusSeeOther)
+		return
+	}
+
 	tokenStr := r.URL.Query().Get("tok")
 	if tokenStr == "" {
 		emailCookie, err := r.Cookie("email")

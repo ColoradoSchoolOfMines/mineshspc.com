@@ -193,6 +193,11 @@ func (a *Application) CreateStudentVerifyJWT(email string) *jwt.Token {
 }
 
 func (a *Application) HandleTeacherDeleteMember(w http.ResponseWriter, r *http.Request) {
+	if !a.Config.RegistrationEnabled {
+		http.Redirect(w, r, "/register", http.StatusSeeOther)
+		return
+	}
+
 	email := r.URL.Query().Get("email")
 	teamIDStr := r.URL.Query().Get("team_id")
 	log := a.Log.With().
