@@ -42,6 +42,7 @@ type Student struct {
 	Name                    string
 	Age                     int
 	ParentEmail             string
+	Signatory               string
 	PreviouslyParticipated  bool
 	EmailConfirmed          bool
 	LiabilitySigned         bool
@@ -65,7 +66,7 @@ func (d *Database) scanTeamWithStudents(row Scannable) (*Team, error) {
 	}
 
 	studentRows, err := d.Raw.Query(`
-		SELECT s.email, s.name, s.age, s.parentemail, s.previouslyparticipated, s.emailconfirmed,
+		SELECT s.email, s.name, s.age, s.parentemail, s.signatory, s.previouslyparticipated, s.emailconfirmed,
 			s.computerusewaiver, s.multimediareleaseform, s.campustour, s.dietaryrestrictions
 		FROM students s
 		WHERE s.teamid = ?
@@ -76,15 +77,19 @@ func (d *Database) scanTeamWithStudents(row Scannable) (*Team, error) {
 	defer studentRows.Close()
 	for studentRows.Next() {
 		var s Student
-		var parentEmail, dietaryRestrictions sql.NullString
+		var parentEmail, signatory, dietaryRestrictions sql.NullString
 		var campusTour sql.NullBool
-		if err := studentRows.Scan(&s.Email, &s.Name, &s.Age, &parentEmail, &s.PreviouslyParticipated,
+		if err := studentRows.Scan(&s.Email, &s.Name, &s.Age, &parentEmail, &signatory, &s.PreviouslyParticipated,
 			&s.EmailConfirmed, &s.ComputerUseWaiverSigned, &s.MultimediaReleaseForm, &campusTour, &dietaryRestrictions); err != nil {
 			return nil, err
 		}
 
 		if parentEmail.Valid {
 			s.ParentEmail = parentEmail.String
+		}
+
+		if signatory.Valid {
+			s.Signatory = signatory.String
 		}
 
 		if dietaryRestrictions.Valid {

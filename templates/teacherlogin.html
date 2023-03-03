@@ -23,7 +23,13 @@
         {{ else }}
           {{ with .Data.EmailNotConfirmed }}
             <div class="alert alert-danger" role="alert">
-              That email hasn't been confirmed yet. Please confirm your email before logging in.
+              <p>
+                That email hasn't been confirmed yet. Please confirm your email before logging in.
+              </p>
+              <p>
+                Lost your confirmation email? Send an email to
+                <a href="mailto:support@mineshspc.com">support@mineshspc.com</a>.
+              </p>
             </div>
           {{ else }}
             <div class="alert alert-secondary" role="alert">

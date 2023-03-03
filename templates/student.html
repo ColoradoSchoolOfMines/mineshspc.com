@@ -149,6 +149,35 @@
           </div>
         </div>
       </div>
+    {{ else }}
+      <div class="row my-4" id="parent-information">
+        <div class="col">
+          <div class="card">
+            <h4 class="card-header">Forms Information</h4>
+            <div class="card-body">
+              <div class="row">
+                <div class="col">
+                  <p>
+                    Since you are over 18, you may sign the forms necessary for you to participate.
+                    You will be sent a link at the following email where you can sign the forms.
+                  </p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <div class="form-floating">
+                    <input type="email" class="form-control col-12"
+                      placeholder="Email"
+                      {{ with .Data.Student.Email }}value="{{ . }}" disabled{{ end }}
+                    />
+                    <label for="team-name">Email</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     {{ end }}
     <div class="row text-center mt-4">
       <div class="col-md-12">

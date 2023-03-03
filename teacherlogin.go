@@ -18,6 +18,7 @@ const (
 	IssuerEmailLogin    Issuer = "email_login"
 	IssuerSessionToken  Issuer = "session_token"
 	IssuerStudentVerify Issuer = "student_verify"
+	IssuerSignForms     Issuer = "sign_forms"
 )
 
 func (a *Application) GetEmailLoginTemplate(r *http.Request) map[string]any {

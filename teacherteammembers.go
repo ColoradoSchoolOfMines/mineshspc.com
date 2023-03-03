@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	htmltemplate "html/template"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
+	"github.com/mattn/go-sqlite3"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
@@ -98,11 +100,27 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 		Str("student_name", studentName).
 		Int("student_age", studentAge).
 		Str("student_email", studentEmail).
+		Bool("previously_participated", previouslyParticipated).
 		Str("team_id", teamIDStr).
 		Logger()
 	log.Info().Msg("adding student")
 	if err := a.DB.AddTeamMember(teamID, studentName, studentAge, studentEmail, previouslyParticipated); err != nil {
-		log.Error().Err(err).Msg("Failed to add team member")
+		log.Error().Err(err).Interface("oheaohea", err).Bool("ohea", errors.Is(err, sqlite3.ErrConstraintUnique)).Msg("Failed to add team member")
+
+		var sqliteErr sqlite3.Error
+		if errors.As(err, &sqliteErr); sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique || sqliteErr.ExtendedCode == sqlite3.ErrConstraintPrimaryKey {
+			a.TeamAddMemberRenderer(w, r, map[string]any{
+				"Error": map[string]any{
+					"General": "That email address has already added to a team.",
+				},
+				"StudentName":            studentName,
+				"StudentAge":             studentAge,
+				"StudentEmail":           studentEmail,
+				"PreviouslyParticipated": previouslyParticipated,
+			})
+			return
+		}
+
 		// TODO report this error to the user and email admin
 		w.WriteHeader(http.StatusInternalServerError)
 		return

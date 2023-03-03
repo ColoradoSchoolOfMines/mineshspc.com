@@ -10,15 +10,25 @@
 </div>
 
 <div class="container page-content register-parent p-4">
+  {{ with .Data.Accepted }}
+    <div class="row">
+      <div class="col">
+        <div class="alert alert-success" role="alert">
+          <b>All of the necessary forms have been signed!</b>
+        </div>
+      </div>
+    </div>
+  {{ end }}
   <div class="row">
     <div class="col">
       <p>
-        <b>Student Name</b> has been registered for the CS@Mines HSPC by <b>Teacher Name</b>.
+        <b>{{ .Data.Student.Name }}</b> has been registered for the CS@Mines HSPC by
+        <b>{{ .Data.Teacher.Name }}</b>.
         In order to participate, you need to accept the following forms.
       </p>
     </div>
   </div>
-  <form method="post" action="/register/student/confirminfo?tok={{ .Data.Token }}" class="form-floating">
+  <form method="post" action="/register/parent/signforms?tok={{ .Data.Token }}" class="form-floating">
     <table class="table">
       <thead>
         <tr>
@@ -29,13 +39,13 @@
       <tbody>
         <tr>
           <td>
-            <a href="">Waiver of Liability with Photo Release</a>
+            <a href="" target="_blank">Waiver of Liability with Photo Release</a>
           </td>
           <td>
             <div class="form-check">
               <input class="form-check-input" type="checkbox" value="" id="liability"
-                name="confirm-info-correct" required
-                {{ if .Data.Confirmed }}checked disabled{{ end }} />
+                name="liability" required
+                {{ if .Data.Accepted }}checked disabled{{ end }} />
               <label class="form-check-label" for="confirm-info-correct">
                 Accept
               </label>
@@ -44,13 +54,13 @@
         </tr>
         <tr>
           <td>
-            <a href="">Minor Technology Use Waiver</a>
+            <a href="" target=_blank>Minor Technology Use Waiver</a>
           </td>
           <td>
             <div class="form-check">
-              <input class="form-check-input" type="checkbox" value="" id="technology"
-                name="confirm-info-correct" required
-                {{ if .Data.Confirmed }}checked disabled{{ end }} />
+              <input class="form-check-input" type="checkbox" value="" id="technology-use"
+                name="technology-use" required
+                {{ if .Data.Accepted }}checked disabled{{ end }} />
               <label class="form-check-label" for="confirm-info-correct">
                 Accept
               </label>
@@ -59,13 +69,13 @@
         </tr>
         <tr>
           <td>
-            <a href="">Technology Resource Access Agreement for Affiliated Programs</a>
+            <a href="" target=_blank>Technology Resource Access Agreement for Affiliated Programs</a>
           </td>
           <td>
             <div class="form-check">
-              <input class="form-check-input" type="checkbox" value="" id="technology"
-                name="confirm-info-correct" required
-                {{ if .Data.Confirmed }}checked disabled{{ end }} />
+              <input class="form-check-input" type="checkbox" value="" id="technology-resource-access"
+                name="technology-resource-access" required
+                {{ if .Data.Accepted }}checked disabled{{ end }} />
               <label class="form-check-label" for="confirm-info-correct">
                 Accept
               </label>
@@ -76,11 +86,23 @@
     </table>
     <div class="row my-4">
       <div class="col">
-        <div class="form-floating">
-          <input type="text" class="form-control col-12" name="parent-name" id="parent-name"
-            placeholder="Parent/Guardian Name" required
-          />
-          <label for="team-name">Parent/Guardian Name</label>
+        <div class="card">
+          <div class="card-header">Signature</div>
+          <div class="card-body">
+            <div class="form-floating">
+              <input type="text" class="form-control col-12" name="parent-name" id="parent-name"
+                placeholder="{{ if lt .Data.Student.Age 18 }}Parent/Guardian Name{{ else }}Your Name{{ end }}"
+                required
+                {{ if .Data.Accepted }}disabled value="{{ .Data.Student.Signatory }}"{{ end }} />
+              <label for="team-name">
+                {{ if lt .Data.Student.Age 18 }}Parent/Guardian Name{{ else }}Your Name{{ end }}
+              </label>
+              <div class="form-text">
+                By typing your name above and submitting this form, you consent to using your
+                name as an electronic signature for the above documents.
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

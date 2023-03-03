@@ -23,8 +23,12 @@
   <form method="post" action="/register/teacher/team/addmember?team_id={{ .Data.Team.ID }}"
         class="form-floating {{ if .Data.Validated }}was-validated{{ end }}">
     {{ with .Data.Error.General }}
-      <div class="alert alert-danger" role="alert">
-        {{ . }}
+      <div class="row">
+        <div class="col mx-4 mt-4">
+          <div class="alert alert-danger" role="alert">
+            {{ . }}
+          </div>
+        </div>
       </div>
     {{ end }}
     <div class="row">
@@ -45,6 +49,7 @@
                 <div class="form-floating">
                   <input type="text" class="form-control col-12" name="student-name" id="student-name"
                     placeholder="Student Name" required
+                    {{ with .Data.StudentName }}value="{{ . }}"{{ end }}
                   />
                   <label for="team-name">Student Name</label>
                 </div>
@@ -55,6 +60,7 @@
                 <div class="form-floating">
                   <input type="number" class="form-control col-12" name="student-age" id="student-age"
                     placeholder="Student Age" required
+                    {{ with .Data.StudentAge }}value="{{ . }}"{{ end }}
                   />
                   <label for="team-name">Student Age</label>
                 </div>
@@ -65,6 +71,7 @@
                 <div class="form-floating">
                   <input type="email" class="form-control col-12" name="student-email" id="student-email"
                     placeholder="Student Email" required
+                    {{ with .Data.StudentEmail }}value="{{ . }}"{{ end }}
                   />
                   <label for="team-name">Student Email</label>
                   <div id="student-email-help" class="form-text">
@@ -78,12 +85,16 @@
               <div class="col">
                 This student
                 <div class="btn-group" role="group" aria-label="Select team division">
-                  <input type="radio" class="btn-check" name="student-previously-participated"
-                    value="has" id="has" autocomplete="off" required />
+                  <input type="radio" class="btn-check" name="previously-participated"
+                    value="has" id="has" autocomplete="off" required
+                    {{ if .Data.PreviouslyParticipated }}checked{{ end }}
+                    />
                   <label class="btn btn-outline-primary" for="has">has</label>
 
-                  <input type="radio" class="btn-check" name="student-previously-participated"
-                    value="has-not" id="has-not" autocomplete="off" required />
+                  <input type="radio" class="btn-check" name="previously-participated"
+                    value="has-not" id="has-not" autocomplete="off" required
+                    {{ if not .Data.PreviouslyParticipated }}checked{{ end }}
+                    />
                   <label class="btn btn-outline-primary" for="has-not">has not</label>
                 </div>
                 previously participated in a Mines HSPC competition.

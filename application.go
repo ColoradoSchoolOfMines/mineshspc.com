@@ -32,6 +32,7 @@ type Application struct {
 	TeacherLoginRenderer       func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 	EmailLoginRenderer         func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 	StudentConfirmInfoRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
+	TeamAddMemberRenderer      func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 
 	TeacherCreateAccountRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 
@@ -116,8 +117,6 @@ func (a *Application) Start() {
 		"/register": {"register.html", noArgs},
 		"/faq":      {"faq.html", noArgs},
 		"/archive":  {"archive.html", a.GetArchiveTemplate},
-
-		"/register/parent/signforms": {"parent.html", noArgs},
 	}
 	for path, templateInfo := range staticPages {
 		r.HandleFunc(path, a.ServeTemplate(a.Log, templateInfo.Template, templateInfo.ArgGenerator)).Methods(http.MethodGet)
@@ -147,6 +146,7 @@ func (a *Application) Start() {
 	a.ConfirmEmailRenderer = a.ServeTemplateExtra(a.Log, "confirmemail.html", a.GetEmailLoginTemplate)
 	a.EmailLoginRenderer = a.ServeTemplateExtra(a.Log, "emaillogin.html", a.GetEmailLoginTemplate)
 	a.StudentConfirmInfoRenderer = a.ServeTemplateExtra(a.Log, "student.html", a.GetStudentConfirmInfoTemplate)
+	a.TeamAddMemberRenderer = a.ServeTemplateExtra(a.Log, "teamaddmember.html", a.GetTeacherAddMemberTemplate)
 	registrationPages := map[string]renderInfo{
 		"/register/teacher/confirmemail":   {a.ConfirmEmailRenderer, true},
 		"/register/teacher/createaccount":  {a.TeacherCreateAccountRenderer, true},
@@ -154,10 +154,13 @@ func (a *Application) Start() {
 		"/register/teacher/schoolinfo":     {a.ServeTemplateExtra(a.Log, "schoolinfo.html", a.GetTeacherSchoolInfoTemplate), false},
 		"/register/teacher/teams":          {a.ServeTemplateExtra(a.Log, "teams.html", a.GetTeacherTeamsTemplate), false},
 		"/register/teacher/team/edit":      {a.ServeTemplateExtra(a.Log, "teamedit.html", a.GetTeacherTeamEditTemplate), false},
-		"/register/teacher/team/addmember": {a.ServeTemplateExtra(a.Log, "teamaddmember.html", a.GetTeacherAddMemberTemplate), false},
+		"/register/teacher/team/addmember": {a.TeamAddMemberRenderer, false},
 
 		// Student
 		"/register/student/confirminfo": {a.StudentConfirmInfoRenderer, false},
+
+		// Parent
+		"/register/parent/signforms": {a.ServeTemplateExtra(a.Log, "parent.html", a.GetParentSignFormsTemplate), false},
 	}
 	for path, rend := range registrationPages {
 		renderFn := func(rend renderInfo) func(w http.ResponseWriter, r *http.Request) {
@@ -198,6 +201,7 @@ func (a *Application) Start() {
 		"/register/teacher/team/edit":      a.HandleTeacherTeamEdit,
 		"/register/teacher/team/addmember": a.HandleTeacherAddMember,
 		"/register/student/confirminfo":    a.HandleStudentConfirmEmail,
+		"/register/parent/signforms":       a.HandleParentSignForms,
 	}
 	for path, fn := range formHandlers {
 		r.HandleFunc(path, fn).Methods(http.MethodPost)
