@@ -60,6 +60,7 @@
                 <div class="form-floating">
                   <input type="number" class="form-control col-12" name="student-age" id="student-age"
                     placeholder="Student Age" required
+                    pattern="[0-9]"
                     {{ with .Data.StudentAge }}value="{{ . }}"{{ end }}
                   />
                   <label for="team-name">Student Age</label>
