@@ -37,7 +37,7 @@
               <div class="col-md-12">
                 <div class="form-floating">
                   <input type="text" class="form-control col-12" name="your-name" id="your-name" placeholder="Jane Doe"
-                    {{ with .Data.Name }}value="{{ . }}"{{ end }} />
+                    {{ with .Data.Name }}value="{{ . }}"{{ end }} required />
                   <label for="your-name">Your Name</label>
                 </div>
               </div>
@@ -46,7 +46,7 @@
               <div class="col-12">
                 <div class="form-floating">
                   <input type="email" class="form-control" name="email-address" id="email-address" placeholder="you@example.com"
-                    {{ with .Data.Email }}value="{{ . }}"{{ end }} />
+                    {{ with .Data.Email }}value="{{ . }}"{{ end }} required />
                   <label for="email-address">Email address</label>
                 </div>
               </div>

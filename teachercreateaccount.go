@@ -84,7 +84,8 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 	}
 
 	err := a.DB.NewTeacher(name, emailAddress)
-	if errors.Is(err, sqlite3.ErrConstraintUnique) {
+	var sqliteErr sqlite3.Error
+	if errors.As(err, &sqliteErr); sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique || sqliteErr.ExtendedCode == sqlite3.ErrConstraintPrimaryKey {
 		log.Warn().Err(err).Msg("account already exists")
 		a.TeacherCreateAccountRenderer(w, r, map[string]any{
 			"Name":        name,
