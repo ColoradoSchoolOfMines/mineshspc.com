@@ -164,7 +164,7 @@ func (a *Application) Start() {
 		"/register/parent/signforms": {a.ServeTemplateExtra(a.Log, "parent.html", a.GetParentSignFormsTemplate), false},
 	}
 	for path, rend := range registrationPages {
-		renderFn := func(rend renderInfo) func(w http.ResponseWriter, r *http.Request) {
+		renderFn := func(path string, rend renderInfo) func(w http.ResponseWriter, r *http.Request) {
 			return func(w http.ResponseWriter, r *http.Request) {
 				if !a.Config.RegistrationEnabled {
 					http.Redirect(w, r, "/register", http.StatusSeeOther)
@@ -175,7 +175,7 @@ func (a *Application) Start() {
 					a.Log.Warn().Err(err).
 						Bool("redirect_if_logged_in", rend.RedirectIfLoggedIn).
 						Msg("Failed to get logged in teacher")
-					if rend.RedirectIfLoggedIn {
+					if rend.RedirectIfLoggedIn && path != "/register/teacher/login" {
 						http.Redirect(w, r, "/register/teacher/login", http.StatusTemporaryRedirect)
 					}
 				} else if rend.RedirectIfLoggedIn && teacher != nil {
@@ -189,7 +189,7 @@ func (a *Application) Start() {
 				rend.RenderFn(w, r, nil)
 			}
 		}
-		r.HandleFunc(path, renderFn(rend)).Methods(http.MethodGet)
+		r.HandleFunc(path, renderFn(path, rend)).Methods(http.MethodGet)
 	}
 
 	// Delete Team member
