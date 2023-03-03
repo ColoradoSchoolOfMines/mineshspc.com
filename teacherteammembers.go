@@ -5,6 +5,7 @@ import (
 	"fmt"
 	htmltemplate "html/template"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 	texttemplate "text/template"
@@ -46,6 +47,8 @@ func (a *Application) GetTeacherAddMemberTemplate(r *http.Request) map[string]an
 	return templateData
 }
 
+var ageRegex = regexp.MustCompile(`^(\d+)$`)
+
 func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Request) {
 	log := a.Log.With().Str("page_name", "teacher_add_member").Logger()
 	user, err := a.GetLoggedInTeacher(r)
@@ -66,6 +69,18 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 	studentAgeStr := r.FormValue("student-age")
 	studentEmail := r.FormValue("student-email")
 	previouslyParticipated := r.FormValue("previously-participated") == "has"
+
+	if !ageRegex.MatchString(studentAgeStr) {
+		a.TeamAddMemberRenderer(w, r, map[string]any{
+			"Error": map[string]any{
+				"General": htmltemplate.HTML("Please enter an integer age without decimal places."),
+			},
+			"StudentName":            studentName,
+			"StudentEmail":           studentEmail,
+			"PreviouslyParticipated": previouslyParticipated,
+		})
+		return
+	}
 
 	studentAge, err := strconv.Atoi(studentAgeStr)
 	if err != nil {
