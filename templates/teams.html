@@ -12,6 +12,15 @@
 </div>
 
 <div class="container page-content teacher">
+  {{ if not .RegistrationEnabled }}
+    <div class="row pt-4 px-4">
+      <div class="col">
+        <div class="alert alert-warning" role="alert">
+          Registration is currently disabled.
+        </div>
+      </div>
+    </div>
+  {{ end }}
   {{ if .Data.AllowanceReached }}
     <div class="row">
       <div class="col m-4 mb-0">
@@ -119,19 +128,23 @@
               {{ end }}
             </ul>
           </div>
-          <div class="card-footer">
-            <a href="/register/teacher/team/edit?team_id={{ .ID }}" type="button" class="btn btn-primary">
-              Edit
-            </a>
-          </div>
+          {{ if .RegistrationEnabled }}
+            <div class="card-footer">
+              <a href="/register/teacher/team/edit?team_id={{ .ID }}" type="button" class="btn btn-primary">
+                Edit
+              </a>
+            </div>
+          {{ end }}
         </div>
       </div>
     </div>
   {{ end }}
-  <div class="row text-center p-4">
-    <div class="col-md-12">
-      <a href="/register/teacher/team/edit" class="btn btn-lg btn-primary">New Team</a>
+  {{ if .RegistrationEnabled }}
+    <div class="row text-center p-4">
+      <div class="col-md-12">
+        <a href="/register/teacher/team/edit" class="btn btn-lg btn-primary">New Team</a>
+      </div>
     </div>
-  </div>
+  {{ end }}
 </div>
 {{ end }}

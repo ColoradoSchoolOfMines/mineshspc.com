@@ -10,10 +10,11 @@ import (
 type Configuration struct {
 	secretKeyBytes []byte
 
-	Domain         string
-	SendGridAPIKey string
-	HealthcheckURL string
-	HostedByHTML   template.HTML
+	Domain              string
+	SendGridAPIKey      string
+	HealthcheckURL      string
+	HostedByHTML        template.HTML
+	RegistrationEnabled bool
 
 	Recaptcha struct {
 		SiteKey   string
@@ -23,10 +24,11 @@ type Configuration struct {
 
 func InitConfiguration() Configuration {
 	return Configuration{
-		Domain:         viper.GetString("domain"),
-		SendGridAPIKey: viper.GetString("sendgrid_api_key"),
-		HealthcheckURL: viper.GetString("healthcheck_url"),
-		HostedByHTML:   template.HTML(viper.GetString("hosted_by_html")),
+		Domain:              viper.GetString("domain"),
+		SendGridAPIKey:      viper.GetString("sendgrid_api_key"),
+		HealthcheckURL:      viper.GetString("healthcheck_url"),
+		HostedByHTML:        template.HTML(viper.GetString("hosted_by_html")),
+		RegistrationEnabled: viper.GetBool("registration_enabled"),
 		Recaptcha: struct {
 			SiteKey   string
 			SecretKey string

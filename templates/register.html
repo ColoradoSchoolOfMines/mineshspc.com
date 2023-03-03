@@ -10,6 +10,15 @@
 </div>
 
 <div class="container page-content register">
+  {{ if not .RegistrationEnabled }}
+    <div class="row p-4">
+      <div class="col">
+        <div class="alert alert-warning" role="alert">
+          Registration is currently disabled. Check back soon!
+        </div>
+      </div>
+    </div>
+  {{ end }}
   <div class="row p-4">
     <div class="col lg-5">
       <ol class="register-flow mb-0">
@@ -23,9 +32,11 @@
               able to participate in-person.
             </p>
             <p>All registrations are subject to approval by the HSPC organizers.</p>
-            <a href="/register/teacher/createaccount" type="button" class="btn btn-primary">
-              Register A Team
-            </a>
+            {{ if .RegistrationEnabled }}
+              <a href="/register/teacher/createaccount" type="button" class="btn btn-primary">
+                Register A Team
+              </a>
+            {{ end }}
           </div>
         </li>
         <li class="pt-4">

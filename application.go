@@ -79,9 +79,10 @@ func (a *Application) ServeTemplateExtra(logger *zerolog.Logger, templateName st
 		}
 
 		templateData := map[string]any{
-			"PageName":     parts[0],
-			"Data":         data,
-			"HostedByHTML": a.Config.HostedByHTML,
+			"PageName":            parts[0],
+			"Data":                data,
+			"HostedByHTML":        a.Config.HostedByHTML,
+			"RegistrationEnabled": a.Config.RegistrationEnabled,
 		}
 		log.Trace().Interface("template_data", templateData).Msg("serving template")
 		if err := template.ExecuteTemplate(w, "base.html", templateData); err != nil {
@@ -165,6 +166,11 @@ func (a *Application) Start() {
 	for path, rend := range registrationPages {
 		renderFn := func(rend renderInfo) func(w http.ResponseWriter, r *http.Request) {
 			return func(w http.ResponseWriter, r *http.Request) {
+				if !a.Config.RegistrationEnabled {
+					http.Redirect(w, r, "/register", http.StatusSeeOther)
+					return
+				}
+
 				if teacher, err := a.GetLoggedInTeacher(r); err != nil {
 					a.Log.Warn().Err(err).Msg("Failed to get logged in teacher")
 					if !rend.RedirectIfLoggedIn {
@@ -204,7 +210,18 @@ func (a *Application) Start() {
 		"/register/parent/signforms":       a.HandleParentSignForms,
 	}
 	for path, fn := range formHandlers {
-		r.HandleFunc(path, fn).Methods(http.MethodPost)
+		renderFn := func(handler func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
+			return func(w http.ResponseWriter, r *http.Request) {
+				if !a.Config.RegistrationEnabled {
+					http.Redirect(w, r, "/register", http.StatusSeeOther)
+					return
+				}
+
+				handler(w, r)
+			}
+		}
+
+		r.HandleFunc(path, renderFn(fn)).Methods(http.MethodPost)
 	}
 
 	http.Handle("/", r)
