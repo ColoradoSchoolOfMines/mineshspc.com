@@ -15,9 +15,9 @@ func (a *Application) SendEmail(log zerolog.Logger, subject string, to *mail.Ema
 		Str("subject", subject).
 		Logger()
 
-	from := mail.NewEmail("Mines HSPC", "noreply@mineshspc.com")
+	from := mail.NewEmail("Mines HSPC Support", "support@mineshspc.com")
 	message := mail.NewSingleEmail(from, subject, to, plainTextContent, htmlContent)
-	message.ReplyTo = mail.NewEmail("Mines HSPC Support", "support@mineshspc.com")
+	message.ReplyTo = from
 	resp, err := a.SendGridClient.Send(message)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to send email")
