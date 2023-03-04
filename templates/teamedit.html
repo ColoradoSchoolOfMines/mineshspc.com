@@ -142,35 +142,36 @@
         <div class="col m-4 mt-0">
           <div class="card">
             <h4 class="card-header">Team Members</h4>
-            <div class="list-group list-group-flush">
-              {{ range .Members }}
-                <div class="list-group-item">
-                  <div class="row">
-                    <div class="col">
-                      <h4>
-                        <b>{{ .Name }}</b>
-                        <a href="/register/teacher/team/delete?team_id={{ $t.ID }}&email={{ .Email }}" class="btn btn-danger ms-4">
-                          <i class="fa fa-times"></i>
-                          Delete
-                        </a>
-                      </h4>
-                      <dl class="row">
-                        <dt class="col-sm-4">Email:</dt>
-                        <dd class="col-sm-8">{{ .Email }}</dd>
-                        <dt class="col-sm-4">Age:</dt>
-                        <dd class="col-sm-8">{{ .Age }}</dd>
-                        <dt class="col-sm-4">Previously Participated:</dt>
-                        <dd class="col-sm-8">{{ if .PreviouslyParticipated }}Yes{{ else }}No{{ end }}</dd>
-                        {{ if lt .Age 18 }}
-                        <dt class="col-sm-4">Parent/Guardian Email:</dt>
-                        <dd class="col-sm-8">{{ .ParentEmail }}</dd>
-                        {{ end }}
-                      </dl>
-                    </div>
-                  </div>
-                </div>
-              {{ end }}
-            </div>
+            <table class="table mb-0 small">
+              <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Age</th>
+                  <th scope="col">Previously Participated</th>
+                  <th scope="col">Parent/Guardian Email</th>
+                  <th scope="col" class="text-center">Delete</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{ range .Members }}
+                  <tr>
+                    <th scope="row">{{ .Name }}</th>
+                    <td>{{ .Email }}</td>
+                    <td>{{ .Age }}</td>
+                    <td>{{ if .PreviouslyParticipated }}Yes{{ else }}No{{ end }}</td>
+                    <td>{{ .ParentEmail }}</td>
+                    <td class="text-center">
+                      <a href="/register/teacher/team/delete?team_id={{ $t.ID }}&email={{ .Email }}"
+                         onclick="return confirm('Are you sure you want to remove {{ .Name }} from {{ $t.Name }}?')"
+                         class="btn btn-danger">
+                        <i class="fa fa-times"></i>
+                      </a>
+                    </td>
+                  </tr>
+                {{ end }}
+              </tbody>
+            </table>
             <div class="card-footer">
               {{ if lt (len .Members) 4 }}
                 <a href="/register/teacher/team/addmember?team_id={{ .ID }}" type="button" class="btn btn-primary">
