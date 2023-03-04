@@ -72,10 +72,12 @@ func (a *Application) HandleParentSignForms(w http.ResponseWriter, r *http.Reque
 	tok := r.URL.Query().Get("tok")
 	student, err := a.getStudentBySignFormsToken(tok)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to get student from sign forms token")
+		log.Warn().Err(err).Msg("failed to get student from sign forms token")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
+	log = log.With().Str("student_email", student.Email).Logger()
 
 	if err := r.ParseForm(); err != nil {
 		log.Error().Err(err).Msg("failed to parse form")
@@ -84,20 +86,20 @@ func (a *Application) HandleParentSignForms(w http.ResponseWriter, r *http.Reque
 	}
 
 	if !r.Form.Has("liability") || !r.Form.Has("technology-use") || !r.Form.Has("technology-resource-access") {
-		log.Error().Msg("liability not signed")
+		log.Warn().Msg("forms not accepted")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	parentName := r.Form.Get("parent-name")
 	if parentName == "" {
-		log.Error().Msg("parent name not provided")
+		log.Warn().Msg("parent name not provided")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if err = a.DB.SignFormsForStudent(student.Email, parentName); err != nil {
-		log.Error().Err(err).Msg("failed to confirm student")
+		log.Error().Err(err).Msg("failed to sign forms for student")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}

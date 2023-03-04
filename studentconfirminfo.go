@@ -103,7 +103,7 @@ func (a *Application) HandleStudentConfirmEmail(w http.ResponseWriter, r *http.R
 		if r.Form.Has("confirm-info-correct") {
 			student.EmailConfirmed = true
 		} else {
-			log.Error().Msg("student did not confirm info")
+			log.Warn().Msg("student did not confirm info")
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -111,7 +111,7 @@ func (a *Application) HandleStudentConfirmEmail(w http.ResponseWriter, r *http.R
 		if student.Age < 18 && student.ParentEmail == "" {
 			parentEmail := r.FormValue("parent-email")
 			if parentEmail == "" {
-				log.Error().Err(err).Msg("parent email is required for students under 18")
+				log.Warn().Err(err).Msg("parent email is required for students under 18")
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}

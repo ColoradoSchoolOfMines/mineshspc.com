@@ -73,7 +73,7 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 
 	captchaResponse := r.FormValue("g-recaptcha-response")
 	if err := a.verifyCaptcha(captchaResponse); err != nil {
-		log.Error().Err(err).Msg("failed to verify captcha")
+		log.Warn().Err(err).Msg("failed to verify captcha")
 		w.WriteHeader(http.StatusBadRequest)
 		a.TeacherCreateAccountRenderer(w, r, map[string]any{
 			"Name":         name,
@@ -158,7 +158,7 @@ func (a *Application) HandleTeacherEmailLogin(w http.ResponseWriter, r *http.Req
 		return a.Config.ReadSecretKey(), nil
 	})
 	if err != nil {
-		a.Log.Error().Err(err).Msg("failed to parse email login token")
+		a.Log.Warn().Err(err).Msg("failed to parse email login token")
 		// TODO check if the error is that it is expired, and if so, then do
 		// something nicer for the user.
 		http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -167,21 +167,22 @@ func (a *Application) HandleTeacherEmailLogin(w http.ResponseWriter, r *http.Req
 
 	claims, ok := token.Claims.(*jwt.RegisteredClaims)
 	if !token.Valid || !ok {
-		a.Log.Error().Interface("token", token).Msg("failed to validate token")
+		a.Log.Warn().Interface("token", token).Msg("failed to validate token")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
 	if claims.Issuer != string(IssuerEmailLogin) {
-		a.Log.Error().Interface("token", token).Msg("invalid token issuer, should be login")
+		a.Log.Warn().Interface("token", token).Msg("invalid token issuer, should be login")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
-	a.Log.Info().Str("sub", claims.Subject).Msg("confirmed email")
+	a.Log.Info().Str("sub", claims.Subject).Msg("confirming email")
 	err = a.DB.SetEmailConfirmed(claims.Subject)
 	if err != nil {
 		a.Log.Error().Err(err).Msg("failed to set email confirmed")
+		return
 	}
 
 	teacher, err := a.DB.GetTeacherByEmail(claims.Subject)

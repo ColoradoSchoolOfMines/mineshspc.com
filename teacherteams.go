@@ -11,7 +11,7 @@ import (
 func (a *Application) GetTeacherTeamsTemplate(r *http.Request) map[string]any {
 	user, err := a.GetLoggedInTeacher(r)
 	if err != nil {
-		a.Log.Error().Err(err).Msg("Failed to get logged in user")
+		a.Log.Warn().Err(err).Msg("Failed to get logged in user")
 		return nil
 	}
 	a.Log.Debug().Interface("user", user).Msg("found user")
@@ -36,7 +36,7 @@ func (a *Application) GetTeacherTeamsTemplate(r *http.Request) map[string]any {
 func (a *Application) GetTeacherTeamEditTemplate(r *http.Request) map[string]any {
 	user, err := a.GetLoggedInTeacher(r)
 	if err != nil {
-		a.Log.Error().Err(err).Msg("Failed to get logged in user")
+		a.Log.Warn().Err(err).Msg("Failed to get logged in user")
 		return nil
 	}
 	a.Log.Debug().Interface("user", user).Msg("found user")
@@ -51,7 +51,7 @@ func (a *Application) GetTeacherTeamEditTemplate(r *http.Request) map[string]any
 	teamIDStr := r.URL.Query().Get("team_id")
 	teamID, err := uuid.Parse(teamIDStr)
 	if err != nil {
-		a.Log.Error().Err(err).Msg("Failed to parse team id")
+		a.Log.Warn().Err(err).Msg("Failed to parse team id")
 		return nil
 	}
 	a.Log.Debug().Str("team_id", teamIDStr).Msg("getting team")
@@ -75,8 +75,7 @@ func (a *Application) HandleTeacherTeamEdit(w http.ResponseWriter, r *http.Reque
 	log := a.Log.With().Str("page_name", "teacher_team_edit").Logger()
 	user, err := a.GetLoggedInTeacher(r)
 	if err != nil {
-		// TODO indicate that they are logged out
-		log.Error().Err(err).Msg("Failed to get logged in user")
+		log.Warn().Err(err).Msg("Failed to get logged in user")
 		http.Redirect(w, r, "/register/teacher/login", http.StatusSeeOther)
 		return
 	}
@@ -91,7 +90,7 @@ func (a *Application) HandleTeacherTeamEdit(w http.ResponseWriter, r *http.Reque
 	inPerson := r.FormValue("team-location") == "in-person"
 	teamDivision, err := database.ParseDivision(r.FormValue("team-division"))
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to parse team division")
+		log.Warn().Err(err).Msg("Failed to parse team division")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -106,7 +105,7 @@ func (a *Application) HandleTeacherTeamEdit(w http.ResponseWriter, r *http.Reque
 		// Update the team
 		teamID, err = uuid.Parse(teamIDStr)
 		if err != nil {
-			log.Error().Err(err).Msg("Failed to parse team id")
+			log.Warn().Err(err).Msg("Failed to parse team id")
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -120,7 +119,7 @@ func (a *Application) HandleTeacherTeamEdit(w http.ResponseWriter, r *http.Reque
 		}
 
 		if team.InPerson != inPerson {
-			log.Error().Err(err).Msg("Cannot change in-person status of team")
+			log.Warn().Err(err).Msg("Cannot change in-person status of team")
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}

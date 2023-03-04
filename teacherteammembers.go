@@ -19,7 +19,7 @@ import (
 func (a *Application) GetTeacherAddMemberTemplate(r *http.Request) map[string]any {
 	user, err := a.GetLoggedInTeacher(r)
 	if err != nil {
-		a.Log.Error().Err(err).Msg("Failed to get logged in user")
+		a.Log.Warn().Err(err).Msg("Failed to get logged in user")
 		return nil
 	}
 	a.Log.Debug().Interface("user", user).Msg("found user")
@@ -29,7 +29,7 @@ func (a *Application) GetTeacherAddMemberTemplate(r *http.Request) map[string]an
 	teamIDStr := r.URL.Query().Get("team_id")
 	teamID, err := uuid.Parse(teamIDStr)
 	if err != nil {
-		a.Log.Error().Err(err).Msg("Failed to parse team id")
+		a.Log.Warn().Err(err).Msg("Failed to parse team id")
 		return nil
 	}
 	a.Log.Debug().Str("team_id", teamIDStr).Msg("getting team")
@@ -53,8 +53,7 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 	log := a.Log.With().Str("page_name", "teacher_add_member").Logger()
 	user, err := a.GetLoggedInTeacher(r)
 	if err != nil {
-		// TODO indicate that they are logged out
-		log.Error().Err(err).Msg("Failed to get logged in user")
+		log.Warn().Err(err).Msg("Failed to get logged in user")
 		http.Redirect(w, r, "/register/teacher/login", http.StatusSeeOther)
 		return
 	}
@@ -84,13 +83,13 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 
 	studentAge, err := strconv.Atoi(studentAgeStr)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to parse student age")
+		log.Warn().Err(err).Msg("failed to parse student age")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	if user.EmailAllowance <= 0 {
-		log.Error().Msg("User has no email allowance")
+		log.Warn().Msg("User has no email allowance")
 		a.TeamAddMemberRenderer(w, r, map[string]any{
 			"Error": map[string]any{
 				"General": htmltemplate.HTML(
@@ -116,7 +115,7 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 	teamIDStr := r.URL.Query().Get("team_id")
 	teamID, err := uuid.Parse(teamIDStr)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to parse team id")
+		log.Warn().Err(err).Msg("Failed to parse team id")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -130,7 +129,7 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 	}
 
 	if len(team.Members) >= 4 {
-		log.Error().Err(err).Msg("Team already has 4 members")
+		log.Warn().Err(err).Msg("Team already has 4 members")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -144,8 +143,6 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 		Logger()
 	log.Info().Msg("adding student")
 	if err := a.DB.AddTeamMember(teamID, studentName, studentAge, studentEmail, previouslyParticipated); err != nil {
-		log.Error().Err(err).Interface("oheaohea", err).Bool("ohea", errors.Is(err, sqlite3.ErrConstraintUnique)).Msg("Failed to add team member")
-
 		var sqliteErr sqlite3.Error
 		if errors.As(err, &sqliteErr); sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique || sqliteErr.ExtendedCode == sqlite3.ErrConstraintPrimaryKey {
 			a.TeamAddMemberRenderer(w, r, map[string]any{
@@ -160,7 +157,7 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 			return
 		}
 
-		// TODO report this error to the user and email admin
+		log.Error().Err(err).Msg("Failed to add team member")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -222,15 +219,14 @@ func (a *Application) HandleTeacherDeleteMember(w http.ResponseWriter, r *http.R
 		Logger()
 	user, err := a.GetLoggedInTeacher(r)
 	if err != nil {
-		// TODO indicate that they are logged out
-		log.Error().Err(err).Msg("Failed to get logged in user")
+		log.Warn().Err(err).Msg("Failed to get logged in user")
 		http.Redirect(w, r, "/register/teacher/login", http.StatusSeeOther)
 		return
 	}
 
 	teamID, err := uuid.Parse(teamIDStr)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to parse team id")
+		log.Warn().Err(err).Msg("Failed to parse team id")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

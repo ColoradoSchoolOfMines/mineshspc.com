@@ -5,7 +5,7 @@ import "net/http"
 func (a *Application) GetTeacherSchoolInfoTemplate(r *http.Request) map[string]any {
 	user, err := a.GetLoggedInTeacher(r)
 	if err != nil {
-		a.Log.Error().Err(err).Msg("Failed to get logged in user")
+		a.Log.Warn().Err(err).Msg("Failed to get logged in user")
 		return nil
 	}
 	a.Log.Info().Interface("user", user).Msg("found user")
@@ -24,8 +24,7 @@ func (a *Application) HandleTeacherSchoolInfo(w http.ResponseWriter, r *http.Req
 	log := a.Log.With().Str("page_name", "teacher_school_info").Logger()
 	user, err := a.GetLoggedInTeacher(r)
 	if err != nil {
-		// TODO indicate that they are logged out
-		log.Error().Err(err).Msg("Failed to get logged in user")
+		log.Warn().Err(err).Msg("Failed to get logged in user")
 		http.Redirect(w, r, "/register/teacher/login", http.StatusSeeOther)
 		return
 	}

@@ -50,7 +50,7 @@ func (a *Application) HandleTeacherLogin(w http.ResponseWriter, r *http.Request)
 
 	emailAddress := r.FormValue("email-address")
 	if emailAddress == "" {
-		a.Log.Error().Msg("no email address provided in request")
+		a.Log.Warn().Msg("no email address provided in request")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -58,14 +58,14 @@ func (a *Application) HandleTeacherLogin(w http.ResponseWriter, r *http.Request)
 
 	teacher, err := a.DB.GetTeacherByEmail(emailAddress)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to find teacher by email")
+		log.Warn().Err(err).Msg("failed to find teacher by email")
 		a.TeacherLoginRenderer(w, r, map[string]any{
 			"Email":         emailAddress,
 			"EmailNotFound": true,
 		})
 		return
 	} else if !teacher.EmailConfirmed {
-		log.Error().Err(err).Msg("teacher email not confirmed, not sending login code to avoid amplification attacks")
+		log.Warn().Err(err).Msg("teacher email not confirmed, not sending login code to avoid amplification attacks")
 		a.TeacherLoginRenderer(w, r, map[string]any{
 			"Email":             emailAddress,
 			"EmailNotConfirmed": true,
