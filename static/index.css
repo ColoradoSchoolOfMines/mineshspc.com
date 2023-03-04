@@ -231,8 +231,12 @@ footer.footer a:hover {
 }
 
 .registration-progress-text div {
-  width: 180px;
+  width: 150px;
   text-align: center;
+}
+
+.registration-progress-text small {
+  font-size: 0.7em;
 }
 
 .registration-progress-text .line {
@@ -240,7 +244,7 @@ footer.footer a:hover {
 }
 
 .registration-progress .line {
-  width: 160px;
+  width: 130px;
   height: 6px;
   background: #a5a5a5;
 }
