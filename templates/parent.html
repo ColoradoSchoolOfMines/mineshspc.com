@@ -10,15 +10,21 @@
 </div>
 
 <div class="container page-content register-parent p-4">
-  {{ with .Data.Accepted }}
-    <div class="row">
-      <div class="col">
+  <div class="row">
+    <div class="col">
+      {{ if .Data.Accepted }}
         <div class="alert alert-success" role="alert">
-          <b>All of the necessary forms have been signed!</b>
+          <b>Thank you for signing!</b> All of the necessary forms have been signed! You may return
+          to this page at any time to view the forms again.
         </div>
-      </div>
+      {{ else }}
+        <div class="alert alert-secondary" role="alert">
+          <b>Questions?</b> Email
+          <a href="mailto:support@mineshspc.com">support@mineshspc.com</a>.
+        </div>
+      {{ end }}
     </div>
-  {{ end }}
+  </div>
   <div class="row">
     <div class="col">
       <p>
@@ -108,10 +114,17 @@
     </div>
     <div class="row text-center mt-4">
       <div class="col-md-12">
-        <button type="submit" class="btn btn-lg btn-primary"
-          {{ if .Data.Accepted }}disabled{{ end }}>
-          Sign
-        </button>
+        {{ if not .Data.Accepted }}
+          <button type="submit" class="btn btn-lg btn-primary">
+            Sign
+          </button>
+        {{ else }}
+          <p class="small text-secondary">
+            You have already signed the forms. If you would like to revoke your signature, please
+            email
+            <a href="mailto:support@mineshspc.com">support@mineshspc.com</a>.
+          </p>
+        {{ end }}
       </div>
     </div>
   </form>
