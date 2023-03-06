@@ -175,7 +175,7 @@ func (a *Application) Start() {
 					a.Log.Warn().Err(err).
 						Bool("redirect_if_logged_in", rend.RedirectIfLoggedIn).
 						Msg("Failed to get logged in teacher")
-					if rend.RedirectIfLoggedIn && path != "/register/teacher/login" && path != "/register/teacher/createaccount" {
+					if rend.RedirectIfLoggedIn && path != "/register/teacher/login" && path != "/register/teacher/createaccount" && path != "/register/teacher/confirmemail" {
 						http.Redirect(w, r, "/register/teacher/login", http.StatusTemporaryRedirect)
 					}
 				} else if rend.RedirectIfLoggedIn && teacher != nil {

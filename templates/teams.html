@@ -78,9 +78,9 @@
               <tbody>
                 {{ range .Members }}
                   <tr>
-                    <td class="align-middle">
+                    <td class="align-middle w-50">
                       <b>{{ .Name }}</b>
-                      <p class="small text-secondary">
+                      <p class="small text-secondary mb-0">
                         {{ .Email }}
                       </p>
                     </td>
@@ -100,10 +100,6 @@
                               <div class="step {{ if .ComputerUseWaiverSigned }}completed{{ end }}">
                                 <span><i class="fa {{ if .ComputerUseWaiverSigned }}fa-check{{ else }}fa-times{{ end }}"></i></span>
                               </div>
-                              <span class="line {{ if .MultimediaReleaseForm }}completed{{ end }}"></span>
-                              <div class="step {{ if .MultimediaReleaseForm }}completed{{ end }}">
-                                <span><i class="fa {{ if .MultimediaReleaseForm }}fa-check{{ else }}fa-times{{ end }}"></i></span>
-                              </div>
                             {{ end }}
                           </div>
                         </div>
@@ -117,8 +113,6 @@
                             {{ if $t.InPerson }}
                               <span class="line"></span>
                               <div><small class="{{ if not .ComputerUseWaiverSigned }}text-muted{{ end }}">Computer Use Waiver</small></div>
-                              <span class="line"></span>
-                              <div><small class="{{ if not .MultimediaReleaseForm }}text-muted{{ end }}">Multimedia Release</small></div>
                             {{ end }}
                           </div>
                         </div>

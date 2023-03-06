@@ -1,6 +1,9 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
+	"fmt"
+)
 
 func (d *Database) GetStudentByEmail(email string) (*Student, error) {
 	var student Student
@@ -8,13 +11,13 @@ func (d *Database) GetStudentByEmail(email string) (*Student, error) {
 	var campusTour sql.NullBool
 	err := d.Raw.QueryRow(`
 		SELECT teamid, email, name, age, parentemail, signatory, previouslyparticipated,
-			emailconfirmed, liabilitywaiver, computerusewaiver, multimediareleaseform,
+			emailconfirmed, liabilitywaiver, computerusewaiver,
 			campustour, dietaryrestrictions
 		FROM students
 		WHERE email = $1
 	`, email).Scan(&student.TeamID, &student.Email, &student.Name, &student.Age,
 		&parentEmail, &signatory, &student.PreviouslyParticipated, &student.EmailConfirmed,
-		&student.LiabilitySigned, &student.ComputerUseWaiverSigned, &student.MultimediaReleaseForm,
+		&student.LiabilitySigned, &student.ComputerUseWaiverSigned,
 		&campusTour, &dietaryRestrictions)
 	if err != nil {
 		return nil, err
@@ -48,11 +51,16 @@ func (d *Database) ConfirmStudent(email string, campusTour bool, dietaryRestrict
 	return err
 }
 
-func (d *Database) SignFormsForStudent(email, signatory string) error {
-	_, err := d.Raw.Exec(`
+func (d *Database) SignFormsForStudent(email, signatory string, computerUse bool) error {
+	computerUseQuery := ""
+	if computerUse {
+		computerUseQuery = "computerusewaiver = true,"
+	}
+	q := fmt.Sprintf(`
 		UPDATE students
-		SET liabilitywaiver = true, computerusewaiver = true, multimediareleaseform = true, signatory = $1
+		SET liabilitywaiver = true, %s signatory = $1
 		WHERE email = $2
-	`, signatory, email)
+	`, computerUseQuery)
+	_, err := d.Raw.Exec(q, signatory, email)
 	return err
 }

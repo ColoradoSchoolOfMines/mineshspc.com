@@ -59,11 +59,17 @@ func (a *Application) GetParentSignFormsTemplate(r *http.Request) map[string]any
 		return nil
 	}
 
+	accepted := student.LiabilitySigned
+	if team.InPerson {
+		accepted = accepted && student.ComputerUseWaiverSigned
+	}
+
 	return map[string]any{
-		"Accepted": student.ComputerUseWaiverSigned && student.MultimediaReleaseForm && student.LiabilitySigned,
-		"Student":  student,
-		"Teacher":  teacher,
-		"Token":    tok,
+		"Accepted":               accepted,
+		"Student":                student,
+		"Teacher":                teacher,
+		"NeedsComputerUseWaiver": team.InPerson,
+		"Token":                  tok,
 	}
 }
 
@@ -77,6 +83,13 @@ func (a *Application) HandleParentSignForms(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	team, err := a.DB.GetTeamNoMembers(student.TeamID)
+	if err != nil {
+		a.Log.Error().Err(err).Msg("failed to get student's team")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	log = log.With().Str("student_email", student.Email).Logger()
 
 	if err := r.ParseForm(); err != nil {
@@ -85,8 +98,14 @@ func (a *Application) HandleParentSignForms(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	if !r.Form.Has("liability") || !r.Form.Has("technology-use") || !r.Form.Has("technology-resource-access") {
-		log.Warn().Msg("forms not accepted")
+	if !r.Form.Has("liability-waiver") {
+		log.Warn().Msg("liability form not accepted")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if team.InPerson && !r.Form.Has("computer-use-waiver") {
+		log.Warn().Msg("liability form not accepted")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -98,7 +117,7 @@ func (a *Application) HandleParentSignForms(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	if err = a.DB.SignFormsForStudent(student.Email, parentName); err != nil {
+	if err = a.DB.SignFormsForStudent(student.Email, parentName, team.InPerson); err != nil {
 		log.Error().Err(err).Msg("failed to sign forms for student")
 		w.WriteHeader(http.StatusBadRequest)
 		return

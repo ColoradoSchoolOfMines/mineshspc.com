@@ -64,9 +64,10 @@ func (d *Database) RunMigrations() {
 				campustour             BOOLEAN,
 				previouslyparticipated BOOLEAN NOT NULL DEFAULT FALSE,
 				emailconfirmed         BOOLEAN NOT NULL DEFAULT FALSE,
+
+				-- Waivers
 				liabilitywaiver        BOOLEAN NOT NULL DEFAULT FALSE,
-				computerusewaiver      BOOLEAN NOT NULL DEFAULT FALSE,
-				multimediareleaseform  BOOLEAN NOT NULL DEFAULT FALSE
+				computerusewaiver      BOOLEAN NOT NULL DEFAULT FALSE
 			)
 		`,
 	}

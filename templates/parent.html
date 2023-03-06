@@ -45,49 +45,36 @@
       <tbody>
         <tr>
           <td>
-            <a href="" target="_blank">Waiver of Liability with Photo Release</a>
+            <a href="/static/Sp2023_HighSchoolPaperwork.pdf" target="_blank">Liability Waiver and Photo/Multimedia Model Release</a>
           </td>
           <td>
             <div class="form-check">
-              <input class="form-check-input" type="checkbox" value="" id="liability"
-                name="liability" required
+              <input class="form-check-input" type="checkbox" value="" id="liability-waiver"
+                name="liability-waiver" required
                 {{ if .Data.Accepted }}checked disabled{{ end }} />
-              <label class="form-check-label" for="confirm-info-correct">
+              <label class="form-check-label" for="liability-waiver">
                 Accept
               </label>
             </div>
           </td>
         </tr>
-        <tr>
-          <td>
-            <a href="" target=_blank>Minor Technology Use Waiver</a>
-          </td>
-          <td>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" value="" id="technology-use"
-                name="technology-use" required
-                {{ if .Data.Accepted }}checked disabled{{ end }} />
-              <label class="form-check-label" for="confirm-info-correct">
-                Accept
-              </label>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a href="" target=_blank>Technology Resource Access Agreement for Affiliated Programs</a>
-          </td>
-          <td>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" value="" id="technology-resource-access"
-                name="technology-resource-access" required
-                {{ if .Data.Accepted }}checked disabled{{ end }} />
-              <label class="form-check-label" for="confirm-info-correct">
-                Accept
-              </label>
-            </div>
-          </td>
-        </tr>
+        {{ if .Data.NeedsComputerUseWaiver }}
+          <tr>
+            <td>
+              <a href="/static/HSPC_MinesMinorComputerUseWaiver_2023.pdf" target=_blank>Colorado School of Mines Minor's Computer Use Waiver Form</a>
+            </td>
+            <td>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="computer-use-waiver"
+                  name="computer-use-waiver" required
+                  {{ if .Data.Accepted }}checked disabled{{ end }} />
+                <label class="form-check-label" for="computer-use-waiver">
+                  Accept
+                </label>
+              </div>
+            </td>
+          </tr>
+        {{ end }}
       </tbody>
     </table>
     <div class="row my-4">
@@ -100,7 +87,7 @@
                 placeholder="{{ if lt .Data.Student.Age 18 }}Parent/Guardian Name{{ else }}Your Name{{ end }}"
                 required
                 {{ if .Data.Accepted }}disabled value="{{ .Data.Student.Signatory }}"{{ end }} />
-              <label for="team-name">
+              <label for="parent-name">
                 {{ if lt .Data.Student.Age 18 }}Parent/Guardian Name{{ else }}Your Name{{ end }}
               </label>
               <div class="form-text">
