@@ -49,17 +49,17 @@ func (a *Application) GetTeacherTeamEditTemplate(r *http.Request) map[string]any
 	}
 
 	teamIDStr := r.URL.Query().Get("team_id")
-	teamID, err := uuid.Parse(teamIDStr)
-	if err != nil {
-		a.Log.Warn().Err(err).Msg("Failed to parse team id")
-		return nil
-	}
-	a.Log.Debug().Str("team_id", teamIDStr).Msg("getting team")
 	if teamIDStr != "" {
+		a.Log.Debug().Str("team_id", teamIDStr).Msg("getting team")
+		teamID, err := uuid.Parse(teamIDStr)
+		if err != nil {
+			a.Log.Warn().Str("team_id", teamIDStr).Err(err).Msg("Failed to parse team id.")
+			return nil
+		}
+
 		team, err := a.DB.GetTeam(user.Email, teamID)
 		if err != nil {
 			a.Log.Error().Err(err).Msg("Failed to get teacher teams")
-			// TODO report this error to the user and email admin
 			return nil
 		}
 
