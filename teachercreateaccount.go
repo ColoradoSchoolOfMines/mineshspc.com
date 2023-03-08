@@ -158,7 +158,7 @@ func (a *Application) HandleTeacherEmailLogin(w http.ResponseWriter, r *http.Req
 		return a.Config.ReadSecretKey(), nil
 	})
 	if err != nil {
-		a.Log.Warn().Err(err).Msg("failed to parse email login token")
+		a.Log.Warn().Str("token", tokenStr).Err(err).Msg("failed to parse email login token")
 		// TODO check if the error is that it is expired, and if so, then do
 		// something nicer for the user.
 		http.Redirect(w, r, "/", http.StatusSeeOther)
