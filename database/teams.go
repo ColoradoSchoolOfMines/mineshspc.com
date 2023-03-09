@@ -34,6 +34,7 @@ type Team struct {
 	DivisionExplanation string
 	InPerson            bool
 	Members             []Student
+	SchoolName          string
 }
 
 type Student struct {
@@ -54,7 +55,7 @@ type Student struct {
 
 func (d *Database) scanTeam(row Scannable) (*Team, error) {
 	var team Team
-	err := row.Scan(&team.ID, &team.TeacherEmail, &team.Name, &team.Division, &team.InPerson, &team.DivisionExplanation)
+	err := row.Scan(&team.ID, &team.TeacherEmail, &team.Name, &team.Division, &team.InPerson, &team.DivisionExplanation, &team.SchoolName)
 	return &team, err
 }
 
@@ -107,7 +108,7 @@ func (d *Database) scanTeamWithStudents(row Scannable) (*Team, error) {
 
 func (d *Database) GetTeacherTeams(email string) ([]*Team, error) {
 	rows, err := d.Raw.Query(`
-		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation
+		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname
 		FROM teams t
 		JOIN teachers tt ON tt.email = t.teacheremail
 		WHERE tt.email = ?
@@ -130,9 +131,33 @@ func (d *Database) GetTeacherTeams(email string) ([]*Team, error) {
 	return teams, err
 }
 
+func (d *Database) GetAdminTeams() ([]*Team, error) {
+	rows, err := d.Raw.Query(`
+		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname
+		FROM teams t
+		JOIN teachers tt ON tt.email = t.teacheremail
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var teams []*Team
+
+	for rows.Next() {
+		team, err := d.scanTeamWithStudents(rows)
+		if err != nil {
+			return nil, err
+		}
+		teams = append(teams, team)
+	}
+
+	return teams, err
+}
+
 func (d *Database) GetTeam(email string, teamID uuid.UUID) (*Team, error) {
 	row := d.Raw.QueryRow(`
-		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation
+		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname
 		FROM teams t
 		JOIN teachers tt ON tt.email = t.teacheremail
 		WHERE tt.email = ?

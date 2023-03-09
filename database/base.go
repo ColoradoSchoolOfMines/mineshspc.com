@@ -70,6 +70,11 @@ func (d *Database) RunMigrations() {
 				computerusewaiver      BOOLEAN NOT NULL DEFAULT FALSE
 			)
 		`,
+		`
+			CREATE TABLE IF NOT EXISTS admins (
+				email TEXT NOT NULL PRIMARY KEY
+			)
+		`,
 	}
 	txn, err := d.Raw.BeginTx(context.TODO(), nil)
 	if err != nil {

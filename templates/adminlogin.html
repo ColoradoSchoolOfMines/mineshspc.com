@@ -1,0 +1,22 @@
+{{ define "title" }}Authors{{ end }}
+
+{{ define "content" }}
+<div class="container">
+  <div class="row page-header">
+    <div class="col">
+      <h1>Admin</h1>
+    </div>
+  </div>
+</div>
+
+<div class="container page-content rules">
+  <div class="row">
+    <div class="col m-4">
+      <form method="post" action="/admin/emaillogin">
+        <input type="email" name="email" required />
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  </div>
+</div>
+{{ end }}

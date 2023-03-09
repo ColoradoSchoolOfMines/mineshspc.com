@@ -1,0 +1,100 @@
+{{ define "title" }}Admin Teams{{ end }}
+
+{{ define "content" }}
+<div class="container page-header">
+  <div class="row">
+    <div class="col">
+      <div class="header">
+        <h1>Admin Teams</h1>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container page-content teacher">
+  <div class="row">
+    <div class="col m-4">
+      If you don't see anything, you might need to go
+      <a href="/admin/login">back to login</a>.
+    </div>
+  </div>
+  {{ range $t := .Data.Teams }}
+    <div class="row">
+      <div class="col m-4">
+        <div class="card">
+          <div class="card-header">
+            Team <b>{{ .Name }}</b>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-sm-5">
+                <b>School:</b> {{ .SchoolName }}
+              </div>
+              <div class="col-sm-3">
+                <b>Division:</b> {{ .Division }}
+              </div>
+              <div class="col-sm-3">
+                <b>In Person:</b> {{ if .InPerson }}Yes{{ else }}No{{ end }}
+              </div>
+            </div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {{ range .Members }}
+                  <tr>
+                    <td class="align-middle w-50">
+                      <b>{{ .Name }}</b>
+                      <p class="small text-secondary mb-0">
+                        {{ .Email }}
+                      </p>
+                    </td>
+                    <td class="align-middle">
+                      <div class="row">
+                        <div class="col d-flex justify-content-center">
+                          <div class="registration-progress">
+                            <div class="step {{ if .EmailConfirmed }}completed{{ end }}">
+                              <span><i class="fa {{ if .EmailConfirmed }}fa-check{{ else }}fa-times{{ end }}"></i></span>
+                            </div>
+                            <span class="line {{ if .LiabilitySigned }}completed{{ end }}"></span>
+                            <div class="step {{ if .LiabilitySigned }}completed{{ end }}">
+                              <span><i class="fa {{ if .LiabilitySigned }}fa-check{{ else }}fa-times{{ end }}"></i></span>
+                            </div>
+                            {{ if $t.InPerson }}
+                              <span class="line {{ if .ComputerUseWaiverSigned }}completed{{ end }}"></span>
+                              <div class="step {{ if .ComputerUseWaiverSigned }}completed{{ end }}">
+                                <span><i class="fa {{ if .ComputerUseWaiverSigned }}fa-check{{ else }}fa-times{{ end }}"></i></span>
+                              </div>
+                            {{ end }}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col d-flex justify-content-center">
+                          <div class="registration-progress-text">
+                            <div><small class="{{ if not .EmailConfirmed }}text-muted{{ end }}">Email Confirmed</small></div>
+                            <span class="line"></span>
+                            <div><small class="{{ if not .LiabilitySigned }}text-muted{{ end }}">Liability Waiver</small></div>
+                            {{ if $t.InPerson }}
+                              <span class="line"></span>
+                              <div><small class="{{ if not .ComputerUseWaiverSigned }}text-muted{{ end }}">Computer Use Waiver</small></div>
+                            {{ end }}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                {{ end }}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  {{ end }}
+</div>
+{{ end }}
