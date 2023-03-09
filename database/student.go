@@ -46,8 +46,8 @@ func (d *Database) ConfirmStudent(email string, campusTour bool, dietaryRestrict
 	_, err := d.Raw.Exec(`
 		UPDATE students
 		SET emailconfirmed = true, campustour = $1, dietaryrestrictions = $2, parentemail = $3
-		WHERE email = $3
-	`, campusTour, dietaryRestrictions, email, parentEmail)
+		WHERE email = $4
+	`, campusTour, dietaryRestrictions, parentEmail, email)
 	return err
 }
 

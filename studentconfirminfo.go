@@ -99,6 +99,8 @@ func (a *Application) HandleStudentConfirmEmail(w http.ResponseWriter, r *http.R
 
 	sendEmail := false
 
+	log.Info().Interface("student", student).Msg("confirming email")
+
 	if !student.EmailConfirmed {
 		if r.Form.Has("confirm-info-correct") {
 			student.EmailConfirmed = true
@@ -119,6 +121,8 @@ func (a *Application) HandleStudentConfirmEmail(w http.ResponseWriter, r *http.R
 		}
 		sendEmail = true
 	}
+
+	log.Info().Interface("send_email", sendEmail).Interface("student", student).Msg("done confirming")
 
 	if team.InPerson {
 		student.CampusTour = r.Form.Has("campus-tour")
