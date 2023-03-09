@@ -168,7 +168,7 @@ func (d *Database) GetTeam(email string, teamID uuid.UUID) (*Team, error) {
 
 func (d *Database) GetTeamNoMembers(teamID uuid.UUID) (*Team, error) {
 	row := d.Raw.QueryRow(`
-		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation
+		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, ''
 		FROM teams t
 		WHERE t.id = ?
 	`, teamID)
