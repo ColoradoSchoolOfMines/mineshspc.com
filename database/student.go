@@ -64,3 +64,24 @@ func (d *Database) SignFormsForStudent(email, signatory string, computerUse bool
 	_, err := d.Raw.Exec(q, signatory, email)
 	return err
 }
+
+func (d *Database) GetAllDietaryRestrictions() ([]string, error) {
+	rows, err := d.Raw.Query(`
+		SELECT dietaryrestrictions
+		FROM students
+		WHERE dietaryrestrictions != '' AND dietaryrestrictions IS NOT NULL
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var dietaryRestrictions []string
+	for rows.Next() {
+		var restriction string
+		err = rows.Scan(&restriction)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return dietaryRestrictions, nil
+}

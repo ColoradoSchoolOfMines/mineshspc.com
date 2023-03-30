@@ -70,6 +70,28 @@ func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
 	}
 }
 
+func (a *Application) GetAdminDietaryRestrictionsTemplate(r *http.Request) map[string]any {
+	tok, err := r.Cookie("admin_token")
+	if err != nil {
+		a.Log.Warn().Err(err).Msg("failed to get admin token")
+		return nil
+	}
+
+	if isAdmin, err := a.isAdminByToken(tok.Value); err != nil || !isAdmin {
+		a.Log.Warn().Err(err).Msg("user is not admin!")
+		return nil
+	}
+
+	dietaryRestrictions, err := a.DB.GetAllDietaryRestrictions()
+	if err != nil {
+		return nil
+	}
+
+	return map[string]any{
+		"DietaryRestrictions": dietaryRestrictions,
+	}
+}
+
 func (a *Application) HandleAdminEmailLogin(w http.ResponseWriter, r *http.Request) {
 	tok := r.URL.Query().Get("tok")
 	log.Info().Str("token", tok).Msg("got token")
