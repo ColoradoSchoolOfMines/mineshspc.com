@@ -78,10 +78,10 @@ func (d *Database) GetAllDietaryRestrictions() ([]string, error) {
 	var dietaryRestrictions []string
 	for rows.Next() {
 		var restriction string
-		err = rows.Scan(&restriction)
-		if err != nil {
+		if err = rows.Scan(&restriction); err != nil {
 			return nil, err
 		}
+		dietaryRestrictions = append(dietaryRestrictions, restriction)
 	}
 	return dietaryRestrictions, nil
 }

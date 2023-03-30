@@ -62,6 +62,7 @@ func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
 
 	teams, err := a.DB.GetAdminTeams()
 	if err != nil {
+		a.Log.Err(err).Msg("failed to get teams")
 		return nil
 	}
 
@@ -84,6 +85,7 @@ func (a *Application) GetAdminDietaryRestrictionsTemplate(r *http.Request) map[s
 
 	dietaryRestrictions, err := a.DB.GetAllDietaryRestrictions()
 	if err != nil {
+		a.Log.Err(err).Msg("failed to get dietary restrictions")
 		return nil
 	}
 
