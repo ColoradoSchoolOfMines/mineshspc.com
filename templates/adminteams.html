@@ -18,22 +18,6 @@
       <a href="/admin/login">back to login</a>.
     </div>
   </div>
-
-  <div class="row">
-    <div class="col m-4">
-      {{ $advanced := 0 }}
-      {{ range $t := .Data.Teams }}
-        {{ if .Division .eq "Advanced" }}
-          {{ $advanced = $advanced + 1 }}
-        {{ end }}
-      {{ end }}
-
-      Registered Teams: {{ .Data.Teams }}
-      Advanced Competition: {{ $advanced }}
-      Beginner Competition: {{ .Data.Teams - $advanced }}
-    </div>
-  </div>
-
   {{ range $t := .Data.Teams }}
     <div class="row">
       <div class="col m-4">
