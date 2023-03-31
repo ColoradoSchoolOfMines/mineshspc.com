@@ -18,6 +18,25 @@
       <a href="/admin/login">back to login</a>.
     </div>
   </div>
+  <div class="row">
+    <div class="col">
+        <div class="card">
+          <div class="card-header">
+            Registration Stats
+          </div>
+          <div class="card-body">
+              <dl class="row my-0">
+                <dt class="col-sm-6">Registered Teams:</dt>
+                <dd class="col-sm-6">{{ .RegisteredTeams }}</dd>
+                <dt class="col-sm-6">Advanced:</dt>
+                <dd class="col-sm-6">{{ .RegisteredAdvanced }}</dd>
+                <dt class="col-sm-6">Beginner:</dt>
+                <dd class="col-sm-6">{{ .RegisteredBeginner }}</dd>
+              </dl>
+          </div>
+        </div>
+    </div>
+  </div>
   {{ range $t := .Data.Teams }}
     <div class="row">
       <div class="col m-4">

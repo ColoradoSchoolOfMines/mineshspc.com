@@ -9,6 +9,8 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/rs/zerolog/log"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
+
+	"github.com/ColoradoSchoolOfMines/mineshspc.com/database"
 )
 
 func (a *Application) CreateAdminLoginJWT(email string) *jwt.Token {
@@ -66,8 +68,18 @@ func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
 		return nil
 	}
 
+	beginner := 0
+	for _, team := range teams {
+		if team.Division == database.DivisionBeginner {
+			beginner++
+		}
+	}
+
 	return map[string]any{
-		"Teams": teams,
+		"Teams":              teams,
+		"RegisteredTeams":    len(teams),
+		"RegisteredBeginner": beginner,
+		"RegisteredAdvanced": len(teams) - beginner,
 	}
 }
 
