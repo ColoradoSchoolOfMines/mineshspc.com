@@ -19,7 +19,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col">
+    <div class="col m-4">
         <div class="card">
           <div class="card-header">
             Registration Stats
@@ -27,11 +27,11 @@
           <div class="card-body">
               <dl class="row my-0">
                 <dt class="col-sm-6">Registered Teams:</dt>
-                <dd class="col-sm-6">{{ .RegisteredTeams }}</dd>
+                <dd class="col-sm-6">{{ .Data.RegisteredTeams }}</dd>
                 <dt class="col-sm-6">Advanced:</dt>
-                <dd class="col-sm-6">{{ .RegisteredAdvanced }}</dd>
+                <dd class="col-sm-6">{{ .Data.RegisteredAdvanced }}</dd>
                 <dt class="col-sm-6">Beginner:</dt>
-                <dd class="col-sm-6">{{ .RegisteredBeginner }}</dd>
+                <dd class="col-sm-6">{{ .Data.RegisteredBeginner }}</dd>
               </dl>
           </div>
         </div>
