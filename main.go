@@ -38,6 +38,10 @@ func main() {
 		}
 	}
 
+	if logLevel, err := zerolog.ParseLevel(viper.GetString("log_level")); err != nil {
+		log = log.Level(logLevel)
+	}
+
 	// Open the database
 	viper.SetDefault("db", "./mineshspc.db")
 	dbPath := viper.GetString("db")
