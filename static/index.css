@@ -13,12 +13,12 @@ html {
 
 body {
   background-color: #E2E2E2;
-  margin: 0 0 130px 0;
+  margin: 0 0 160px 0;
 }
 
 @media (max-width: 800px) {
   body {
-    margin-bottom: 200px;
+    margin-bottom: 225px;
   }
 }
 
