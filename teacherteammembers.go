@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	htmltemplate "html/template"
@@ -13,6 +14,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"github.com/mattn/go-sqlite3"
+	"github.com/rs/zerolog"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
@@ -45,6 +47,38 @@ func (a *Application) GetTeacherAddMemberTemplate(r *http.Request) map[string]an
 	a.Log.Info().Interface("template_data", templateData).Msg("team edit template")
 
 	return templateData
+}
+
+func (a *Application) sendStudentEmail(ctx context.Context, studentEmail, studentName, teacherName, teamName string) error {
+	log := zerolog.Ctx(ctx).With().Str("action", "sendStudentEmail").Logger()
+
+	tok := a.CreateStudentVerifyJWT(studentEmail)
+	signedTok, err := tok.SignedString(a.Config.ReadSecretKey())
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to create student verify url")
+		return err
+	}
+	templateData := map[string]any{
+		"Name":        studentName,
+		"TeacherName": teacherName,
+		"TeamName":    teamName,
+		"VerifyURL":   fmt.Sprintf("%s/register/student/confirminfo?tok=%s", a.Config.Domain, signedTok),
+	}
+
+	var plainTextContent, htmlContent strings.Builder
+	texttemplate.Must(texttemplate.ParseFS(emailTemplates, "emailtemplates/studentverify.txt")).Execute(&plainTextContent, templateData)
+	htmltemplate.Must(htmltemplate.ParseFS(emailTemplates, "emailtemplates/studentverify.html")).Execute(&htmlContent, templateData)
+
+	err = a.SendEmail(log, "Confirm Mines HSPC Registration",
+		mail.NewEmail(studentName, studentEmail),
+		plainTextContent.String(),
+		htmlContent.String())
+	if err != nil {
+		log.Error().Err(err).Msg("failed to send email")
+		return err
+	}
+	log.Info().Msg("sent email")
+	return nil
 }
 
 var ageRegex = regexp.MustCompile(`^(\d+)$`)
@@ -164,35 +198,10 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 	}
 
 	// Send email to student
-	tok := a.CreateStudentVerifyJWT(studentEmail)
-	signedTok, err := tok.SignedString(a.Config.ReadSecretKey())
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to create student verify url")
-		// TODO report this error to the user and email admin
+	if err := a.sendStudentEmail(ctx, studentEmail, studentName, user.Name, team.Name); err != nil {
+		log.Error().Err(err).Msg("failed to send student email")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
-	}
-	templateData := map[string]any{
-		"Name":        studentName,
-		"TeacherName": user.Name,
-		"TeamName":    team.Name,
-		"VerifyURL":   fmt.Sprintf("%s/register/student/confirminfo?tok=%s", a.Config.Domain, signedTok),
-	}
-
-	var plainTextContent, htmlContent strings.Builder
-	texttemplate.Must(texttemplate.ParseFS(emailTemplates, "emailtemplates/studentverify.txt")).Execute(&plainTextContent, templateData)
-	htmltemplate.Must(htmltemplate.ParseFS(emailTemplates, "emailtemplates/studentverify.html")).Execute(&htmlContent, templateData)
-
-	err = a.SendEmail(log, "Confirm Mines HSPC Registration",
-		mail.NewEmail(studentName, studentEmail),
-		plainTextContent.String(),
-		htmlContent.String())
-	if err != nil {
-		log.Error().Err(err).Msg("failed to send email")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	} else {
-		log.Info().Msg("sent email")
 	}
 
 	http.Redirect(w, r, "/register/teacher/team/edit?team_id="+teamID.String(), http.StatusSeeOther)

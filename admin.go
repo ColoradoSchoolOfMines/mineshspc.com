@@ -215,3 +215,93 @@ func (a *Application) HandleAdminLogin(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("check your email for a login link"))
 	}
 }
+
+func (a *Application) HandleResendStudentEmail(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tok, err := r.Cookie("admin_token")
+	if err != nil {
+		a.Log.Warn().Err(err).Msg("failed to get admin token")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if isAdmin, err := a.isAdminByToken(tok.Value); err != nil || !isAdmin {
+		a.Log.Warn().Err(err).Msg("user is not admin!")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	email := r.URL.Query().Get("email")
+	if email == "" {
+		a.Log.Warn().Msg("no email address provided in query string")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	student, err := a.DB.GetStudentByEmail(ctx, email)
+	if err != nil {
+		a.Log.Warn().Err(err).Msg("failed to get student by email")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	teacher, err := a.DB.GetTeacherForTeam(ctx, student.TeamID)
+	if err != nil {
+		log.Error().Err(err).Msg("failed to get student's teacher")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	team, err := a.DB.GetTeamNoMembers(ctx, student.TeamID)
+	if err != nil {
+		log.Error().Err(err).Msg("failed to get student's team")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if err := a.sendStudentEmail(ctx, student.Email, student.Name, teacher.Name, team.Name); err != nil {
+		a.Log.Err(err).Msg("failed to send student email")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/admin/teams", http.StatusSeeOther)
+}
+
+func (a *Application) HandleResendParentEmail(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tok, err := r.Cookie("admin_token")
+	if err != nil {
+		a.Log.Warn().Err(err).Msg("failed to get admin token")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if isAdmin, err := a.isAdminByToken(tok.Value); err != nil || !isAdmin {
+		a.Log.Warn().Err(err).Msg("user is not admin!")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	email := r.URL.Query().Get("email")
+	if email == "" {
+		a.Log.Warn().Msg("no email address provided in query string")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	student, err := a.DB.GetStudentByEmail(ctx, email)
+	if err != nil {
+		a.Log.Warn().Err(err).Msg("failed to get student by email")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if err := a.sendParentEmail(ctx, student); err != nil {
+		a.Log.Err(err).Msg("failed to send parent email")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/admin/teams", http.StatusSeeOther)
+}

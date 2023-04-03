@@ -19,6 +19,14 @@
     </div>
   </div>
   <div class="row">
+    <div class="col mx-4">
+      <div class="alert alert-danger" role="alert">
+        Clicking on any of the "resend email" buttons will <b>IMMEDIATELY</b> send an email to the
+        student/parent. Please only use if you are absolutely sure that you want to send an email.
+      </div>
+    </div>
+  </div>
+  <div class="row">
     <div class="col ms-4 md-8">
       <div class="card">
         <div class="card-header">
@@ -141,6 +149,22 @@
                       <b>{{ .Name }}</b>
                       <p class="small text-secondary mb-0">
                         {{ .Email }}
+                        {{ if not .EmailConfirmed }}
+                          <br>
+                          <small>
+                            <a href="/admin/resendstudentemail?email={{ .Email }}">
+                              Resend Student Email Confirmation
+                            </a>
+                          </small>
+                        {{ end }}
+                        {{ if and .EmailConfirmed (not .LiabilitySigned) }}
+                          <br>
+                          <small>
+                            <a href="/admin/resendparentemail?email={{ .Email }}">
+                              Resend Parent Email
+                            </a>
+                          </small>
+                        {{ end }}
                       </p>
                     </td>
                     <td class="align-middle">

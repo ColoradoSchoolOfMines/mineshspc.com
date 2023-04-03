@@ -10,6 +10,7 @@ import (
 	texttemplate "text/template"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/rs/zerolog"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 
 	"github.com/ColoradoSchoolOfMines/mineshspc.com/database"
@@ -72,6 +73,41 @@ func (a *Application) CreateSignFormsJWT(email string) *jwt.Token {
 		Issuer:  string(IssuerSignForms),
 		Subject: email,
 	})
+}
+
+func (a *Application) sendParentEmail(ctx context.Context, student *database.Student) error {
+	log := zerolog.Ctx(ctx).With().Str("action", "sendParentEmail").Logger()
+	toAddress := student.ParentEmail
+	if student.Age >= 18 {
+		toAddress = student.Email
+	}
+
+	tok := a.CreateSignFormsJWT(student.Email)
+	signedTok, err := tok.SignedString(a.Config.ReadSecretKey())
+	if err != nil {
+		log.Error().Err(err).Msg("failed to sign email login token")
+		return err
+	}
+
+	templateData := map[string]any{
+		"Student": student,
+		"SignURL": fmt.Sprintf("%s/register/parent/signforms?tok=%s", a.Config.Domain, signedTok),
+	}
+
+	var plainTextContent, htmlContent strings.Builder
+	texttemplate.Must(texttemplate.ParseFS(emailTemplates, "emailtemplates/forms.txt")).Execute(&plainTextContent, templateData)
+	htmltemplate.Must(htmltemplate.ParseFS(emailTemplates, "emailtemplates/forms.html")).Execute(&htmlContent, templateData)
+
+	err = a.SendEmail(log, "Sign forms to participate in Mines HSPC",
+		mail.NewEmail("", toAddress),
+		plainTextContent.String(),
+		htmlContent.String())
+	if err != nil {
+		log.Error().Err(err).Msg("failed to send email")
+		return err
+	}
+	log.Info().Msg("successfully sent email")
+	return nil
 }
 
 func (a *Application) HandleStudentConfirmEmail(w http.ResponseWriter, r *http.Request) {
@@ -141,38 +177,10 @@ func (a *Application) HandleStudentConfirmEmail(w http.ResponseWriter, r *http.R
 	log.Info().Interface("s", student).Msg("student confirmed")
 
 	if sendEmail {
-		toAddress := student.ParentEmail
-		if student.Age >= 18 {
-			toAddress = student.Email
-		}
-
-		tok := a.CreateSignFormsJWT(student.Email)
-		signedTok, err := tok.SignedString(a.Config.ReadSecretKey())
-		if err != nil {
-			log.Error().Err(err).Msg("failed to sign email login token")
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		templateData := map[string]any{
-			"Student": student,
-			"SignURL": fmt.Sprintf("%s/register/parent/signforms?tok=%s", a.Config.Domain, signedTok),
-		}
-
-		var plainTextContent, htmlContent strings.Builder
-		texttemplate.Must(texttemplate.ParseFS(emailTemplates, "emailtemplates/forms.txt")).Execute(&plainTextContent, templateData)
-		htmltemplate.Must(htmltemplate.ParseFS(emailTemplates, "emailtemplates/forms.html")).Execute(&htmlContent, templateData)
-
-		err = a.SendEmail(log, "Sign forms to participate in Mines HSPC",
-			mail.NewEmail("", toAddress),
-			plainTextContent.String(),
-			htmlContent.String())
-		if err != nil {
+		if err := a.sendParentEmail(ctx, student); err != nil {
 			log.Error().Err(err).Msg("failed to send email")
 			w.WriteHeader(http.StatusInternalServerError)
 			return
-		} else {
-			log.Info().Msg("successfully sent email")
 		}
 	}
 

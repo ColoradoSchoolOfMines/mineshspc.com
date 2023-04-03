@@ -227,6 +227,8 @@ func (a *Application) Start() {
 	r.HandleFunc("/admin/login", a.ServeTemplate(a.Log, "adminlogin.html", noArgs)).Methods(http.MethodGet)
 	r.HandleFunc("/admin/emaillogin", a.HandleAdminEmailLogin).Methods(http.MethodGet)
 	r.HandleFunc("/admin/emaillogin", a.HandleAdminLogin).Methods(http.MethodPost)
+	r.HandleFunc("/admin/resendstudentemail", a.HandleResendStudentEmail).Methods(http.MethodGet)
+	r.HandleFunc("/admin/resendparentemail", a.HandleResendParentEmail).Methods(http.MethodGet)
 
 	r.HandleFunc("/admin/dietaryrestrictions", a.ServeTemplate(a.Log, "admindietaryrestrictions.html", a.GetAdminDietaryRestrictionsTemplate)).Methods(http.MethodGet)
 	r.HandleFunc("/admin/teams", a.ServeTemplate(a.Log, "adminteams.html", a.GetAdminTeamsTemplate)).Methods(http.MethodGet)

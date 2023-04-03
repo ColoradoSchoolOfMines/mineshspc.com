@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/google/uuid"
 	"maunium.net/go/mautrix/util/dbutil"
 )
 
@@ -53,6 +54,16 @@ func (d *Database) GetTeacherByEmail(ctx context.Context, email string) (*Teache
 		FROM teachers t
 		WHERE t.email = ?
 	`, email)
+	return d.scanTeacher(row)
+}
+
+func (d *Database) GetTeacherForTeam(ctx context.Context, teamID uuid.UUID) (*Teacher, error) {
+	row := d.DB.QueryRowContext(ctx, `
+		SELECT t.name, t.email, t.emailconfirmed, t.emailallowance, t.schoolname, t.schoolcity, t.schoolstate
+		FROM teachers t
+		JOIN teams tea ON tea.teacheremail = t.email
+		WHERE tea.id = ?
+	`, teamID)
 	return d.scanTeacher(row)
 }
 
