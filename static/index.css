@@ -194,11 +194,11 @@ footer.footer .acm-logo {
 }
 
 footer.footer .hosted-at {
-  margin: 0 5px 0 8px;
+  margin-left: 8px;
 }
 
 footer.footer .mines-logo {
-  max-width: 200px;
+  max-width: 160px;
 }
 
 footer.footer a {
