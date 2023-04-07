@@ -37,7 +37,7 @@ func (a *Application) GetTeacherAddMemberTemplate(r *http.Request) map[string]an
 	a.Log.Debug().Str("team_id", teamIDStr).Msg("getting team")
 	team, err := a.DB.GetTeam(r.Context(), user.Email, teamID)
 	if err != nil {
-		a.Log.Error().Err(err).Msg("Failed to get team")
+		a.Log.Err(err).Msg("Failed to get team")
 		// TODO report this error to the user and email admin
 		return nil
 	}
@@ -55,7 +55,7 @@ func (a *Application) sendStudentEmail(ctx context.Context, studentEmail, studen
 	tok := a.CreateStudentVerifyJWT(studentEmail)
 	signedTok, err := tok.SignedString(a.Config.ReadSecretKey())
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to create student verify url")
+		log.Err(err).Msg("Failed to create student verify url")
 		return err
 	}
 	templateData := map[string]any{
@@ -74,7 +74,7 @@ func (a *Application) sendStudentEmail(ctx context.Context, studentEmail, studen
 		plainTextContent.String(),
 		htmlContent.String())
 	if err != nil {
-		log.Error().Err(err).Msg("failed to send email")
+		log.Err(err).Msg("failed to send email")
 		return err
 	}
 	log.Info().Msg("sent email")
@@ -94,7 +94,7 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 	}
 
 	if err := r.ParseForm(); err != nil {
-		log.Error().Err(err).Msg("failed to parse form")
+		log.Err(err).Msg("failed to parse form")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -142,7 +142,7 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 
 	err = a.DB.DecrementEmailAllowance(ctx, user.Email)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to decrement email allowance")
+		log.Err(err).Msg("Failed to decrement email allowance")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -158,7 +158,7 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 	// Ensure the team exists and that the user is the owner
 	team, err := a.DB.GetTeam(ctx, user.Email, teamID)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to get team")
+		log.Err(err).Msg("Failed to get team")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -192,14 +192,14 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 			return
 		}
 
-		log.Error().Err(err).Msg("Failed to add team member")
+		log.Err(err).Msg("Failed to add team member")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	// Send email to student
 	if err := a.sendStudentEmail(ctx, studentEmail, studentName, user.Name, team.Name); err != nil {
-		log.Error().Err(err).Msg("failed to send student email")
+		log.Err(err).Msg("failed to send student email")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -245,13 +245,13 @@ func (a *Application) HandleTeacherDeleteMember(w http.ResponseWriter, r *http.R
 	// Ensure the team exists and that the user is the owner
 	_, err = a.DB.GetTeam(ctx, user.Email, teamID)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to get team")
+		log.Err(err).Msg("Failed to get team")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	if err := a.DB.RemoveTeamMember(ctx, teamID, email); err != nil {
-		log.Error().Err(err).Msg("Failed to delete team member")
+		log.Err(err).Msg("Failed to delete team member")
 		// TODO report this error to the user and email admin
 		w.WriteHeader(http.StatusInternalServerError)
 		return

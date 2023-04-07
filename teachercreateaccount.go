@@ -63,7 +63,7 @@ func (a *Application) verifyCaptcha(response string) error {
 func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.Request) {
 	log := a.Log.With().Str("page_name", "teacher_create_account").Logger()
 	if err := r.ParseForm(); err != nil {
-		log.Error().Err(err).Msg("failed to parse form")
+		log.Err(err).Msg("failed to parse form")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -94,7 +94,7 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 		})
 		return
 	} else if err != nil {
-		log.Error().Err(err).Msg("failed to create new teacher account")
+		log.Err(err).Msg("failed to create new teacher account")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -102,7 +102,7 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 	tok := a.CreateEmailLoginJWT(emailAddress)
 	signedTok, err := tok.SignedString(a.Config.ReadSecretKey())
 	if err != nil {
-		log.Error().Err(err).Msg("failed to sign email login token")
+		log.Err(err).Msg("failed to sign email login token")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -120,7 +120,7 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 		plainTextContent.String(),
 		htmlContent.String())
 	if err != nil {
-		log.Error().Err(err).Msg("failed to send email")
+		log.Err(err).Msg("failed to send email")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	} else {
@@ -182,20 +182,20 @@ func (a *Application) HandleTeacherEmailLogin(w http.ResponseWriter, r *http.Req
 	a.Log.Info().Str("sub", claims.Subject).Msg("confirming email")
 	err = a.DB.SetEmailConfirmed(ctx, claims.Subject)
 	if err != nil {
-		a.Log.Error().Err(err).Msg("failed to set email confirmed")
+		a.Log.Err(err).Msg("failed to set email confirmed")
 		return
 	}
 
 	teacher, err := a.DB.GetTeacherByEmail(ctx, claims.Subject)
 	if err != nil {
-		a.Log.Error().Err(err).Msg("failed to get teacher from DB")
+		a.Log.Err(err).Msg("failed to get teacher from DB")
 		return
 	}
 
 	jwt, expires := a.CreateSessionJWT(claims.Subject)
 	jwtStr, err := jwt.SignedString(a.Config.ReadSecretKey())
 	if err != nil {
-		a.Log.Error().Err(err).Msg("failed to sign JWT")
+		a.Log.Err(err).Msg("failed to sign JWT")
 		return
 	}
 	a.Log.Info().Interface("jwt", jwt).Str("jwt_str", jwtStr).Msg("signed JWT")

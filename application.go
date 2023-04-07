@@ -84,7 +84,7 @@ func (a *Application) ServeTemplateExtra(logger *zerolog.Logger, templateName st
 			"RegistrationEnabled": a.Config.RegistrationEnabled,
 		}
 		if err := template.ExecuteTemplate(w, "base.html", templateData); err != nil {
-			log.Error().Err(err).Msg("Failed to execute the template")
+			log.Err(err).Msg("Failed to execute the template")
 		}
 	}
 }

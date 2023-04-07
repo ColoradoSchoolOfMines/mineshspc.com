@@ -165,7 +165,7 @@ func (a *Application) HandleAdminEmailLogin(w http.ResponseWriter, r *http.Reque
 func (a *Application) HandleAdminLogin(w http.ResponseWriter, r *http.Request) {
 	log := a.Log.With().Str("page_name", "admin_login").Logger()
 	if err := r.ParseForm(); err != nil {
-		log.Error().Err(err).Msg("failed to parse form")
+		log.Err(err).Msg("failed to parse form")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -192,7 +192,7 @@ func (a *Application) HandleAdminLogin(w http.ResponseWriter, r *http.Request) {
 	tok := a.CreateAdminLoginJWT(emailAddress)
 	signedTok, err := tok.SignedString(a.Config.ReadSecretKey())
 	if err != nil {
-		log.Error().Err(err).Msg("failed to sign email login token")
+		log.Err(err).Msg("failed to sign email login token")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -206,7 +206,7 @@ func (a *Application) HandleAdminLogin(w http.ResponseWriter, r *http.Request) {
 		plainTextContent,
 		"")
 	if err != nil {
-		log.Error().Err(err).Msg("failed to send email")
+		log.Err(err).Msg("failed to send email")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	} else {
@@ -247,14 +247,14 @@ func (a *Application) HandleResendStudentEmail(w http.ResponseWriter, r *http.Re
 
 	teacher, err := a.DB.GetTeacherForTeam(ctx, student.TeamID)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to get student's teacher")
+		log.Err(err).Msg("failed to get student's teacher")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	team, err := a.DB.GetTeamNoMembers(ctx, student.TeamID)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to get student's team")
+		log.Err(err).Msg("failed to get student's team")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}

@@ -51,13 +51,13 @@ func (a *Application) GetParentSignFormsTemplate(r *http.Request) map[string]any
 
 	team, err := a.DB.GetTeamNoMembers(ctx, student.TeamID)
 	if err != nil {
-		a.Log.Error().Err(err).Msg("failed to get student's team")
+		a.Log.Err(err).Msg("failed to get student's team")
 		return nil
 	}
 
 	teacher, err := a.DB.GetTeacherByEmail(ctx, team.TeacherEmail)
 	if err != nil {
-		a.Log.Error().Err(err).Msg("failed to get teacher from DB")
+		a.Log.Err(err).Msg("failed to get teacher from DB")
 		return nil
 	}
 
@@ -88,7 +88,7 @@ func (a *Application) HandleParentSignForms(w http.ResponseWriter, r *http.Reque
 
 	team, err := a.DB.GetTeamNoMembers(ctx, student.TeamID)
 	if err != nil {
-		a.Log.Error().Err(err).Msg("failed to get student's team")
+		a.Log.Err(err).Msg("failed to get student's team")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -96,7 +96,7 @@ func (a *Application) HandleParentSignForms(w http.ResponseWriter, r *http.Reque
 	log = log.With().Str("student_email", student.Email).Logger()
 
 	if err := r.ParseForm(); err != nil {
-		log.Error().Err(err).Msg("failed to parse form")
+		log.Err(err).Msg("failed to parse form")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -121,7 +121,7 @@ func (a *Application) HandleParentSignForms(w http.ResponseWriter, r *http.Reque
 	}
 
 	if err = a.DB.SignFormsForStudent(ctx, student.Email, parentName, team.InPerson); err != nil {
-		log.Error().Err(err).Msg("failed to sign forms for student")
+		log.Err(err).Msg("failed to sign forms for student")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}

@@ -20,7 +20,7 @@ func (a *Application) SendEmail(log zerolog.Logger, subject string, to *mail.Ema
 	message.ReplyTo = from
 	resp, err := a.SendGridClient.Send(message)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to send email")
+		log.Err(err).Msg("failed to send email")
 		return err
 	} else if resp.StatusCode != http.StatusAccepted {
 		log.Error().

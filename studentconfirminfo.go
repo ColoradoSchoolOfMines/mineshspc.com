@@ -56,7 +56,7 @@ func (a *Application) GetStudentConfirmInfoTemplate(r *http.Request) map[string]
 
 	team, err := a.DB.GetTeamNoMembers(ctx, student.TeamID)
 	if err != nil {
-		a.Log.Error().Err(err).Msg("failed to get student's team")
+		a.Log.Err(err).Msg("failed to get student's team")
 		return nil
 	}
 
@@ -85,7 +85,7 @@ func (a *Application) sendParentEmail(ctx context.Context, student *database.Stu
 	tok := a.CreateSignFormsJWT(student.Email)
 	signedTok, err := tok.SignedString(a.Config.ReadSecretKey())
 	if err != nil {
-		log.Error().Err(err).Msg("failed to sign email login token")
+		log.Err(err).Msg("failed to sign email login token")
 		return err
 	}
 
@@ -103,7 +103,7 @@ func (a *Application) sendParentEmail(ctx context.Context, student *database.Stu
 		plainTextContent.String(),
 		htmlContent.String())
 	if err != nil {
-		log.Error().Err(err).Msg("failed to send email")
+		log.Err(err).Msg("failed to send email")
 		return err
 	}
 	log.Info().Msg("successfully sent email")
@@ -124,14 +124,14 @@ func (a *Application) HandleStudentConfirmEmail(w http.ResponseWriter, r *http.R
 	}
 
 	if err := r.ParseForm(); err != nil {
-		log.Error().Err(err).Msg("failed to parse form")
+		log.Err(err).Msg("failed to parse form")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	team, err := a.DB.GetTeamNoMembers(ctx, student.TeamID)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to get student's team")
+		log.Err(err).Msg("failed to get student's team")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -169,7 +169,7 @@ func (a *Application) HandleStudentConfirmEmail(w http.ResponseWriter, r *http.R
 	}
 
 	if err = a.DB.ConfirmStudent(ctx, student.Email, student.CampusTour, student.DietaryRestrictions, student.ParentEmail); err != nil {
-		log.Error().Err(err).Msg("failed to confirm student")
+		log.Err(err).Msg("failed to confirm student")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -178,7 +178,7 @@ func (a *Application) HandleStudentConfirmEmail(w http.ResponseWriter, r *http.R
 
 	if sendEmail {
 		if err := a.sendParentEmail(ctx, student); err != nil {
-			log.Error().Err(err).Msg("failed to send email")
+			log.Err(err).Msg("failed to send email")
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}

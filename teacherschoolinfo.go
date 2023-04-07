@@ -30,7 +30,7 @@ func (a *Application) HandleTeacherSchoolInfo(w http.ResponseWriter, r *http.Req
 	}
 
 	if err := r.ParseForm(); err != nil {
-		log.Error().Err(err).Msg("failed to parse form")
+		log.Err(err).Msg("failed to parse form")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}

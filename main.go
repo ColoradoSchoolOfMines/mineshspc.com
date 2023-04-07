@@ -98,7 +98,7 @@ func main() {
 				log.Info().Msg("Sending healthcheck ping")
 				resp, err := http.Get(healthcheckURL)
 				if err != nil {
-					log.Error().Err(err).Msg("Failed to send healtheck ping")
+					log.Err(err).Msg("Failed to send healtheck ping")
 				} else if resp.StatusCode < 200 || 300 <= resp.StatusCode {
 					log.Error().Int("status", resp.StatusCode).Msg("non-200 status code from healthcheck ping")
 				}
