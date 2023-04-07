@@ -40,8 +40,10 @@ func main() {
 		}
 	}
 
-	if logLevel, err := zerolog.ParseLevel(viper.GetString("log_level")); err != nil {
-		log = log.Level(logLevel)
+	if logLevelStr := viper.GetString("log_level"); logLevelStr != "" {
+		if logLevel, err := zerolog.ParseLevel(logLevelStr); err == nil {
+			log = log.Level(logLevel)
+		}
 	}
 
 	// Open the database

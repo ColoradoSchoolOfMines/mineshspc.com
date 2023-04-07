@@ -83,7 +83,6 @@ func (a *Application) ServeTemplateExtra(logger *zerolog.Logger, templateName st
 			"HostedByHTML":        a.Config.HostedByHTML,
 			"RegistrationEnabled": a.Config.RegistrationEnabled,
 		}
-		log.Trace().Interface("template_data", templateData).Msg("serving template")
 		if err := template.ExecuteTemplate(w, "base.html", templateData); err != nil {
 			log.Error().Err(err).Msg("Failed to execute the template")
 		}
