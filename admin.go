@@ -62,7 +62,7 @@ func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
 		return nil
 	}
 
-	teams, err := a.DB.GetAdminTeams(r.Context())
+	teamsWithTeachers, err := a.DB.GetAdminTeamsWithTeacherName(r.Context())
 	if err != nil {
 		a.Log.Err(err).Msg("failed to get teams")
 		return nil
@@ -72,7 +72,7 @@ func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
 	var beginnerStudents, advancedStudents int
 	var beginnerInPersonTeams, advancedInPersonTeams int
 	var beginnerInPersonStudents, advancedInPersonStudents int
-	for _, team := range teams {
+	for _, team := range teamsWithTeachers {
 		if team.Division == database.DivisionBeginner {
 			beginnerTeams++
 			beginnerStudents += len(team.Members)
@@ -91,7 +91,7 @@ func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
 	}
 
 	return map[string]any{
-		"Teams": teams,
+		"Teams": teamsWithTeachers,
 		"TeamStats": map[string]any{
 			"Beginner": map[string]int{
 				"InPerson": beginnerInPersonTeams,

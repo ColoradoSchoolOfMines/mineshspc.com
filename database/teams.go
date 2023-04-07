@@ -41,6 +41,11 @@ type Team struct {
 	RegistrationTS      time.Time
 }
 
+type TeamWithTeacherName struct {
+	*Team
+	TeacherName string
+}
+
 type Student struct {
 	TeamID                  uuid.UUID
 	Email                   string
@@ -65,12 +70,17 @@ func (d *Database) scanTeam(row dbutil.Scannable) (*Team, error) {
 	return &team, err
 }
 
-func (d *Database) scanTeamWithStudents(ctx context.Context, row dbutil.Scannable) (*Team, error) {
-	team, err := d.scanTeam(row)
-	if err != nil {
-		return nil, err
-	}
+func (d *Database) scanTeamWithTeacherName(row dbutil.Scannable) (*TeamWithTeacherName, error) {
+	var team Team
+	var teamWithTeacherName TeamWithTeacherName
+	var registrationTS int64
+	err := row.Scan(&team.ID, &team.TeacherEmail, &team.Name, &team.Division, &team.InPerson, &team.DivisionExplanation, &team.SchoolName, &registrationTS, &teamWithTeacherName.TeacherName)
+	team.RegistrationTS = time.UnixMilli(registrationTS)
+	teamWithTeacherName.Team = &team
+	return &teamWithTeacherName, err
+}
 
+func (d *Database) scanTeamStudents(ctx context.Context, team *Team) error {
 	studentRows, err := d.DB.QueryContext(ctx, `
 		SELECT s.email, s.name, s.age, s.parentemail, s.signatory, s.previouslyparticipated, s.emailconfirmed,
 			s.liabilitywaiver, s.computerusewaiver, s.campustour, s.dietaryrestrictions
@@ -78,7 +88,7 @@ func (d *Database) scanTeamWithStudents(ctx context.Context, row dbutil.Scannabl
 		WHERE s.teamid = ?
 	`, team.ID)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer studentRows.Close()
 	for studentRows.Next() {
@@ -87,7 +97,7 @@ func (d *Database) scanTeamWithStudents(ctx context.Context, row dbutil.Scannabl
 		var campusTour sql.NullBool
 		if err := studentRows.Scan(&s.Email, &s.Name, &s.Age, &parentEmail, &signatory, &s.PreviouslyParticipated,
 			&s.EmailConfirmed, &s.LiabilitySigned, &s.ComputerUseWaiverSigned, &campusTour, &dietaryRestrictions); err != nil {
-			return nil, err
+			return err
 		}
 
 		if parentEmail.Valid {
@@ -108,8 +118,33 @@ func (d *Database) scanTeamWithStudents(ctx context.Context, row dbutil.Scannabl
 
 		team.Members = append(team.Members, s)
 	}
+	return nil
+}
+
+func (d *Database) scanTeamWithStudents(ctx context.Context, row dbutil.Scannable) (*Team, error) {
+	team, err := d.scanTeam(row)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := d.scanTeamStudents(ctx, team); err != nil {
+		return nil, err
+	}
 
 	return team, err
+}
+
+func (d *Database) scanTeamWithStudentsAndTeacherName(ctx context.Context, row dbutil.Scannable) (*TeamWithTeacherName, error) {
+	teamWithTeacherName, err := d.scanTeamWithTeacherName(row)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := d.scanTeamStudents(ctx, teamWithTeacherName.Team); err != nil {
+		return nil, err
+	}
+
+	return teamWithTeacherName, err
 }
 
 func (d *Database) GetTeacherTeams(ctx context.Context, email string) ([]*Team, error) {
@@ -137,9 +172,9 @@ func (d *Database) GetTeacherTeams(ctx context.Context, email string) ([]*Team, 
 	return teams, err
 }
 
-func (d *Database) GetAdminTeams(ctx context.Context) ([]*Team, error) {
+func (d *Database) GetAdminTeamsWithTeacherName(ctx context.Context) ([]*TeamWithTeacherName, error) {
 	rows, err := d.DB.QueryContext(ctx, `
-		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname, t.registration_ts
+		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname, t.registration_ts, tt.name
 		FROM teams t
 		JOIN teachers tt ON tt.email = t.teacheremail
 	`)
@@ -148,10 +183,10 @@ func (d *Database) GetAdminTeams(ctx context.Context) ([]*Team, error) {
 	}
 	defer rows.Close()
 
-	var teams []*Team
+	var teams []*TeamWithTeacherName
 
 	for rows.Next() {
-		team, err := d.scanTeamWithStudents(ctx, rows)
+		team, err := d.scanTeamWithStudentsAndTeacherName(ctx, rows)
 		if err != nil {
 			return nil, err
 		}
