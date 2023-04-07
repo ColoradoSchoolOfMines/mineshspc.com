@@ -26,7 +26,7 @@ func (a *Application) isAdminByToken(tokenStr string) (bool, error) {
 		return false, errors.New("no token")
 	}
 
-	token, err := jwt.ParseWithClaims(tokenStr, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenStr, &jwt.RegisteredClaims{}, func(token *jwt.Token) (any, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -68,18 +68,58 @@ func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
 		return nil
 	}
 
-	beginner := 0
+	var beginnerTeams, advancedTeams int
+	var beginnerStudents, advancedStudents int
+	var beginnerInPersonTeams, advancedInPersonTeams int
+	var beginnerInPersonStudents, advancedInPersonStudents int
 	for _, team := range teams {
 		if team.Division == database.DivisionBeginner {
-			beginner++
+			beginnerTeams++
+			beginnerStudents += len(team.Members)
+			if team.InPerson {
+				beginnerInPersonStudents += len(team.Members)
+				beginnerInPersonTeams++
+			}
+		} else {
+			advancedTeams++
+			advancedStudents += len(team.Members)
+			if team.InPerson {
+				advancedInPersonStudents += len(team.Members)
+				advancedInPersonTeams++
+			}
 		}
 	}
 
 	return map[string]any{
-		"Teams":              teams,
-		"RegisteredTeams":    len(teams),
-		"RegisteredBeginner": beginner,
-		"RegisteredAdvanced": len(teams) - beginner,
+		"Teams": teams,
+		"TeamStats": map[string]any{
+			"Beginner": map[string]int{
+				"InPerson": beginnerInPersonTeams,
+				"Remote":   beginnerTeams - beginnerInPersonTeams,
+				"Total":    beginnerTeams,
+			},
+			"Advanced": map[string]int{
+				"InPerson": advancedInPersonTeams,
+				"Remote":   advancedTeams - advancedInPersonTeams,
+				"Total":    advancedTeams,
+			},
+			"TotalInPerson": beginnerInPersonTeams + advancedInPersonTeams,
+			"TotalRemote":   (beginnerTeams + advancedTeams) - (beginnerInPersonTeams - advancedInPersonTeams),
+		},
+		"StudentStats": map[string]any{
+			"Beginner": map[string]int{
+				"InPerson": beginnerInPersonStudents,
+				"Remote":   beginnerStudents - beginnerInPersonStudents,
+				"Total":    beginnerStudents,
+			},
+			"Advanced": map[string]int{
+				"InPerson": advancedInPersonStudents,
+				"Remote":   advancedStudents - advancedInPersonStudents,
+				"Total":    advancedStudents,
+			},
+			"TotalInPerson": beginnerInPersonStudents + advancedInPersonStudents,
+			"TotalRemote":   (beginnerStudents + advancedStudents) - (beginnerInPersonStudents - advancedInPersonStudents),
+		},
 	}
 }
 

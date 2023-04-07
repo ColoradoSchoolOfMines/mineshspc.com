@@ -15,7 +15,7 @@ func (a *Application) GetLoggedInTeacher(r *http.Request) (*database.Teacher, er
 		return nil, err
 	}
 
-	token, err := jwt.ParseWithClaims(jwtStr.Value, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(jwtStr.Value, &jwt.RegisteredClaims{}, func(token *jwt.Token) (any, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])

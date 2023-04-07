@@ -19,22 +19,83 @@
     </div>
   </div>
   <div class="row">
-    <div class="col m-4">
-        <div class="card">
-          <div class="card-header">
-            Registration Stats
-          </div>
-          <div class="card-body">
-              <dl class="row my-0">
-                <dt class="col-sm-6">Registered Teams:</dt>
-                <dd class="col-sm-6">{{ .Data.RegisteredTeams }}</dd>
-                <dt class="col-sm-6">Advanced:</dt>
-                <dd class="col-sm-6">{{ .Data.RegisteredAdvanced }}</dd>
-                <dt class="col-sm-6">Beginner:</dt>
-                <dd class="col-sm-6">{{ .Data.RegisteredBeginner }}</dd>
-              </dl>
-          </div>
+    <div class="col m-4 md-8">
+      <div class="card">
+        <div class="card-header">
+          Team Registration Stats
         </div>
+        <div class="card-body">
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Beginner</th>
+                <th>Advanced</th>
+                <th><b>TOTAL</b></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>In-Person</th>
+                <th>{{ .Data.TeamStats.Beginner.InPerson }}</th>
+                <th>{{ .Data.TeamStats.Advanced.InPerson }}</th>
+                <th>{{ .Data.TeamStats.TotalInPerson }}</th>
+              </tr>
+              <tr>
+                <th>Remote</th>
+                <th>{{ .Data.TeamStats.Beginner.InPerson }}</th>
+                <th>{{ .Data.TeamStats.Advanced.InPerson }}</th>
+                <th>{{ .Data.TeamStats.TotalRemote }}</th>
+              </tr>
+              <tr>
+                <th><b>TOTAL</b></th>
+                <th>{{ .Data.TeamStats.Beginner.Total }}</th>
+                <th>{{ .Data.TeamStats.Advanced.Total }}</th>
+                <th></th>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col m-4 md-8">
+      <div class="card">
+        <div class="card-header">
+          Student Registration Stats
+        </div>
+        <div class="card-body">
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Beginner</th>
+                <th>Advanced</th>
+                <th><b>TOTAL</b></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>In-Person</th>
+                <th>{{ .Data.StudentStats.Beginner.InPerson }}</th>
+                <th>{{ .Data.StudentStats.Advanced.InPerson }}</th>
+                <th>{{ .Data.StudentStats.TotalInPerson }}</th>
+              </tr>
+              <tr>
+                <th>Remote</th>
+                <th>{{ .Data.StudentStats.Beginner.InPerson }}</th>
+                <th>{{ .Data.StudentStats.Advanced.InPerson }}</th>
+                <th>{{ .Data.StudentStats.TotalRemote }}</th>
+              </tr>
+              <tr>
+                <th><b>TOTAL</b></th>
+                <th>{{ .Data.StudentStats.Beginner.Total }}</th>
+                <th>{{ .Data.StudentStats.Advanced.Total }}</th>
+                <th></th>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
   {{ range $t := .Data.Teams }}

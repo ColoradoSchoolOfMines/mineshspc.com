@@ -8,7 +8,7 @@ import (
 )
 
 type Scannable interface {
-	Scan(dest ...interface{}) error
+	Scan(dest ...any) error
 }
 
 type Database struct {
