@@ -67,6 +67,11 @@
               <div class="col-sm-3">
                 <b>In Person:</b> {{ if .InPerson }}Yes{{ else }}No{{ end }}
               </div>
+              {{ if gt .RegistrationTS.UnixMilli 0 }}
+                <div class="col-sm-6">
+                  <b>Registration Time:</b> {{ .RegistrationTS.Format "2006-01-02 15:04 MST" }}
+                </div>
+              {{ end }}
             </div>
             <table class="table">
               <thead>

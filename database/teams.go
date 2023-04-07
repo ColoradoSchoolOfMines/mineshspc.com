@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"maunium.net/go/mautrix/util/dbutil"
@@ -37,6 +38,7 @@ type Team struct {
 	InPerson            bool
 	Members             []Student
 	SchoolName          string
+	RegistrationTS      time.Time
 }
 
 type Student struct {
@@ -57,7 +59,9 @@ type Student struct {
 
 func (d *Database) scanTeam(row dbutil.Scannable) (*Team, error) {
 	var team Team
-	err := row.Scan(&team.ID, &team.TeacherEmail, &team.Name, &team.Division, &team.InPerson, &team.DivisionExplanation, &team.SchoolName)
+	var registrationTS int64
+	err := row.Scan(&team.ID, &team.TeacherEmail, &team.Name, &team.Division, &team.InPerson, &team.DivisionExplanation, &team.SchoolName, &registrationTS)
+	team.RegistrationTS = time.UnixMilli(registrationTS)
 	return &team, err
 }
 
@@ -110,7 +114,7 @@ func (d *Database) scanTeamWithStudents(ctx context.Context, row dbutil.Scannabl
 
 func (d *Database) GetTeacherTeams(ctx context.Context, email string) ([]*Team, error) {
 	rows, err := d.DB.QueryContext(ctx, `
-		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname
+		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname, t.registration_ts
 		FROM teams t
 		JOIN teachers tt ON tt.email = t.teacheremail
 		WHERE tt.email = ?
@@ -135,7 +139,7 @@ func (d *Database) GetTeacherTeams(ctx context.Context, email string) ([]*Team, 
 
 func (d *Database) GetAdminTeams(ctx context.Context) ([]*Team, error) {
 	rows, err := d.DB.QueryContext(ctx, `
-		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname
+		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname, t.registration_ts
 		FROM teams t
 		JOIN teachers tt ON tt.email = t.teacheremail
 	`)
@@ -159,7 +163,7 @@ func (d *Database) GetAdminTeams(ctx context.Context) ([]*Team, error) {
 
 func (d *Database) GetTeam(ctx context.Context, email string, teamID uuid.UUID) (*Team, error) {
 	row := d.DB.QueryRowContext(ctx, `
-		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname
+		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname, t.registration_ts
 		FROM teams t
 		JOIN teachers tt ON tt.email = t.teacheremail
 		WHERE tt.email = ?
@@ -170,7 +174,7 @@ func (d *Database) GetTeam(ctx context.Context, email string, teamID uuid.UUID) 
 
 func (d *Database) GetTeamNoMembers(ctx context.Context, teamID uuid.UUID) (*Team, error) {
 	row := d.DB.QueryRowContext(ctx, `
-		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, ''
+		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, '', t.registration_ts
 		FROM teams t
 		WHERE t.id = ?
 	`, teamID)
@@ -179,9 +183,9 @@ func (d *Database) GetTeamNoMembers(ctx context.Context, teamID uuid.UUID) (*Tea
 
 func (d *Database) UpsertTeam(ctx context.Context, teacherEmail string, teamID uuid.UUID, name string, division Division, inPerson bool, divisionExplanation string) error {
 	_, err := d.DB.ExecContext(ctx, `
-		INSERT OR REPLACE INTO teams (id, teacheremail, name, division, inperson, divisionexplanation)
-		VALUES (?, ?, ?, ?, ?, ?)
-	`, teamID, teacherEmail, name, division, inPerson, divisionExplanation)
+		INSERT OR REPLACE INTO teams (id, teacheremail, name, division, inperson, divisionexplanation, registration_ts)
+		VALUES (?, ?, ?, ?, ?, ?, ?)
+	`, teamID, teacherEmail, name, division, inPerson, divisionExplanation, time.Now().UnixMilli())
 	return err
 }
 

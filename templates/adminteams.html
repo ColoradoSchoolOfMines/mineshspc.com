@@ -116,8 +116,13 @@
               <div class="col-sm-3">
                 <b>In Person:</b> {{ if .InPerson }}Yes{{ else }}No{{ end }}
               </div>
+              {{ if gt .RegistrationTS.UnixMilli 0 }}
+                <div class="col-sm-6">
+                  <b>Registration Time:</b> {{ .RegistrationTS.Format "2006-01-02 15:04 MST" }}
+                </div>
+              {{ end }}
             </div>
-            <div class="row">
+            <div class="row my-2">
               <div class="col">
                 <b>Reason for division:</b> {{ .DivisionExplanation }}
               </div>
