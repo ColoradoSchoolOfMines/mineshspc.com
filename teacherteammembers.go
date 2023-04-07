@@ -33,7 +33,7 @@ func (a *Application) GetTeacherAddMemberTemplate(r *http.Request) map[string]an
 		return nil
 	}
 	a.Log.Debug().Str("team_id", teamIDStr).Msg("getting team")
-	team, err := a.DB.GetTeam(user.Email, teamID)
+	team, err := a.DB.GetTeam(r.Context(), user.Email, teamID)
 	if err != nil {
 		a.Log.Error().Err(err).Msg("Failed to get team")
 		// TODO report this error to the user and email admin
@@ -50,6 +50,7 @@ func (a *Application) GetTeacherAddMemberTemplate(r *http.Request) map[string]an
 var ageRegex = regexp.MustCompile(`^(\d+)$`)
 
 func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	log := a.Log.With().Str("page_name", "teacher_add_member").Logger()
 	user, err := a.GetLoggedInTeacher(r)
 	if err != nil {
@@ -105,7 +106,7 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	err = a.DB.DecrementEmailAllowance(user.Email)
+	err = a.DB.DecrementEmailAllowance(ctx, user.Email)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to decrement email allowance")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -121,7 +122,7 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 	}
 
 	// Ensure the team exists and that the user is the owner
-	team, err := a.DB.GetTeam(user.Email, teamID)
+	team, err := a.DB.GetTeam(ctx, user.Email, teamID)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to get team")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -142,7 +143,7 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 		Str("team_id", teamIDStr).
 		Logger()
 	log.Info().Msg("adding student")
-	if err := a.DB.AddTeamMember(teamID, studentName, studentAge, studentEmail, previouslyParticipated); err != nil {
+	if err := a.DB.AddTeamMember(ctx, teamID, studentName, studentAge, studentEmail, previouslyParticipated); err != nil {
 		var sqliteErr sqlite3.Error
 		if errors.As(err, &sqliteErr); sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique || sqliteErr.ExtendedCode == sqlite3.ErrConstraintPrimaryKey {
 			a.TeamAddMemberRenderer(w, r, map[string]any{
@@ -205,6 +206,7 @@ func (a *Application) CreateStudentVerifyJWT(email string) *jwt.Token {
 }
 
 func (a *Application) HandleTeacherDeleteMember(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	if !a.Config.RegistrationEnabled {
 		http.Redirect(w, r, "/register", http.StatusSeeOther)
 		return
@@ -232,14 +234,14 @@ func (a *Application) HandleTeacherDeleteMember(w http.ResponseWriter, r *http.R
 	}
 
 	// Ensure the team exists and that the user is the owner
-	_, err = a.DB.GetTeam(user.Email, teamID)
+	_, err = a.DB.GetTeam(ctx, user.Email, teamID)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to get team")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	if err := a.DB.RemoveTeamMember(teamID, email); err != nil {
+	if err := a.DB.RemoveTeamMember(ctx, teamID, email); err != nil {
 		log.Error().Err(err).Msg("Failed to delete team member")
 		// TODO report this error to the user and email admin
 		w.WriteHeader(http.StatusInternalServerError)

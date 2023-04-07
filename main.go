@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"net/http"
 	"os"
 	"os/signal"
@@ -14,6 +13,9 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
+	"maunium.net/go/mautrix/util/dbutil"
+
+	"github.com/ColoradoSchoolOfMines/mineshspc.com/database"
 )
 
 func main() {
@@ -46,9 +48,15 @@ func main() {
 	viper.SetDefault("db", "./mineshspc.db")
 	dbPath := viper.GetString("db")
 	log.Info().Str("db_path", dbPath).Msg("opening database...")
-	db, err := sql.Open("sqlite3", dbPath)
+	rawDB, err := dbutil.NewWithDialect(dbPath, "sqlite3")
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to open database")
+	}
+	rawDB.Log = dbutil.ZeroLogger(log)
+
+	db := database.NewDatabase(rawDB)
+	if err := db.DB.Upgrade(); err != nil {
+		log.Fatal().Err(err).Msg("failed to upgrade the mineshspc.com database")
 	}
 
 	// Make sure to exit cleanly
@@ -65,7 +73,7 @@ func main() {
 		for range c { // when the process is killed
 			log.Info().Msg("Cleaning up")
 			healthcheckCancel()
-			db.Close()
+			db.DB.RawDB.Close()
 			os.Exit(0)
 		}
 	}()

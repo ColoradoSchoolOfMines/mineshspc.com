@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"embed"
 	"fmt"
 	"html/template"
@@ -39,10 +38,10 @@ type Application struct {
 	SendGridClient *sendgrid.Client
 }
 
-func NewApplication(log *zerolog.Logger, db *sql.DB) *Application {
+func NewApplication(log *zerolog.Logger, db *database.Database) *Application {
 	return &Application{
 		Log:        log,
-		DB:         database.NewDatabase(db, log.With().Str("module", "database").Logger()),
+		DB:         db,
 		EmailRegex: regexp.MustCompile(`(?i)^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$`),
 		Config:     InitConfiguration(),
 	}
@@ -97,8 +96,6 @@ type renderInfo struct {
 }
 
 func (a *Application) Start() {
-	a.DB.RunMigrations()
-
 	a.Log.Info().Msg("connecting to sendgrid")
 	a.SendGridClient = sendgrid.NewSendClient(a.Config.SendGridAPIKey)
 

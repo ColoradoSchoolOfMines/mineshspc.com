@@ -62,7 +62,7 @@ func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
 		return nil
 	}
 
-	teams, err := a.DB.GetAdminTeams()
+	teams, err := a.DB.GetAdminTeams(r.Context())
 	if err != nil {
 		a.Log.Err(err).Msg("failed to get teams")
 		return nil
@@ -137,7 +137,7 @@ func (a *Application) GetAdminDietaryRestrictionsTemplate(r *http.Request) map[s
 		return nil
 	}
 
-	dietaryRestrictions, err := a.DB.GetAllDietaryRestrictions()
+	dietaryRestrictions, err := a.DB.GetAllDietaryRestrictions(r.Context())
 	if err != nil {
 		a.Log.Err(err).Msg("failed to get dietary restrictions")
 		return nil
@@ -178,7 +178,7 @@ func (a *Application) HandleAdminLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	log = log.With().Str("email", emailAddress).Logger()
 
-	isAdmin, err := a.DB.IsEmailAdmin(emailAddress)
+	isAdmin, err := a.DB.IsEmailAdmin(r.Context(), emailAddress)
 	if err != nil {
 		log.Warn().Err(err).Msg("failed to find admin by email")
 		w.WriteHeader(http.StatusBadRequest)

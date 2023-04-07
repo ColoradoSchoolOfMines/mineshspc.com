@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -10,7 +11,7 @@ import (
 	"github.com/ColoradoSchoolOfMines/mineshspc.com/database"
 )
 
-func (a *Application) getStudentBySignFormsToken(tokenStr string) (*database.Student, error) {
+func (a *Application) getStudentBySignFormsToken(ctx context.Context, tokenStr string) (*database.Student, error) {
 	if tokenStr == "" {
 		return nil, errors.New("no token")
 	}
@@ -36,24 +37,25 @@ func (a *Application) getStudentBySignFormsToken(tokenStr string) (*database.Stu
 		return nil, fmt.Errorf("invalid sign forms token: %w", err)
 	}
 
-	return a.DB.GetStudentByEmail(claims.Subject)
+	return a.DB.GetStudentByEmail(ctx, claims.Subject)
 }
 
 func (a *Application) GetParentSignFormsTemplate(r *http.Request) map[string]any {
+	ctx := r.Context()
 	tok := r.URL.Query().Get("tok")
-	student, err := a.getStudentBySignFormsToken(tok)
+	student, err := a.getStudentBySignFormsToken(ctx, tok)
 	if err != nil {
 		a.Log.Warn().Err(err).Msg("failed to get student from token")
 		return nil
 	}
 
-	team, err := a.DB.GetTeamNoMembers(student.TeamID)
+	team, err := a.DB.GetTeamNoMembers(ctx, student.TeamID)
 	if err != nil {
 		a.Log.Error().Err(err).Msg("failed to get student's team")
 		return nil
 	}
 
-	teacher, err := a.DB.GetTeacherByEmail(team.TeacherEmail)
+	teacher, err := a.DB.GetTeacherByEmail(ctx, team.TeacherEmail)
 	if err != nil {
 		a.Log.Error().Err(err).Msg("failed to get teacher from DB")
 		return nil
@@ -74,16 +76,17 @@ func (a *Application) GetParentSignFormsTemplate(r *http.Request) map[string]any
 }
 
 func (a *Application) HandleParentSignForms(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	log := a.Log.With().Str("page_name", "sign_forms").Logger()
 	tok := r.URL.Query().Get("tok")
-	student, err := a.getStudentBySignFormsToken(tok)
+	student, err := a.getStudentBySignFormsToken(ctx, tok)
 	if err != nil {
 		log.Warn().Err(err).Msg("failed to get student from sign forms token")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	team, err := a.DB.GetTeamNoMembers(student.TeamID)
+	team, err := a.DB.GetTeamNoMembers(ctx, student.TeamID)
 	if err != nil {
 		a.Log.Error().Err(err).Msg("failed to get student's team")
 		w.WriteHeader(http.StatusBadRequest)
@@ -117,7 +120,7 @@ func (a *Application) HandleParentSignForms(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	if err = a.DB.SignFormsForStudent(student.Email, parentName, team.InPerson); err != nil {
+	if err = a.DB.SignFormsForStudent(ctx, student.Email, parentName, team.InPerson); err != nil {
 		log.Error().Err(err).Msg("failed to sign forms for student")
 		w.WriteHeader(http.StatusBadRequest)
 		return

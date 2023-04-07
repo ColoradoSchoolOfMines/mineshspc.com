@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	htmltemplate "html/template"
@@ -14,7 +15,7 @@ import (
 	"github.com/ColoradoSchoolOfMines/mineshspc.com/database"
 )
 
-func (a *Application) getStudentByToken(tokenStr string) (*database.Student, error) {
+func (a *Application) getStudentByToken(ctx context.Context, tokenStr string) (*database.Student, error) {
 	if tokenStr == "" {
 		return nil, errors.New("no token")
 	}
@@ -40,18 +41,19 @@ func (a *Application) getStudentByToken(tokenStr string) (*database.Student, err
 		return nil, fmt.Errorf("invalid student verify token: %w", err)
 	}
 
-	return a.DB.GetStudentByEmail(claims.Subject)
+	return a.DB.GetStudentByEmail(ctx, claims.Subject)
 }
 
 func (a *Application) GetStudentConfirmInfoTemplate(r *http.Request) map[string]any {
+	ctx := r.Context()
 	tok := r.URL.Query().Get("tok")
-	student, err := a.getStudentByToken(tok)
+	student, err := a.getStudentByToken(ctx, tok)
 	if err != nil {
 		a.Log.Warn().Err(err).Msg("failed to get student from token")
 		return nil
 	}
 
-	team, err := a.DB.GetTeamNoMembers(student.TeamID)
+	team, err := a.DB.GetTeamNoMembers(ctx, student.TeamID)
 	if err != nil {
 		a.Log.Error().Err(err).Msg("failed to get student's team")
 		return nil
@@ -73,9 +75,10 @@ func (a *Application) CreateSignFormsJWT(email string) *jwt.Token {
 }
 
 func (a *Application) HandleStudentConfirmEmail(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	log := a.Log.With().Str("page_name", "student_confirm_email").Logger()
 	tok := r.URL.Query().Get("tok")
-	student, err := a.getStudentByToken(tok)
+	student, err := a.getStudentByToken(ctx, tok)
 	if err != nil {
 		log.Warn().Err(err).Msg("failed to get student from token")
 		a.StudentConfirmInfoRenderer(w, r, map[string]any{
@@ -90,7 +93,7 @@ func (a *Application) HandleStudentConfirmEmail(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	team, err := a.DB.GetTeamNoMembers(student.TeamID)
+	team, err := a.DB.GetTeamNoMembers(ctx, student.TeamID)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to get student's team")
 		w.WriteHeader(http.StatusBadRequest)
@@ -129,7 +132,7 @@ func (a *Application) HandleStudentConfirmEmail(w http.ResponseWriter, r *http.R
 		student.DietaryRestrictions = r.FormValue("dietary-restrictions")
 	}
 
-	if err = a.DB.ConfirmStudent(student.Email, student.CampusTour, student.DietaryRestrictions, student.ParentEmail); err != nil {
+	if err = a.DB.ConfirmStudent(ctx, student.Email, student.CampusTour, student.DietaryRestrictions, student.ParentEmail); err != nil {
 		log.Error().Err(err).Msg("failed to confirm student")
 		w.WriteHeader(http.StatusBadRequest)
 		return

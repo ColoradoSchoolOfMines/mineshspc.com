@@ -1,15 +1,16 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 )
 
-func (d *Database) GetStudentByEmail(email string) (*Student, error) {
+func (d *Database) GetStudentByEmail(ctx context.Context, email string) (*Student, error) {
 	var student Student
 	var parentEmail, signatory, dietaryRestrictions sql.NullString
 	var campusTour sql.NullBool
-	err := d.Raw.QueryRow(`
+	err := d.DB.QueryRowContext(ctx, `
 		SELECT teamid, email, name, age, parentemail, signatory, previouslyparticipated,
 			emailconfirmed, liabilitywaiver, computerusewaiver,
 			campustour, dietaryrestrictions
@@ -42,8 +43,8 @@ func (d *Database) GetStudentByEmail(email string) (*Student, error) {
 	return &student, err
 }
 
-func (d *Database) ConfirmStudent(email string, campusTour bool, dietaryRestrictions, parentEmail string) error {
-	_, err := d.Raw.Exec(`
+func (d *Database) ConfirmStudent(ctx context.Context, email string, campusTour bool, dietaryRestrictions, parentEmail string) error {
+	_, err := d.DB.ExecContext(ctx, `
 		UPDATE students
 		SET emailconfirmed = true, campustour = $1, dietaryrestrictions = $2, parentemail = $3
 		WHERE email = $4
@@ -51,7 +52,7 @@ func (d *Database) ConfirmStudent(email string, campusTour bool, dietaryRestrict
 	return err
 }
 
-func (d *Database) SignFormsForStudent(email, signatory string, computerUse bool) error {
+func (d *Database) SignFormsForStudent(ctx context.Context, email, signatory string, computerUse bool) error {
 	computerUseQuery := ""
 	if computerUse {
 		computerUseQuery = "computerusewaiver = true,"
@@ -61,12 +62,12 @@ func (d *Database) SignFormsForStudent(email, signatory string, computerUse bool
 		SET liabilitywaiver = true, %s signatory = $1
 		WHERE email = $2
 	`, computerUseQuery)
-	_, err := d.Raw.Exec(q, signatory, email)
+	_, err := d.DB.ExecContext(ctx, q, signatory, email)
 	return err
 }
 
-func (d *Database) GetAllDietaryRestrictions() ([]string, error) {
-	rows, err := d.Raw.Query(`
+func (d *Database) GetAllDietaryRestrictions(ctx context.Context) ([]string, error) {
+	rows, err := d.DB.QueryContext(ctx, `
 		SELECT dietaryrestrictions
 		FROM students
 		WHERE dietaryrestrictions != '' AND dietaryrestrictions IS NOT NULL

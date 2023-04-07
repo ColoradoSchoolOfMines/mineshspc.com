@@ -57,7 +57,7 @@ func (a *Application) HandleTeacherLogin(w http.ResponseWriter, r *http.Request)
 	}
 	log = log.With().Str("email", emailAddress).Logger()
 
-	teacher, err := a.DB.GetTeacherByEmail(emailAddress)
+	teacher, err := a.DB.GetTeacherByEmail(r.Context(), emailAddress)
 	if err != nil {
 		log.Warn().Err(err).Msg("failed to find teacher by email")
 		a.TeacherLoginRenderer(w, r, map[string]any{

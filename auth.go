@@ -36,7 +36,7 @@ func (a *Application) GetLoggedInTeacher(r *http.Request) (*database.Teacher, er
 		return nil, fmt.Errorf("token is not a session token")
 	}
 
-	user, err := a.DB.GetTeacherByEmail(claims.Subject)
+	user, err := a.DB.GetTeacherByEmail(r.Context(), claims.Subject)
 	if err != nil {
 		a.Log.Warn().Err(err).
 			Interface("claims", claims).

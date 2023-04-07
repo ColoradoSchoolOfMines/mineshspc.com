@@ -50,7 +50,7 @@ func (a *Application) HandleTeacherSchoolInfo(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	err = a.DB.SetTeacherSchoolInfo(user.Email, schoolName, schoolCity, schoolState)
+	err = a.DB.SetTeacherSchoolInfo(r.Context(), user.Email, schoolName, schoolCity, schoolState)
 	if err != nil {
 		a.ConfirmEmailRenderer(w, r, map[string]any{
 			"Errors": map[string]any{

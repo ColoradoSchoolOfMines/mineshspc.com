@@ -16,7 +16,7 @@ func (a *Application) GetTeacherTeamsTemplate(r *http.Request) map[string]any {
 	}
 	a.Log.Debug().Interface("user", user).Msg("found user")
 
-	teams, err := a.DB.GetTeacherTeams(user.Email)
+	teams, err := a.DB.GetTeacherTeams(r.Context(), user.Email)
 	if err != nil {
 		a.Log.Error().Err(err).Msg("Failed to get teacher teams")
 		// TODO report this error to the user and email admin
@@ -57,7 +57,7 @@ func (a *Application) GetTeacherTeamEditTemplate(r *http.Request) map[string]any
 			return nil
 		}
 
-		team, err := a.DB.GetTeam(user.Email, teamID)
+		team, err := a.DB.GetTeam(r.Context(), user.Email, teamID)
 		if err != nil {
 			a.Log.Error().Err(err).Msg("Failed to get teacher teams")
 			return nil
@@ -72,6 +72,7 @@ func (a *Application) GetTeacherTeamEditTemplate(r *http.Request) map[string]any
 }
 
 func (a *Application) HandleTeacherTeamEdit(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	log := a.Log.With().Str("page_name", "teacher_team_edit").Logger()
 	user, err := a.GetLoggedInTeacher(r)
 	if err != nil {
@@ -111,7 +112,7 @@ func (a *Application) HandleTeacherTeamEdit(w http.ResponseWriter, r *http.Reque
 		}
 
 		// Verify that the in-person-ness of the team did not change
-		team, err := a.DB.GetTeam(user.Email, teamID)
+		team, err := a.DB.GetTeam(ctx, user.Email, teamID)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to get team")
 			w.WriteHeader(http.StatusInternalServerError)
@@ -125,7 +126,7 @@ func (a *Application) HandleTeacherTeamEdit(w http.ResponseWriter, r *http.Reque
 		}
 	}
 
-	if err := a.DB.UpsertTeam(user.Email, teamID, teamName, teamDivision, inPerson, teamDivisionExplanation); err != nil {
+	if err := a.DB.UpsertTeam(ctx, user.Email, teamID, teamName, teamDivision, inPerson, teamDivisionExplanation); err != nil {
 		log.Error().Err(err).Msg("Failed to upsert team")
 		// TODO report this error to the user and email admin
 		w.WriteHeader(http.StatusInternalServerError)

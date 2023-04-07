@@ -83,7 +83,7 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 		return
 	}
 
-	err := a.DB.NewTeacher(name, emailAddress)
+	err := a.DB.NewTeacher(r.Context(), name, emailAddress)
 	var sqliteErr sqlite3.Error
 	if errors.As(err, &sqliteErr); sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique || sqliteErr.ExtendedCode == sqlite3.ErrConstraintPrimaryKey {
 		log.Warn().Err(err).Msg("account already exists")
@@ -131,6 +131,7 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 }
 
 func (a *Application) HandleTeacherEmailLogin(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	if !a.Config.RegistrationEnabled {
 		http.Redirect(w, r, "/register", http.StatusSeeOther)
 		return
@@ -179,13 +180,13 @@ func (a *Application) HandleTeacherEmailLogin(w http.ResponseWriter, r *http.Req
 	}
 
 	a.Log.Info().Str("sub", claims.Subject).Msg("confirming email")
-	err = a.DB.SetEmailConfirmed(claims.Subject)
+	err = a.DB.SetEmailConfirmed(ctx, claims.Subject)
 	if err != nil {
 		a.Log.Error().Err(err).Msg("failed to set email confirmed")
 		return
 	}
 
-	teacher, err := a.DB.GetTeacherByEmail(claims.Subject)
+	teacher, err := a.DB.GetTeacherByEmail(ctx, claims.Subject)
 	if err != nil {
 		a.Log.Error().Err(err).Msg("failed to get teacher from DB")
 		return

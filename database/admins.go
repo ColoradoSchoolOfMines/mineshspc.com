@@ -1,10 +1,13 @@
 package database
 
-import "database/sql"
+import (
+	"context"
+	"database/sql"
+)
 
-func (d *Database) IsEmailAdmin(email string) (bool, error) {
+func (d *Database) IsEmailAdmin(ctx context.Context, email string) (bool, error) {
 	var isAdmin bool
-	err := d.Raw.QueryRow("SELECT true FROM admins WHERE email = $1", email).Scan(&isAdmin)
+	err := d.DB.QueryRowContext(ctx, "SELECT true FROM admins WHERE email = $1", email).Scan(&isAdmin)
 	if err == sql.ErrNoRows {
 		return false, nil
 	} else if err != nil {

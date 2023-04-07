@@ -1,11 +1,13 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
+	"maunium.net/go/mautrix/util/dbutil"
 )
 
 type Division string
@@ -53,19 +55,19 @@ type Student struct {
 	DietaryRestrictions string
 }
 
-func (d *Database) scanTeam(row Scannable) (*Team, error) {
+func (d *Database) scanTeam(row dbutil.Scannable) (*Team, error) {
 	var team Team
 	err := row.Scan(&team.ID, &team.TeacherEmail, &team.Name, &team.Division, &team.InPerson, &team.DivisionExplanation, &team.SchoolName)
 	return &team, err
 }
 
-func (d *Database) scanTeamWithStudents(row Scannable) (*Team, error) {
+func (d *Database) scanTeamWithStudents(ctx context.Context, row dbutil.Scannable) (*Team, error) {
 	team, err := d.scanTeam(row)
 	if err != nil {
 		return nil, err
 	}
 
-	studentRows, err := d.Raw.Query(`
+	studentRows, err := d.DB.QueryContext(ctx, `
 		SELECT s.email, s.name, s.age, s.parentemail, s.signatory, s.previouslyparticipated, s.emailconfirmed,
 			s.liabilitywaiver, s.computerusewaiver, s.campustour, s.dietaryrestrictions
 		FROM students s
@@ -106,8 +108,8 @@ func (d *Database) scanTeamWithStudents(row Scannable) (*Team, error) {
 	return team, err
 }
 
-func (d *Database) GetTeacherTeams(email string) ([]*Team, error) {
-	rows, err := d.Raw.Query(`
+func (d *Database) GetTeacherTeams(ctx context.Context, email string) ([]*Team, error) {
+	rows, err := d.DB.QueryContext(ctx, `
 		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname
 		FROM teams t
 		JOIN teachers tt ON tt.email = t.teacheremail
@@ -121,7 +123,7 @@ func (d *Database) GetTeacherTeams(email string) ([]*Team, error) {
 	var teams []*Team
 
 	for rows.Next() {
-		team, err := d.scanTeamWithStudents(rows)
+		team, err := d.scanTeamWithStudents(ctx, rows)
 		if err != nil {
 			return nil, err
 		}
@@ -131,8 +133,8 @@ func (d *Database) GetTeacherTeams(email string) ([]*Team, error) {
 	return teams, err
 }
 
-func (d *Database) GetAdminTeams() ([]*Team, error) {
-	rows, err := d.Raw.Query(`
+func (d *Database) GetAdminTeams(ctx context.Context) ([]*Team, error) {
+	rows, err := d.DB.QueryContext(ctx, `
 		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname
 		FROM teams t
 		JOIN teachers tt ON tt.email = t.teacheremail
@@ -145,7 +147,7 @@ func (d *Database) GetAdminTeams() ([]*Team, error) {
 	var teams []*Team
 
 	for rows.Next() {
-		team, err := d.scanTeamWithStudents(rows)
+		team, err := d.scanTeamWithStudents(ctx, rows)
 		if err != nil {
 			return nil, err
 		}
@@ -155,19 +157,19 @@ func (d *Database) GetAdminTeams() ([]*Team, error) {
 	return teams, err
 }
 
-func (d *Database) GetTeam(email string, teamID uuid.UUID) (*Team, error) {
-	row := d.Raw.QueryRow(`
+func (d *Database) GetTeam(ctx context.Context, email string, teamID uuid.UUID) (*Team, error) {
+	row := d.DB.QueryRowContext(ctx, `
 		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname
 		FROM teams t
 		JOIN teachers tt ON tt.email = t.teacheremail
 		WHERE tt.email = ?
 		  AND t.id = ?
 	`, email, teamID)
-	return d.scanTeamWithStudents(row)
+	return d.scanTeamWithStudents(ctx, row)
 }
 
-func (d *Database) GetTeamNoMembers(teamID uuid.UUID) (*Team, error) {
-	row := d.Raw.QueryRow(`
+func (d *Database) GetTeamNoMembers(ctx context.Context, teamID uuid.UUID) (*Team, error) {
+	row := d.DB.QueryRowContext(ctx, `
 		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, ''
 		FROM teams t
 		WHERE t.id = ?
@@ -175,24 +177,24 @@ func (d *Database) GetTeamNoMembers(teamID uuid.UUID) (*Team, error) {
 	return d.scanTeam(row)
 }
 
-func (d *Database) UpsertTeam(teacherEmail string, teamID uuid.UUID, name string, division Division, inPerson bool, divisionExplanation string) error {
-	_, err := d.Raw.Exec(`
+func (d *Database) UpsertTeam(ctx context.Context, teacherEmail string, teamID uuid.UUID, name string, division Division, inPerson bool, divisionExplanation string) error {
+	_, err := d.DB.ExecContext(ctx, `
 		INSERT OR REPLACE INTO teams (id, teacheremail, name, division, inperson, divisionexplanation)
 		VALUES (?, ?, ?, ?, ?, ?)
 	`, teamID, teacherEmail, name, division, inPerson, divisionExplanation)
 	return err
 }
 
-func (d *Database) AddTeamMember(teamID uuid.UUID, name string, studentAge int, studentEmail string, previouslyParticipated bool) error {
-	_, err := d.Raw.Exec(`
+func (d *Database) AddTeamMember(ctx context.Context, teamID uuid.UUID, name string, studentAge int, studentEmail string, previouslyParticipated bool) error {
+	_, err := d.DB.ExecContext(ctx, `
 		INSERT INTO students (teamid, name, age, email, previouslyparticipated)
 		VALUES (?, ?, ?, ?, ?)
 	`, teamID, name, studentAge, studentEmail, previouslyParticipated)
 	return err
 }
 
-func (d *Database) RemoveTeamMember(teamID uuid.UUID, studentEmail string) error {
-	res, err := d.Raw.Exec(`
+func (d *Database) RemoveTeamMember(ctx context.Context, teamID uuid.UUID, studentEmail string) error {
+	res, err := d.DB.ExecContext(ctx, `
 		DELETE FROM students
 		WHERE teamid = ?
 			AND email = ?
