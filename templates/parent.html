@@ -32,6 +32,12 @@
         <b>{{ .Data.Teacher.Name }}</b>.
         In order to participate, you need to accept the following forms.
       </p>
+      <p>
+        <b>
+          You do not need to physically or digitally sign the PDFs, just check "Accept" beside each
+          form and enter your name below.
+        </b>
+      </p>
     </div>
   </div>
   <form method="post" action="/register/parent/signforms?tok={{ .Data.Token }}" class="form-floating">
