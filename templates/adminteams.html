@@ -162,8 +162,9 @@
                               Resend Student Email Confirmation
                             </a>
                             &bull;
-                            <a href="/admin/confirmationlink/student?email={{ .Email }}">
-                              Get link (for sending via side-channel)
+                            <a href="/admin/confirmationlink/student?email={{ .Email }}"
+                               title="Get the link for sending via a side-channel. Use if the student's email is blocking our emails.">
+                              Get link
                             </a>
                           </small>
                         {{ end }}
@@ -174,8 +175,9 @@
                               Resend Parent Email ({{ .ParentEmail }})
                             </a>
                             &bull;
-                            <a href="/admin/confirmationlink/parent?email={{ .Email }}">
-                              Get link (for sending via side-channel)
+                            <a href="/admin/confirmationlink/parent?email={{ .Email }}"
+                               title="Get the link for sending via a side-channel. Use if the parent's email is blocking our emails.">
+                              Get link
                             </a>
                           </small>
                         {{ end }}
