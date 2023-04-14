@@ -161,6 +161,10 @@
                             <a href="/admin/resendstudentemail?email={{ .Email }}">
                               Resend Student Email Confirmation
                             </a>
+                            &bull;
+                            <a href="/admin/confirmationlink/student?email={{ .Email }}">
+                              Get link (for sending via side-channel)
+                            </a>
                           </small>
                         {{ end }}
                         {{ if and .EmailConfirmed (not .LiabilitySigned) }}
@@ -168,6 +172,10 @@
                           <small>
                             <a href="/admin/resendparentemail?email={{ .Email }}">
                               Resend Parent Email ({{ .ParentEmail }})
+                            </a>
+                            &bull;
+                            <a href="/admin/confirmationlink/parent?email={{ .Email }}">
+                              Get link (for sending via side-channel)
                             </a>
                           </small>
                         {{ end }}

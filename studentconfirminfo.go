@@ -68,11 +68,17 @@ func (a *Application) GetStudentConfirmInfoTemplate(r *http.Request) map[string]
 	}
 }
 
-func (a *Application) CreateSignFormsJWT(email string) *jwt.Token {
-	return jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.RegisteredClaims{
+func (a *Application) getParentSignFormsLink(email string) (string, error) {
+	tok := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.RegisteredClaims{
 		Issuer:  string(IssuerSignForms),
 		Subject: email,
 	})
+	signedTok, err := tok.SignedString(a.Config.ReadSecretKey())
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%s/register/parent/signforms?tok=%s", a.Config.Domain, signedTok), nil
 }
 
 func (a *Application) sendParentEmail(ctx context.Context, student *database.Student) error {
@@ -82,16 +88,14 @@ func (a *Application) sendParentEmail(ctx context.Context, student *database.Stu
 		toAddress = student.Email
 	}
 
-	tok := a.CreateSignFormsJWT(student.Email)
-	signedTok, err := tok.SignedString(a.Config.ReadSecretKey())
+	signURL, err := a.getParentSignFormsLink(student.Email)
 	if err != nil {
 		log.Err(err).Msg("failed to sign email login token")
 		return err
 	}
-
 	templateData := map[string]any{
 		"Student": student,
-		"SignURL": fmt.Sprintf("%s/register/parent/signforms?tok=%s", a.Config.Domain, signedTok),
+		"SignURL": signURL,
 	}
 
 	var plainTextContent, htmlContent strings.Builder

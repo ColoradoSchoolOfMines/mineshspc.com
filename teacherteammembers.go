@@ -49,20 +49,32 @@ func (a *Application) GetTeacherAddMemberTemplate(r *http.Request) map[string]an
 	return templateData
 }
 
+func (a *Application) getStudentConfirmEmailLink(email string) (string, error) {
+	tok := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.RegisteredClaims{
+		Issuer:  string(IssuerStudentVerify),
+		Subject: email,
+	})
+
+	signedTok, err := tok.SignedString(a.Config.ReadSecretKey())
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s/register/student/confirminfo?tok=%s", a.Config.Domain, signedTok), nil
+}
+
 func (a *Application) sendStudentEmail(ctx context.Context, studentEmail, studentName, teacherName, teamName string) error {
 	log := zerolog.Ctx(ctx).With().Str("action", "sendStudentEmail").Logger()
 
-	tok := a.CreateStudentVerifyJWT(studentEmail)
-	signedTok, err := tok.SignedString(a.Config.ReadSecretKey())
+	confirmationLink, err := a.getStudentConfirmEmailLink(studentEmail)
 	if err != nil {
-		log.Err(err).Msg("Failed to create student verify url")
+		log.Err(err).Msg("Failed to create student confirmation link")
 		return err
 	}
 	templateData := map[string]any{
 		"Name":        studentName,
 		"TeacherName": teacherName,
 		"TeamName":    teamName,
-		"VerifyURL":   fmt.Sprintf("%s/register/student/confirminfo?tok=%s", a.Config.Domain, signedTok),
+		"VerifyURL":   confirmationLink,
 	}
 
 	var plainTextContent, htmlContent strings.Builder
@@ -205,13 +217,6 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 	}
 
 	http.Redirect(w, r, "/register/teacher/team/edit?team_id="+teamID.String(), http.StatusSeeOther)
-}
-
-func (a *Application) CreateStudentVerifyJWT(email string) *jwt.Token {
-	return jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.RegisteredClaims{
-		Issuer:  string(IssuerStudentVerify),
-		Subject: email,
-	})
 }
 
 func (a *Application) HandleTeacherDeleteMember(w http.ResponseWriter, r *http.Request) {

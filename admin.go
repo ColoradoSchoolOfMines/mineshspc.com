@@ -315,3 +315,81 @@ func (a *Application) HandleResendParentEmail(w http.ResponseWriter, r *http.Req
 
 	http.Redirect(w, r, "/admin/teams", http.StatusSeeOther)
 }
+
+func (a *Application) HandleGetStudentEmailConfirmationLink(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tok, err := r.Cookie("admin_token")
+	if err != nil {
+		a.Log.Warn().Err(err).Msg("failed to get admin token")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if isAdmin, err := a.isAdminByToken(tok.Value); err != nil || !isAdmin {
+		a.Log.Warn().Err(err).Msg("user is not admin!")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	email := r.URL.Query().Get("email")
+	if email == "" {
+		a.Log.Warn().Msg("no email address provided in query string")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	_, err = a.DB.GetStudentByEmail(ctx, email)
+	if err != nil {
+		a.Log.Warn().Err(err).Msg("failed to get student by email")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	confirmationLink, err := a.getStudentConfirmEmailLink(email)
+	if err != nil {
+		a.Log.Err(err).Msg("failed to get student confirmation link")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Write([]byte(confirmationLink))
+}
+
+func (a *Application) HandleGetParentEmailConfirmationLink(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tok, err := r.Cookie("admin_token")
+	if err != nil {
+		a.Log.Warn().Err(err).Msg("failed to get admin token")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if isAdmin, err := a.isAdminByToken(tok.Value); err != nil || !isAdmin {
+		a.Log.Warn().Err(err).Msg("user is not admin!")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	email := r.URL.Query().Get("email")
+	if email == "" {
+		a.Log.Warn().Msg("no email address provided in query string")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	_, err = a.DB.GetStudentByEmail(ctx, email)
+	if err != nil {
+		a.Log.Warn().Err(err).Msg("failed to get student by email")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	signURL, err := a.getParentSignFormsLink(email)
+	if err != nil {
+		a.Log.Err(err).Msg("failed to get parent sign forms link")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Write([]byte(signURL))
+}
