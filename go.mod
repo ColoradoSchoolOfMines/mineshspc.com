@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/mattn/go-sqlite3 v1.14.16
-	github.com/rs/zerolog v1.29.0
+	github.com/rs/zerolog v1.29.1
 	github.com/sendgrid/sendgrid-go v3.12.0+incompatible
 	github.com/spf13/viper v1.15.0
 	maunium.net/go/mautrix v0.15.0
