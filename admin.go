@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"net/http"
@@ -530,5 +531,80 @@ func (a *Application) HandleSendQRCodes(w http.ResponseWriter, r *http.Request) 
 				w.Write([]byte(fmt.Sprintf("Not sending QR code to %s since it's not confirmed\n", member.Email)))
 			}
 		}
+	}
+}
+
+func (a *Application) HandleKattisParticipantsExport(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tok, err := r.Cookie("admin_token")
+	if err != nil {
+		a.Log.Warn().Err(err).Msg("failed to get admin token")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if isAdmin, err := a.isAdminByToken(tok.Value); err != nil || !isAdmin {
+		a.Log.Warn().Err(err).Msg("user is not admin!")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	teamsWithTeachers, err := a.DB.GetAdminTeamsWithTeacherName(ctx)
+	if err != nil {
+		a.Log.Err(err).Msg("failed to get teams with teachers")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	for _, team := range teamsWithTeachers {
+		for _, member := range team.Members {
+			parts := [][]byte{
+				[]byte(member.Name),
+				[]byte(member.Email),
+				[]byte(team.Name),
+				[]byte("CONTESTANT"),
+				[]byte(""),
+				[]byte(""),
+				[]byte(""),
+			}
+			w.Write(bytes.Join(parts, []byte(",")))
+			w.Write([]byte("\n"))
+		}
+	}
+}
+
+func (a *Application) HandleKattisTeamsExport(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tok, err := r.Cookie("admin_token")
+	if err != nil {
+		a.Log.Warn().Err(err).Msg("failed to get admin token")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if isAdmin, err := a.isAdminByToken(tok.Value); err != nil || !isAdmin {
+		a.Log.Warn().Err(err).Msg("user is not admin!")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	teamsWithTeachers, err := a.DB.GetAdminTeamsWithTeacherName(ctx)
+	if err != nil {
+		a.Log.Err(err).Msg("failed to get teams with teachers")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	for _, team := range teamsWithTeachers {
+		siteName := "Colorado School of Mines"
+		if !team.InPerson {
+			siteName = "Remote"
+		}
+		parts := [][]byte{
+			[]byte(team.Name),
+			[]byte(siteName),
+		}
+		w.Write(bytes.Join(parts, []byte(",")))
+		w.Write([]byte("\n"))
 	}
 }
