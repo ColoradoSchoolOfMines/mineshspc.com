@@ -433,14 +433,14 @@ func (a *Application) HandleSendEmailConfirmationReminders(w http.ResponseWriter
 				w.Write([]byte(fmt.Sprintf("Not resending confirmation info to %s because they already finished confirming\n", member.Email)))
 				continue
 			}
-			w.Write([]byte(fmt.Sprintf("Resending confirmation email to %s...", member.Email)))
-			err := a.sendStudentEmail(ctx, member.Email, member.Name, team.TeacherName, team.Name, true)
-			if err != nil {
-				a.Log.Err(err).Msg("failed to send student email")
-				w.Write([]byte(fmt.Sprintf("FAILED\n%v", err)))
-				return
-			}
-			w.Write([]byte("DONE\n"))
+			w.Write([]byte(fmt.Sprintf("Resending confirmation email to %s", member.Email)))
+			go func(team *database.TeamWithTeacherName, member database.Student) {
+				err := a.sendStudentEmail(ctx, member.Email, member.Name, team.TeacherName, team.Name, true)
+				if err != nil {
+					a.Log.Err(err).Msg("failed to send student email")
+					return
+				}
+			}(team, member)
 		}
 	}
 }
@@ -473,14 +473,14 @@ func (a *Application) HandleSendParentReminders(w http.ResponseWriter, r *http.R
 				w.Write([]byte(fmt.Sprintf("Not resending confirmation info to %s because they already signed the forms\n", member.Email)))
 				continue
 			}
-			w.Write([]byte(fmt.Sprintf("Resending confirmation email to %s...", member.Email)))
-			err := a.sendParentEmail(ctx, &member, true)
-			if err != nil {
-				a.Log.Err(err).Msg("failed to send student email")
-				w.Write([]byte(fmt.Sprintf("FAILED\n%v", err)))
-				return
-			}
-			w.Write([]byte("DONE\n"))
+			w.Write([]byte(fmt.Sprintf("Resending confirmation email to %s", member.ParentEmail)))
+			go func(member database.Student) {
+				err := a.sendParentEmail(ctx, &member, true)
+				if err != nil {
+					a.Log.Err(err).Msg("failed to send student email")
+					return
+				}
+			}(member)
 		}
 	}
 }
@@ -512,21 +512,20 @@ func (a *Application) HandleSendQRCodes(w http.ResponseWriter, r *http.Request) 
 			if member.QRCodeSent {
 				w.Write([]byte(fmt.Sprintf("Not sending QR code to %s since we already sent to that email\n", member.Email)))
 			} else if member.EmailConfirmed {
-				w.Write([]byte(fmt.Sprintf("Sending QR code to %s...", member.Email)))
+				w.Write([]byte(fmt.Sprintf("Sending QR code to %s", member.Email)))
 
-				err := a.sendQRCodeEmail(ctx, member.Name, member.Email)
-				if err != nil {
-					a.Log.Err(err).Msg("failed to send QR code email")
-					w.Write([]byte(fmt.Sprintf("FAILED\n%v", err)))
-					return
-				}
+				go func(member database.Student) {
+					err := a.sendQRCodeEmail(ctx, member.Name, member.Email)
+					if err != nil {
+						a.Log.Err(err).Msg("failed to send QR code email")
+						return
+					}
 
-				err = a.DB.MarkQRCodeSent(ctx, member.Email)
-				if err != nil {
-					a.Log.Err(err).Msg("failed to mark QR code sent")
-				}
-
-				w.Write([]byte("DONE\n"))
+					err = a.DB.MarkQRCodeSent(ctx, member.Email)
+					if err != nil {
+						a.Log.Err(err).Msg("failed to mark QR code sent")
+					}
+				}(member)
 			} else {
 				w.Write([]byte(fmt.Sprintf("Not sending QR code to %s since it's not confirmed\n", member.Email)))
 			}
