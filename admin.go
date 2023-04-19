@@ -269,7 +269,7 @@ func (a *Application) HandleResendStudentEmail(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	if err := a.sendStudentEmail(ctx, student.Email, student.Name, teacher.Name, team.Name); err != nil {
+	if err := a.sendStudentEmail(ctx, student.Email, student.Name, teacher.Name, team.Name, false); err != nil {
 		a.Log.Err(err).Msg("failed to send student email")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -312,7 +312,7 @@ func (a *Application) HandleResendParentEmail(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	if err := a.sendParentEmail(ctx, student); err != nil {
+	if err := a.sendParentEmail(ctx, student, false); err != nil {
 		a.Log.Err(err).Msg("failed to send parent email")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -405,11 +405,83 @@ func (a *Application) HandleGetParentEmailConfirmationLink(w http.ResponseWriter
 }
 
 func (a *Application) HandleSendEmailConfirmationReminders(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("NOT IMPLEMENTED"))
+	ctx := r.Context()
+	tok, err := r.Cookie("admin_token")
+	if err != nil {
+		a.Log.Warn().Err(err).Msg("failed to get admin token")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if isAdmin, err := a.isAdminByToken(tok.Value); err != nil || !isAdmin {
+		a.Log.Warn().Err(err).Msg("user is not admin!")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	teamsWithTeachers, err := a.DB.GetAdminTeamsWithTeacherName(ctx)
+	if err != nil {
+		a.Log.Err(err).Msg("failed to get teams with teachers")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	for _, team := range teamsWithTeachers {
+		for _, member := range team.Members {
+			if member.EmailConfirmed {
+				w.Write([]byte(fmt.Sprintf("Not resending confirmation info to %s because they already finished confirming\n", member.Email)))
+				continue
+			}
+			w.Write([]byte(fmt.Sprintf("Resending confirmation email to %s...", member.Email)))
+			err := a.sendStudentEmail(ctx, member.Email, member.Name, team.TeacherName, team.Name, true)
+			if err != nil {
+				a.Log.Err(err).Msg("failed to send student email")
+				w.Write([]byte(fmt.Sprintf("FAILED\n%v", err)))
+				return
+			}
+			w.Write([]byte("DONE\n"))
+		}
+	}
 }
 
 func (a *Application) HandleSendParentReminders(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("NOT IMPLEMENTED"))
+	ctx := r.Context()
+	tok, err := r.Cookie("admin_token")
+	if err != nil {
+		a.Log.Warn().Err(err).Msg("failed to get admin token")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if isAdmin, err := a.isAdminByToken(tok.Value); err != nil || !isAdmin {
+		a.Log.Warn().Err(err).Msg("user is not admin!")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	teamsWithTeachers, err := a.DB.GetAdminTeamsWithTeacherName(ctx)
+	if err != nil {
+		a.Log.Err(err).Msg("failed to get teams with teachers")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	for _, team := range teamsWithTeachers {
+		for _, member := range team.Members {
+			if member.LiabilitySigned {
+				w.Write([]byte(fmt.Sprintf("Not resending confirmation info to %s because they already signed the forms\n", member.Email)))
+				continue
+			}
+			w.Write([]byte(fmt.Sprintf("Resending confirmation email to %s...", member.Email)))
+			err := a.sendParentEmail(ctx, &member, true)
+			if err != nil {
+				a.Log.Err(err).Msg("failed to send student email")
+				w.Write([]byte(fmt.Sprintf("FAILED\n%v", err)))
+				return
+			}
+			w.Write([]byte("DONE\n"))
+		}
+	}
 }
 
 func (a *Application) HandleSendQRCodes(w http.ResponseWriter, r *http.Request) {

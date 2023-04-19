@@ -81,7 +81,7 @@ func (a *Application) getParentSignFormsLink(email string) (string, error) {
 	return fmt.Sprintf("%s/register/parent/signforms?tok=%s", a.Config.Domain, signedTok), nil
 }
 
-func (a *Application) sendParentEmail(ctx context.Context, student *database.Student) error {
+func (a *Application) sendParentEmail(ctx context.Context, student *database.Student, isReminder bool) error {
 	log := zerolog.Ctx(ctx).With().Str("action", "sendParentEmail").Logger()
 	toAddress := student.ParentEmail
 	if student.Age >= 18 {
@@ -102,7 +102,12 @@ func (a *Application) sendParentEmail(ctx context.Context, student *database.Stu
 	texttemplate.Must(texttemplate.ParseFS(emailTemplates, "emailtemplates/forms.txt")).Execute(&plainTextContent, templateData)
 	htmltemplate.Must(htmltemplate.ParseFS(emailTemplates, "emailtemplates/forms.html")).Execute(&htmlContent, templateData)
 
-	err = a.SendEmail(log, "Sign forms to participate in Mines HSPC",
+	subject := "Sign forms to participate in Mines HSPC"
+	if isReminder {
+		subject = fmt.Sprintf("REMINDER: %s", subject)
+	}
+
+	err = a.SendEmail(log, subject,
 		mail.NewEmail("", toAddress),
 		plainTextContent.String(),
 		htmlContent.String())
@@ -181,7 +186,7 @@ func (a *Application) HandleStudentConfirmEmail(w http.ResponseWriter, r *http.R
 	log.Info().Interface("s", student).Msg("student confirmed")
 
 	if sendEmail {
-		if err := a.sendParentEmail(ctx, student); err != nil {
+		if err := a.sendParentEmail(ctx, student, false); err != nil {
 			log.Err(err).Msg("failed to send email")
 			w.WriteHeader(http.StatusInternalServerError)
 			return

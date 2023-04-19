@@ -62,7 +62,7 @@ func (a *Application) getStudentConfirmEmailLink(email string) (string, error) {
 	return fmt.Sprintf("%s/register/student/confirminfo?tok=%s", a.Config.Domain, signedTok), nil
 }
 
-func (a *Application) sendStudentEmail(ctx context.Context, studentEmail, studentName, teacherName, teamName string) error {
+func (a *Application) sendStudentEmail(ctx context.Context, studentEmail, studentName, teacherName, teamName string, isReminder bool) error {
 	log := zerolog.Ctx(ctx).With().Str("action", "sendStudentEmail").Logger()
 
 	confirmationLink, err := a.getStudentConfirmEmailLink(studentEmail)
@@ -81,7 +81,12 @@ func (a *Application) sendStudentEmail(ctx context.Context, studentEmail, studen
 	texttemplate.Must(texttemplate.ParseFS(emailTemplates, "emailtemplates/studentverify.txt")).Execute(&plainTextContent, templateData)
 	htmltemplate.Must(htmltemplate.ParseFS(emailTemplates, "emailtemplates/studentverify.html")).Execute(&htmlContent, templateData)
 
-	err = a.SendEmail(log, "Confirm Mines HSPC Registration",
+	subject := "Confirm Mines HSPC Registration"
+	if isReminder {
+		subject = fmt.Sprintf("REMINDER: %s", subject)
+	}
+
+	err = a.SendEmail(log, subject,
 		mail.NewEmail(studentName, studentEmail),
 		plainTextContent.String(),
 		htmlContent.String())
@@ -215,7 +220,7 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 	}
 
 	// Send email to student
-	if err := a.sendStudentEmail(ctx, studentEmail, studentName, user.Name, team.Name); err != nil {
+	if err := a.sendStudentEmail(ctx, studentEmail, studentName, user.Name, team.Name, false); err != nil {
 		log.Err(err).Msg("failed to send student email")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
