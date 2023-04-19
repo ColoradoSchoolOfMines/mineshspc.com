@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bytes"
+	"encoding/csv"
 	"errors"
 	"fmt"
 	"net/http"
@@ -556,21 +556,22 @@ func (a *Application) HandleKattisParticipantsExport(w http.ResponseWriter, r *h
 		return
 	}
 
+	writer := csv.NewWriter(w)
 	for _, team := range teamsWithTeachers {
 		for _, member := range team.Members {
-			parts := [][]byte{
-				[]byte(member.Name),
-				[]byte(member.Email),
-				[]byte(team.Name),
-				[]byte("CONTESTANT"),
-				[]byte(""),
-				[]byte(""),
-				[]byte(""),
+			parts := []string{
+				member.Name,
+				member.Email,
+				team.Name,
+				"CONTESTANT",
+				"",
+				"",
+				"",
 			}
-			w.Write(bytes.Join(parts, []byte(",")))
-			w.Write([]byte("\n"))
+			writer.Write(parts)
 		}
 	}
+	writer.Flush()
 }
 
 func (a *Application) HandleKattisTeamsExport(w http.ResponseWriter, r *http.Request) {
@@ -595,16 +596,17 @@ func (a *Application) HandleKattisTeamsExport(w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	writer := csv.NewWriter(w)
 	for _, team := range teamsWithTeachers {
 		siteName := "Colorado School of Mines"
 		if !team.InPerson {
 			siteName = "Remote"
 		}
-		parts := [][]byte{
-			[]byte(team.Name),
-			[]byte(siteName),
+		parts := []string{
+			team.Name,
+			siteName,
 		}
-		w.Write(bytes.Join(parts, []byte(",")))
-		w.Write([]byte("\n"))
+		writer.Write(parts)
 	}
+	writer.Flush()
 }
