@@ -61,6 +61,11 @@ func (a *Application) verifyCaptcha(response string) error {
 }
 
 func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.Request) {
+	if !a.Config.RegistrationEnabled {
+		http.Redirect(w, r, "/register", http.StatusSeeOther)
+		return
+	}
+
 	log := a.Log.With().Str("page_name", "teacher_create_account").Logger()
 	if err := r.ParseForm(); err != nil {
 		log.Err(err).Msg("failed to parse form")
@@ -132,11 +137,6 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 
 func (a *Application) HandleTeacherEmailLogin(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	if !a.Config.RegistrationEnabled {
-		http.Redirect(w, r, "/register", http.StatusSeeOther)
-		return
-	}
-
 	tokenStr := r.URL.Query().Get("tok")
 	if tokenStr == "" {
 		emailCookie, err := r.Cookie("email")

@@ -72,6 +72,11 @@ func (a *Application) GetTeacherTeamEditTemplate(r *http.Request) map[string]any
 }
 
 func (a *Application) HandleTeacherTeamEdit(w http.ResponseWriter, r *http.Request) {
+	if !a.Config.RegistrationEnabled {
+		http.Redirect(w, r, "/register", http.StatusSeeOther)
+		return
+	}
+
 	ctx := r.Context()
 	log := a.Log.With().Str("page_name", "teacher_team_edit").Logger()
 	user, err := a.GetLoggedInTeacher(r)

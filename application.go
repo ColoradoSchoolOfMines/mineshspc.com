@@ -163,11 +163,6 @@ func (a *Application) Start() {
 	for path, rend := range registrationPages {
 		renderFn := func(path string, rend renderInfo) func(w http.ResponseWriter, r *http.Request) {
 			return func(w http.ResponseWriter, r *http.Request) {
-				if !a.Config.RegistrationEnabled {
-					http.Redirect(w, r, "/register", http.StatusSeeOther)
-					return
-				}
-
 				if teacher, err := a.GetLoggedInTeacher(r); err != nil {
 					a.Log.Info().Err(err).
 						Bool("redirect_if_logged_in", rend.RedirectIfLoggedIn).
@@ -211,11 +206,6 @@ func (a *Application) Start() {
 	for path, fn := range formHandlers {
 		renderFn := func(handler func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
 			return func(w http.ResponseWriter, r *http.Request) {
-				if !a.Config.RegistrationEnabled {
-					http.Redirect(w, r, "/register", http.StatusSeeOther)
-					return
-				}
-
 				handler(w, r)
 			}
 		}

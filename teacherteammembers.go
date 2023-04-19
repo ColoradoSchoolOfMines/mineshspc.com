@@ -97,6 +97,11 @@ var ageRegex = regexp.MustCompile(`^(\d+)$`)
 
 func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	if !a.Config.RegistrationEnabled {
+		http.Redirect(w, r, "/register", http.StatusSeeOther)
+		return
+	}
+
 	log := a.Log.With().Str("page_name", "teacher_add_member").Logger()
 	user, err := a.GetLoggedInTeacher(r)
 	if err != nil {

@@ -30,6 +30,16 @@
 </div>
 
 <div class="container page-content teacher">
+  {{ if not .RegistrationEnabled }}
+    <div class="row pt-4 px-4">
+      <div class="col">
+        <div class="alert alert-warning" role="alert">
+          Registration is currently disabled. This page is now read-only.
+        </div>
+      </div>
+    </div>
+  {{ end }}
+
   <form method="post" action="/register/teacher/team/edit{{ with .Data.Team }}?team_id={{ .ID }}{{ end }}"
         class="form-floating {{ if .Data.Validated }}was-validated{{ end }}">
     {{ with .Data.Error.General }}
@@ -99,6 +109,7 @@
                 <div class="btn-group" role="group" aria-label="Select team division">
                   <input type="radio" class="btn-check" name="team-division"
                     value="Beginner" id="beginner" autocomplete="off" required
+                    disabled="{{ not .RegistrationEnabled }}"
                     {{ with .Data.Team }}{{ if eq .Division "Beginner" }}checked{{ end }}{{ end }}>
                   <label class="btn w-100 btn-outline-primary" for="beginner">
                     <h4>Beginner</h4>
@@ -110,6 +121,7 @@
 
                   <input type="radio" class="btn-check" name="team-division"
                     value="Advanced" id="advanced" autocomplete="off" required
+                    disabled="{{ not .RegistrationEnabled }}"
                     {{ with .Data.Team }}{{ if eq .Division "Advanced" }}checked{{ end }}{{ end }}>
                   <label class="btn w-100 btn-outline-primary" for="advanced">
                     <h4>Advanced</h4>
@@ -174,7 +186,8 @@
             </table>
             <div class="card-footer">
               {{ if lt (len .Members) 4 }}
-                <a href="/register/teacher/team/addmember?team_id={{ .ID }}" type="button" class="btn btn-primary">
+                <a href="/register/teacher/team/addmember?team_id={{ .ID }}" type="button"
+                   class="btn btn-primary {{ if not $.RegistrationEnabled }}disabled{{ end }}">
                   Add Member
                 </a>
               {{ else }}
@@ -187,7 +200,7 @@
     {{ end }}
     <div class="row text-center pb-4">
       <div class="col-md-12">
-        <button type="submit" class="btn btn-lg btn-primary">
+        <button type="submit" class="btn btn-lg btn-primary" disabled="{{ not .RegistrationEnabled }}">
           {{- if .Data.Team -}}
             Save Team
           {{- else -}}
