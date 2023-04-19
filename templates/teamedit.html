@@ -109,7 +109,7 @@
                 <div class="btn-group" role="group" aria-label="Select team division">
                   <input type="radio" class="btn-check" name="team-division"
                     value="Beginner" id="beginner" autocomplete="off" required
-                    disabled="{{ not .RegistrationEnabled }}"
+                    {{ if not .RegistrationEnabled }}disabled{{ end }}
                     {{ with .Data.Team }}{{ if eq .Division "Beginner" }}checked{{ end }}{{ end }}>
                   <label class="btn w-100 btn-outline-primary" for="beginner">
                     <h4>Beginner</h4>
@@ -121,7 +121,7 @@
 
                   <input type="radio" class="btn-check" name="team-division"
                     value="Advanced" id="advanced" autocomplete="off" required
-                    disabled="{{ not .RegistrationEnabled }}"
+                    {{ if not .RegistrationEnabled }}disabled{{ end }}
                     {{ with .Data.Team }}{{ if eq .Division "Advanced" }}checked{{ end }}{{ end }}>
                   <label class="btn w-100 btn-outline-primary" for="advanced">
                     <h4>Advanced</h4>
@@ -200,7 +200,9 @@
     {{ end }}
     <div class="row text-center pb-4">
       <div class="col-md-12">
-        <button type="submit" class="btn btn-lg btn-primary" disabled="{{ not .RegistrationEnabled }}">
+        <button type="submit" class="btn btn-lg btn-primary"
+          {{ if not .RegistrationEnabled }}disabled{{ end }}
+        >
           {{- if .Data.Team -}}
             Save Team
           {{- else -}}
