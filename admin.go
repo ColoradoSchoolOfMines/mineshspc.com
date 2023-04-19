@@ -74,7 +74,7 @@ func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
 	var beginnerStudents, advancedStudents int
 	var beginnerInPersonTeams, advancedInPersonTeams int
 	var beginnerInPersonStudents, advancedInPersonStudents int
-	var campusTour int
+	var campusTour, emailConfirmed, formsSigned int
 	for _, team := range teamsWithTeachers {
 		if team.Division == database.DivisionBeginner {
 			beginnerTeams++
@@ -92,11 +92,17 @@ func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
 			}
 		}
 
-		if team.InPerson {
-			for _, member := range team.Members {
-				if member.CampusTour {
-					campusTour++
-				}
+		for _, member := range team.Members {
+			if team.InPerson && member.CampusTour {
+				campusTour++
+			}
+
+			if member.EmailConfirmed {
+				emailConfirmed++
+			}
+
+			if member.LiabilitySigned {
+				formsSigned++
 			}
 		}
 	}
@@ -131,9 +137,11 @@ func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
 			"TotalInPerson": beginnerInPersonStudents + advancedInPersonStudents,
 			"TotalRemote":   (beginnerStudents + advancedStudents) - (beginnerInPersonStudents - advancedInPersonStudents),
 		},
-		"TotalTeams":         beginnerTeams + advancedTeams,
-		"TotalStudents":      beginnerStudents + advancedStudents,
-		"CampusTourStudents": campusTour,
+		"TotalTeams":             beginnerTeams + advancedTeams,
+		"TotalStudents":          beginnerStudents + advancedStudents,
+		"CampusTourStudents":     campusTour,
+		"EmailConfirmedStudents": emailConfirmed,
+		"FormsSignedStudents":    formsSigned,
 	}
 }
 
