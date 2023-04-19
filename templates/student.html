@@ -10,7 +10,7 @@
 </div>
 
 <div class="container page-content register-student p-4">
-  {{ with .Data.Confirmed }}
+  {{ if .Data.Confirmed }}
     <div class="row">
       <div class="col">
         <div class="alert alert-success" role="alert">
@@ -144,7 +144,7 @@
                         {{ with .ParentEmail }}value="{{ . }}" disabled{{ end }}
                       />
                       <label for="parent-email">Parent/Guardian Email</label>
-                      {{ with .ParentEmail }}
+                      {{ if .ParentEmail }}
                         <div class="form-text">
                           If you need to edit this value, please email
                           <a href="mailto:support@mineshspc.com">support@mineshspc.com</a>.
