@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/csv"
 	"errors"
 	"fmt"
@@ -433,9 +434,9 @@ func (a *Application) HandleSendEmailConfirmationReminders(w http.ResponseWriter
 				w.Write([]byte(fmt.Sprintf("Not resending confirmation info to %s because they already finished confirming\n", member.Email)))
 				continue
 			}
-			w.Write([]byte(fmt.Sprintf("Resending confirmation email to %s", member.Email)))
+			w.Write([]byte(fmt.Sprintf("Resending confirmation email to %s\n", member.Email)))
 			go func(team *database.TeamWithTeacherName, member database.Student) {
-				err := a.sendStudentEmail(ctx, member.Email, member.Name, team.TeacherName, team.Name, true)
+				err := a.sendStudentEmail(context.Background(), member.Email, member.Name, team.TeacherName, team.Name, true)
 				if err != nil {
 					a.Log.Err(err).Msg("failed to send student email")
 					return
@@ -473,9 +474,9 @@ func (a *Application) HandleSendParentReminders(w http.ResponseWriter, r *http.R
 				w.Write([]byte(fmt.Sprintf("Not resending confirmation info to %s because they already signed the forms\n", member.Email)))
 				continue
 			}
-			w.Write([]byte(fmt.Sprintf("Resending confirmation email to %s", member.ParentEmail)))
+			w.Write([]byte(fmt.Sprintf("Resending confirmation email to %s\n", member.ParentEmail)))
 			go func(member database.Student) {
-				err := a.sendParentEmail(ctx, &member, true)
+				err := a.sendParentEmail(context.Background(), &member, true)
 				if err != nil {
 					a.Log.Err(err).Msg("failed to send student email")
 					return
@@ -512,9 +513,10 @@ func (a *Application) HandleSendQRCodes(w http.ResponseWriter, r *http.Request) 
 			if member.QRCodeSent {
 				w.Write([]byte(fmt.Sprintf("Not sending QR code to %s since we already sent to that email\n", member.Email)))
 			} else if member.EmailConfirmed {
-				w.Write([]byte(fmt.Sprintf("Sending QR code to %s", member.Email)))
+				w.Write([]byte(fmt.Sprintf("Sending QR code to %s\n", member.Email)))
 
 				go func(member database.Student) {
+					ctx := context.Background()
 					err := a.sendQRCodeEmail(ctx, member.Name, member.Email)
 					if err != nil {
 						a.Log.Err(err).Msg("failed to send QR code email")
