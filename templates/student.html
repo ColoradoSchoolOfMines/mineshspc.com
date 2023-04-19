@@ -122,88 +122,86 @@
           </div>
         </div>
       {{ end }}
-      {{ with .Data.Student }}
-        {{ if (lt .Age 18) }}
-          <div class="row my-4" id="parent-information">
-            <div class="col">
-              <div class="card">
-                <h4 class="card-header">Parent/Guardian Information</h4>
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col">
-                      <p>
-                        Your parent/guardian needs to sign some forms in order for you to participate.
-                        Please enter their email here.
-                      </p>
-                    </div>
+      {{ if (lt .Data.Student.Age 18) }}
+        <div class="row my-4" id="parent-information">
+          <div class="col">
+            <div class="card">
+              <h4 class="card-header">Parent/Guardian Information</h4>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col">
+                    <p>
+                      Your parent/guardian needs to sign some forms in order for you to participate.
+                      Please enter their email here.
+                    </p>
                   </div>
-                  <div class="row">
-                    <div class="col">
-                      <div class="form-floating">
-                        <input type="email" class="form-control col-12" name="parent-email" id="parent-email"
-                          placeholder="Parent Email" required
-                          {{ with .ParentEmail }}value="{{ . }}" disabled{{ end }}
-                        />
-                        <label for="parent-email">Parent/Guardian Email</label>
-                        {{ with .ParentEmail }}
-                          <div class="form-text">
-                            If you need to edit this value, please email
-                            <a href="mailto:support@mineshspc.com">support@mineshspc.com</a>.
-                          </div>
-                        {{ else }}
-                          <div class="form-text">
-                            Double check this value, as you will not be able to change it later.
-                          </div>
-                        {{ end }}
-                      </div>
+                </div>
+                <div class="row">
+                  <div class="col">
+                    <div class="form-floating">
+                      <input type="email" class="form-control col-12" name="parent-email" id="parent-email"
+                        placeholder="Parent Email" required
+                        {{ with .ParentEmail }}value="{{ . }}" disabled{{ end }}
+                      />
+                      <label for="parent-email">Parent/Guardian Email</label>
+                      {{ with .ParentEmail }}
+                        <div class="form-text">
+                          If you need to edit this value, please email
+                          <a href="mailto:support@mineshspc.com">support@mineshspc.com</a>.
+                        </div>
+                      {{ else }}
+                        <div class="form-text">
+                          Double check this value, as you will not be able to change it later.
+                        </div>
+                      {{ end }}
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        {{ else }}
-          <div class="row my-4" id="parent-information">
-            <div class="col">
-              <div class="card">
-                <h4 class="card-header">Forms Information</h4>
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col">
-                      <p>
-                        Since you are over 18, you may sign the forms necessary for you to participate.
-                        You will be sent a link at the following email where you can sign the forms.
-                      </p>
-                    </div>
+        </div>
+      {{ else }}
+        <div class="row my-4" id="parent-information">
+          <div class="col">
+            <div class="card">
+              <h4 class="card-header">Forms Information</h4>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col">
+                    <p>
+                      Since you are over 18, you may sign the forms necessary for you to participate.
+                      You will be sent a link at the following email where you can sign the forms.
+                    </p>
                   </div>
-                  <div class="row">
-                    <div class="col">
-                      <div class="form-floating">
-                        <input type="email" class="form-control col-12"
-                          placeholder="Email"
-                          {{ with .Email }}value="{{ . }}" disabled{{ end }}
-                        />
-                        <label for="email">Email</label>
-                      </div>
+                </div>
+                <div class="row">
+                  <div class="col">
+                    <div class="form-floating">
+                      <input type="email" class="form-control col-12"
+                        placeholder="Email"
+                        {{ with .Email }}value="{{ . }}" disabled{{ end }}
+                      />
+                      <label for="email">Email</label>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        {{ end }}
-        <div class="row text-center mt-4">
-          <div class="col-md-12">
-            <button type="submit" class="btn btn-lg btn-primary">
-              {{ if .Data.Confirmed }}
-                Update Registration
-              {{ else }}
-                Confirm Registration
-              {{ end }}
-            </button>
           </div>
         </div>
       {{ end }}
+      <div class="row text-center mt-4">
+        <div class="col-md-12">
+          <button type="submit" class="btn btn-lg btn-primary">
+            {{ if .Data.Confirmed }}
+              Update Registration
+            {{ else }}
+              Confirm Registration
+            {{ end }}
+          </button>
+        </div>
+      </div>
     </form>
   {{ end }}
 </div>
