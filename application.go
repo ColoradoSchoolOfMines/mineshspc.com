@@ -10,6 +10,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/hlog"
 	"github.com/sendgrid/sendgrid-go"
 
 	"github.com/ColoradoSchoolOfMines/mineshspc.com/database"
@@ -231,12 +232,26 @@ func (a *Application) Start() {
 	r.HandleFunc("/admin/resendparentemail", a.HandleResendParentEmail).Methods(http.MethodGet)
 	r.HandleFunc("/admin/confirmationlink/student", a.HandleGetStudentEmailConfirmationLink).Methods(http.MethodGet)
 	r.HandleFunc("/admin/confirmationlink/parent", a.HandleGetParentEmailConfirmationLink).Methods(http.MethodGet)
-
 	r.HandleFunc("/admin/dietaryrestrictions", a.ServeTemplate(a.Log, "admindietaryrestrictions.html", a.GetAdminDietaryRestrictionsTemplate)).Methods(http.MethodGet)
 	r.HandleFunc("/admin/teams", a.ServeTemplate(a.Log, "adminteams.html", a.GetAdminTeamsTemplate)).Methods(http.MethodGet)
+	r.HandleFunc("/admin/sendemailconfirmationreminders", a.HandleSendEmailConfirmationReminders).Methods(http.MethodGet)
+	r.HandleFunc("/admin/sendparentreminders", a.HandleSendParentReminders).Methods(http.MethodGet)
+	r.HandleFunc("/admin/sendqrcodes", a.HandleSendQRCodes).Methods(http.MethodGet)
+
+	// Volunteer pages
+	r.HandleFunc("/volunteer", a.ServeTemplate(a.Log, "volunteerhome.html", noArgs)).Methods(http.MethodGet)
+	r.HandleFunc("/volunteer/login", a.ServeTemplate(a.Log, "volunteerlogin.html", noArgs)).Methods(http.MethodGet)
+	r.HandleFunc("/volunteer/emaillogin", a.HandleVolunteerEmailLogin).Methods(http.MethodGet)
+	r.HandleFunc("/volunteer/emaillogin", a.HandleVolunteerLogin).Methods(http.MethodPost)
+	r.HandleFunc("/volunteer/scan", a.ServeTemplate(a.Log, "volunteerscan.html", a.GetVolunteerScanTemplate)).Methods(http.MethodGet)
+	r.HandleFunc("/volunteer/checkin", a.HandleVolunteerCheckIn).Methods(http.MethodGet)
+
+	var handler http.Handler = r
+	handler = hlog.RequestIDHandler("request_id", "RequestID")(handler)
+	handler = hlog.NewHandler(*a.Log)(handler)
 
 	http.Handle("/", r)
 
 	a.Log.Info().Msg("Listening on port 8090")
-	http.ListenAndServe(":8090", nil)
+	http.ListenAndServe(":8090", handler)
 }

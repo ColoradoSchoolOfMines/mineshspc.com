@@ -1,0 +1,30 @@
+{{ define "title" }}Volunteer Home{{ end }}
+
+{{ define "content" }}
+<div class="container">
+  <div class="row page-header">
+    <div class="col">
+      <h1>Volunteer Home</h1>
+    </div>
+  </div>
+</div>
+
+<div class="container page-content rules">
+  <div class="row">
+    <div class="col m-4">
+      <p>
+        Note that all endpoints besides login require you to be logged in as a volunteer. I didn't
+        implement any redirects to the login page if you are not logged in (it just doesn't return
+        any data in those cases), so if no data shows up, re-authenticate using the login page.
+      </p>
+      <p>
+        <b>Instructions:</b> after logging in, use your phone camera to scan the QR code that the
+        student presents.
+      </p>
+      <ul>
+        <li><a href="/volunteer/login">login</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+{{ end }}

@@ -13,13 +13,13 @@ func (d *Database) GetStudentByEmail(ctx context.Context, email string) (*Studen
 	err := d.DB.QueryRowContext(ctx, `
 		SELECT teamid, email, name, age, parentemail, signatory, previouslyparticipated,
 			emailconfirmed, liabilitywaiver, computerusewaiver,
-			campustour, dietaryrestrictions
+			campustour, dietaryrestrictions, qrcodesent, checkedin
 		FROM students
 		WHERE email = $1
 	`, email).Scan(&student.TeamID, &student.Email, &student.Name, &student.Age,
 		&parentEmail, &signatory, &student.PreviouslyParticipated, &student.EmailConfirmed,
 		&student.LiabilitySigned, &student.ComputerUseWaiverSigned,
-		&campusTour, &dietaryRestrictions)
+		&campusTour, &dietaryRestrictions, &student.QRCodeSent, &student.CheckedIn)
 	if err != nil {
 		return nil, err
 	}
@@ -85,4 +85,22 @@ func (d *Database) GetAllDietaryRestrictions(ctx context.Context) ([]string, err
 		dietaryRestrictions = append(dietaryRestrictions, restriction)
 	}
 	return dietaryRestrictions, nil
+}
+
+func (d *Database) MarkQRCodeSent(ctx context.Context, email string) error {
+	_, err := d.DB.ExecContext(ctx, `
+		UPDATE students
+		SET qrcodesent = true
+		WHERE email = $1
+	`, email)
+	return err
+}
+
+func (d *Database) CheckInStudent(ctx context.Context, email string) error {
+	_, err := d.DB.ExecContext(ctx, `
+		UPDATE students
+		SET checkedin = true
+		WHERE email = $1
+	`, email)
+	return err
 }

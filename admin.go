@@ -13,7 +13,7 @@ import (
 	"github.com/ColoradoSchoolOfMines/mineshspc.com/database"
 )
 
-func (a *Application) CreateAdminLoginJWT(email string) *jwt.Token {
+func (a *Application) createAdminLoginJWT(email string) *jwt.Token {
 	return jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.RegisteredClaims{
 		Issuer:    string(IssuerAdminLogin),
 		Subject:   email,
@@ -199,7 +199,7 @@ func (a *Application) HandleAdminLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tok := a.CreateAdminLoginJWT(emailAddress)
+	tok := a.createAdminLoginJWT(emailAddress)
 	signedTok, err := tok.SignedString(a.Config.ReadSecretKey())
 	if err != nil {
 		log.Err(err).Msg("failed to sign email login token")
@@ -275,7 +275,12 @@ func (a *Application) HandleResendStudentEmail(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	http.Redirect(w, r, "/admin/teams", http.StatusSeeOther)
+	page := r.URL.Query().Get("page")
+	if page == "volunteer" {
+		http.Redirect(w, r, "/volunteer/scan", http.StatusSeeOther)
+	} else {
+		http.Redirect(w, r, "/admin/teams", http.StatusSeeOther)
+	}
 }
 
 func (a *Application) HandleResendParentEmail(w http.ResponseWriter, r *http.Request) {
@@ -313,7 +318,12 @@ func (a *Application) HandleResendParentEmail(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	http.Redirect(w, r, "/admin/teams", http.StatusSeeOther)
+	page := r.URL.Query().Get("page")
+	if page == "volunteer" {
+		http.Redirect(w, r, "/volunteer/scan", http.StatusSeeOther)
+	} else {
+		http.Redirect(w, r, "/admin/teams", http.StatusSeeOther)
+	}
 }
 
 func (a *Application) HandleGetStudentEmailConfirmationLink(w http.ResponseWriter, r *http.Request) {
@@ -392,4 +402,61 @@ func (a *Application) HandleGetParentEmailConfirmationLink(w http.ResponseWriter
 	}
 
 	w.Write([]byte(signURL))
+}
+
+func (a *Application) HandleSendEmailConfirmationReminders(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("NOT IMPLEMENTED"))
+}
+
+func (a *Application) HandleSendParentReminders(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("NOT IMPLEMENTED"))
+}
+
+func (a *Application) HandleSendQRCodes(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tok, err := r.Cookie("admin_token")
+	if err != nil {
+		a.Log.Warn().Err(err).Msg("failed to get admin token")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if isAdmin, err := a.isAdminByToken(tok.Value); err != nil || !isAdmin {
+		a.Log.Warn().Err(err).Msg("user is not admin!")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	teamsWithTeachers, err := a.DB.GetAdminTeamsWithTeacherName(ctx)
+	if err != nil {
+		a.Log.Err(err).Msg("failed to get teams with teachers")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	for _, team := range teamsWithTeachers {
+		for _, member := range team.Members {
+			if member.QRCodeSent {
+				w.Write([]byte(fmt.Sprintf("Not sending QR code to %s since we already sent to that email\n", member.Email)))
+			} else if member.EmailConfirmed {
+				w.Write([]byte(fmt.Sprintf("Sending QR code to %s...", member.Email)))
+
+				err := a.sendQRCodeEmail(ctx, member.Name, member.Email)
+				if err != nil {
+					a.Log.Err(err).Msg("failed to send QR code email")
+					w.Write([]byte(fmt.Sprintf("FAILED\n%v", err)))
+					return
+				}
+
+				err = a.DB.MarkQRCodeSent(ctx, member.Email)
+				if err != nil {
+					a.Log.Err(err).Msg("failed to mark QR code sent")
+				}
+
+				w.Write([]byte("DONE\n"))
+			} else {
+				w.Write([]byte(fmt.Sprintf("Not sending QR code to %s since it's not confirmed\n", member.Email)))
+			}
+		}
+	}
 }

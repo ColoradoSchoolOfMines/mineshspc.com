@@ -109,6 +109,37 @@
       </div>
     </div>
   </div>
+  <div class="row">
+    <div class="col m-4">
+      <div class="card">
+        <div class="card-header text-white bg-danger">
+          <b>Send Reminders and QR Codes</b>
+        </div>
+        <div class="card-body">
+          <p>
+            <b>WARNING</b> pressing these buttons will send emails to many people IMMEDIATELY!
+          </p>
+          <p>
+            <a href="/admin/sendemailconfirmationreminders" class="btn btn-outline-danger">Send Email Confirmation Reminders</a>
+            <br>
+            this will send reminder emails to every student that has not confirmed their email.
+          </p>
+          <p>
+            <a href="/admin/sendparentreminders" class="btn btn-outline-danger">Send Parent Reminders</a>
+            <br>
+            this will send reminder emails to every parent who has not signed the forms for their
+            student.
+          </p>
+          <p>
+            <a href="/admin/sendqrcodes" class="btn btn-outline-danger">Send QR Codes</a>
+            <br>
+            this will send QR codes to the emails of all students. (It will only send if we haven't
+            sent the QR code to that student yet.)
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
   {{ range $t := .Data.Teams }}
     <div class="row">
       <div class="col m-4">
@@ -155,6 +186,10 @@
                       <b>{{ .Name }}</b>
                       <p class="small text-secondary mb-0">
                         {{ .Email }}
+                        {{ if .QRCodeSent }}
+                          <i class="fa fa-qrcode {{ if .CheckedIn }}text-success{{ end }}"
+                             title="QR code has been sent to this user{{ if .CheckedIn }} and the user has checked in{{ end }}"></i>
+                        {{ end }}
                         {{ if not .EmailConfirmed }}
                           <br>
                           <small>

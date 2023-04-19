@@ -168,6 +168,7 @@ h3 {
 .content .page-content.register,
 .content .page-content.register-student,
 .content .page-content.register-parent,
+.content .page-content.volunteer-scan,
 .content .page-content.teacher,
 .content .page-content.team,
 .content .page-content.teams,
@@ -265,6 +266,24 @@ footer.footer a:hover {
 }
 
 .registration-progress .step.completed {
+  background-color: #63d19e;
+  color: white;
+}
+
+/* Volunteer Page */
+.volunteer-scan .step {
+  display: flex;
+  background-color: #ef8f97;
+  color: black;
+  font-size: 14px;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.volunteer-scan .step.completed {
   background-color: #63d19e;
   color: white;
 }

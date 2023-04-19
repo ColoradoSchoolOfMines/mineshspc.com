@@ -15,11 +15,13 @@ import (
 type Issuer string
 
 const (
-	IssuerEmailLogin    Issuer = "email_login"
-	IssuerSessionToken  Issuer = "session_token"
-	IssuerStudentVerify Issuer = "student_verify"
-	IssuerSignForms     Issuer = "sign_forms"
-	IssuerAdminLogin    Issuer = "admin_login"
+	IssuerEmailLogin     Issuer = "email_login"
+	IssuerSessionToken   Issuer = "session_token"
+	IssuerStudentVerify  Issuer = "student_verify"
+	IssuerSignForms      Issuer = "sign_forms"
+	IssuerAdminLogin     Issuer = "admin_login"
+	IssuerStudentQRCode  Issuer = "student_qrcode"
+	IssuerVolunteerLogin Issuer = "volunteer_login"
 )
 
 func (a *Application) GetEmailLoginTemplate(r *http.Request) map[string]any {

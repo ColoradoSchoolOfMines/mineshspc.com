@@ -60,6 +60,9 @@ type Student struct {
 
 	CampusTour          bool
 	DietaryRestrictions string
+
+	QRCodeSent bool
+	CheckedIn  bool
 }
 
 func (d *Database) scanTeam(row dbutil.Scannable) (*Team, error) {
@@ -83,7 +86,7 @@ func (d *Database) scanTeamWithTeacherName(row dbutil.Scannable) (*TeamWithTeach
 func (d *Database) scanTeamStudents(ctx context.Context, team *Team) error {
 	studentRows, err := d.DB.QueryContext(ctx, `
 		SELECT s.email, s.name, s.age, s.parentemail, s.signatory, s.previouslyparticipated, s.emailconfirmed,
-			s.liabilitywaiver, s.computerusewaiver, s.campustour, s.dietaryrestrictions
+			s.liabilitywaiver, s.computerusewaiver, s.campustour, s.dietaryrestrictions, s.qrcodesent, s.checkedin
 		FROM students s
 		WHERE s.teamid = ?
 	`, team.ID)
@@ -95,8 +98,8 @@ func (d *Database) scanTeamStudents(ctx context.Context, team *Team) error {
 		var s Student
 		var parentEmail, signatory, dietaryRestrictions sql.NullString
 		var campusTour sql.NullBool
-		if err := studentRows.Scan(&s.Email, &s.Name, &s.Age, &parentEmail, &signatory, &s.PreviouslyParticipated,
-			&s.EmailConfirmed, &s.LiabilitySigned, &s.ComputerUseWaiverSigned, &campusTour, &dietaryRestrictions); err != nil {
+		if err := studentRows.Scan(&s.Email, &s.Name, &s.Age, &parentEmail, &signatory, &s.PreviouslyParticipated, &s.EmailConfirmed,
+			&s.LiabilitySigned, &s.ComputerUseWaiverSigned, &campusTour, &dietaryRestrictions, &s.QRCodeSent, &s.CheckedIn); err != nil {
 			return err
 		}
 
