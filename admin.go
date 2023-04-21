@@ -122,7 +122,7 @@ func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
 				"Total":    advancedTeams,
 			},
 			"TotalInPerson": beginnerInPersonTeams + advancedInPersonTeams,
-			"TotalRemote":   (beginnerTeams + advancedTeams) - (beginnerInPersonTeams - advancedInPersonTeams),
+			"TotalRemote":   (beginnerTeams + advancedTeams) - (beginnerInPersonTeams + advancedInPersonTeams),
 		},
 		"StudentStats": map[string]any{
 			"Beginner": map[string]int{
@@ -136,7 +136,7 @@ func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
 				"Total":    advancedStudents,
 			},
 			"TotalInPerson": beginnerInPersonStudents + advancedInPersonStudents,
-			"TotalRemote":   (beginnerStudents + advancedStudents) - (beginnerInPersonStudents - advancedInPersonStudents),
+			"TotalRemote":   (beginnerStudents + advancedStudents) - (beginnerInPersonStudents + advancedInPersonStudents),
 		},
 		"TotalTeams":             beginnerTeams + advancedTeams,
 		"TotalStudents":          beginnerStudents + advancedStudents,
