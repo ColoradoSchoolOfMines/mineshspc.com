@@ -565,8 +565,19 @@ func (a *Application) HandleKattisParticipantsExport(w http.ResponseWriter, r *h
 		return
 	}
 
+	divStr := r.URL.Query().Get("div")
+	division, err := database.ParseDivision(divStr)
+	if err != nil {
+		a.Log.Err(err).Msg("invalid division")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	writer := csv.NewWriter(w)
 	for _, team := range teamsWithTeachers {
+		if team.Division != division {
+			continue
+		}
 		for _, member := range team.Members {
 			parts := []string{
 				member.Name,
@@ -605,8 +616,20 @@ func (a *Application) HandleKattisTeamsExport(w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	divStr := r.URL.Query().Get("div")
+	division, err := database.ParseDivision(divStr)
+	if err != nil {
+		a.Log.Err(err).Msg("invalid division")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	writer := csv.NewWriter(w)
 	for _, team := range teamsWithTeachers {
+		if team.Division != division {
+			continue
+		}
+
 		siteName := "Colorado School of Mines"
 		if !team.InPerson {
 			siteName = "Remote"
