@@ -478,15 +478,19 @@ func (a *Application) HandleSendParentReminders(w http.ResponseWriter, r *http.R
 
 	for _, team := range teamsWithTeachers {
 		for _, member := range team.Members {
-			if member.LiabilitySigned {
-				w.Write([]byte(fmt.Sprintf("Not resending confirmation info to %s because they already signed the forms\n", member.Email)))
+			if !member.EmailConfirmed {
+				w.Write([]byte(fmt.Sprintf("Not sending sign forms email for %s because they already signed the forms because the student hasn't confirmed their email yet\n", member.Email)))
 				continue
 			}
-			w.Write([]byte(fmt.Sprintf("Resending confirmation email to %s\n", member.ParentEmail)))
+			if member.LiabilitySigned {
+				w.Write([]byte(fmt.Sprintf("Not resending sign forms email to %s (for %s) because they already signed the forms\n", member.ParentEmail, member.Email)))
+				continue
+			}
+			w.Write([]byte(fmt.Sprintf("Resending sign forms email to %s (for %s)\n", member.ParentEmail, member.Email)))
 			go func(member database.Student) {
 				err := a.sendParentEmail(context.Background(), &member, true)
 				if err != nil {
-					a.Log.Err(err).Msg("failed to send student email")
+					a.Log.Err(err).Msg("failed to send parent email")
 					return
 				}
 			}(member)
