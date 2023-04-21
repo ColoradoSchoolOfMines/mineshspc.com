@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/rs/zerolog/hlog"
 	"github.com/rs/zerolog/log"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 
@@ -416,22 +417,23 @@ func (a *Application) HandleGetParentEmailConfirmationLink(w http.ResponseWriter
 
 func (a *Application) HandleSendEmailConfirmationReminders(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	log := hlog.FromRequest(r).With().Str("action", "send_email_confirmation_reminders").Logger()
 	tok, err := r.Cookie("admin_token")
 	if err != nil {
-		a.Log.Warn().Err(err).Msg("failed to get admin token")
+		log.Warn().Err(err).Msg("failed to get admin token")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if isAdmin, err := a.isAdminByToken(tok.Value); err != nil || !isAdmin {
-		a.Log.Warn().Err(err).Msg("user is not admin!")
+		log.Warn().Err(err).Msg("user is not admin!")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	teamsWithTeachers, err := a.DB.GetAdminTeamsWithTeacherName(ctx)
 	if err != nil {
-		a.Log.Err(err).Msg("failed to get teams with teachers")
+		log.Err(err).Msg("failed to get teams with teachers")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -444,9 +446,10 @@ func (a *Application) HandleSendEmailConfirmationReminders(w http.ResponseWriter
 			}
 			w.Write([]byte(fmt.Sprintf("Resending confirmation email to %s\n", member.Email)))
 			go func(team *database.TeamWithTeacherName, member database.Student) {
-				err := a.sendStudentEmail(context.Background(), member.Email, member.Name, team.TeacherName, team.Name, true)
+				ctx := log.WithContext(context.Background())
+				err := a.sendStudentEmail(ctx, member.Email, member.Name, team.TeacherName, team.Name, true)
 				if err != nil {
-					a.Log.Err(err).Msg("failed to send student email")
+					log.Err(err).Msg("failed to send student email")
 					return
 				}
 			}(team, member)
@@ -456,22 +459,24 @@ func (a *Application) HandleSendEmailConfirmationReminders(w http.ResponseWriter
 
 func (a *Application) HandleSendParentReminders(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	log := hlog.FromRequest(r).With().Str("action", "send_parent_reminders").Logger()
+
 	tok, err := r.Cookie("admin_token")
 	if err != nil {
-		a.Log.Warn().Err(err).Msg("failed to get admin token")
+		log.Warn().Err(err).Msg("failed to get admin token")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if isAdmin, err := a.isAdminByToken(tok.Value); err != nil || !isAdmin {
-		a.Log.Warn().Err(err).Msg("user is not admin!")
+		log.Warn().Err(err).Msg("user is not admin!")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	teamsWithTeachers, err := a.DB.GetAdminTeamsWithTeacherName(ctx)
 	if err != nil {
-		a.Log.Err(err).Msg("failed to get teams with teachers")
+		log.Err(err).Msg("failed to get teams with teachers")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -488,9 +493,10 @@ func (a *Application) HandleSendParentReminders(w http.ResponseWriter, r *http.R
 			}
 			w.Write([]byte(fmt.Sprintf("Resending sign forms email to %s (for %s)\n", member.ParentEmail, member.Email)))
 			go func(member database.Student) {
-				err := a.sendParentEmail(context.Background(), &member, true)
+				ctx := log.WithContext(context.Background())
+				err := a.sendParentEmail(ctx, &member, true)
 				if err != nil {
-					a.Log.Err(err).Msg("failed to send parent email")
+					log.Err(err).Msg("failed to send parent email")
 					return
 				}
 			}(member)
