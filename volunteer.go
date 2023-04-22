@@ -156,6 +156,8 @@ func (a *Application) GetVolunteerScanTemplate(r *http.Request) map[string]any {
 		return res
 	}
 
+	res["TeamName"] = team.Name
+
 	if !team.InPerson {
 		res["NotInPerson"] = true
 		return res
