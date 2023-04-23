@@ -637,7 +637,7 @@ func (a *Application) HandleKattisTeamsExport(w http.ResponseWriter, r *http.Req
 
 	writer := csv.NewWriter(w)
 	for _, team := range teamsWithTeachers {
-		if team.Division != division {
+		if team.Division != division || len(team.Members) == 0 {
 			continue
 		}
 
