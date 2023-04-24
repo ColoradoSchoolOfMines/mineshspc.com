@@ -211,6 +211,9 @@
                   <tr>
                     <td class="align-middle w-50">
                       <b>{{ .Name }}</b>
+                      {{ if .PreviouslyParticipated }}
+                        <i class="fa fa-repeat"></i>
+                      {{ end }}
                       <p class="small text-secondary mb-0">
                         {{ .Email }}
                         {{ if .QRCodeSent }}
