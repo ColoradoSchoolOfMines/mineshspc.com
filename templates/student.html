@@ -141,10 +141,10 @@
                     <div class="form-floating">
                       <input type="email" class="form-control col-12" name="parent-email" id="parent-email"
                         placeholder="Parent Email" required
-                        {{ with .ParentEmail }}value="{{ . }}" disabled{{ end }}
+                        {{ with .Data.Student.ParentEmail }}value="{{ . }}" disabled{{ end }}
                       />
                       <label for="parent-email">Parent/Guardian Email</label>
-                      {{ if .ParentEmail }}
+                      {{ if .Data.Student.ParentEmail }}
                         <div class="form-text">
                           If you need to edit this value, please email
                           <a href="mailto:support@mineshspc.com">support@mineshspc.com</a>.
@@ -180,7 +180,7 @@
                     <div class="form-floating">
                       <input type="email" class="form-control col-12"
                         placeholder="Email"
-                        {{ with .Email }}value="{{ . }}" disabled{{ end }}
+                        {{ with .Data.Student.Email }}value="{{ . }}" disabled{{ end }}
                       />
                       <label for="email">Email</label>
                     </div>
