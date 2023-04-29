@@ -229,6 +229,7 @@ func (a *Application) Start() {
 	r.HandleFunc("/admin/sendqrcodes", a.HandleSendQRCodes).Methods(http.MethodGet)
 	r.HandleFunc("/admin/kattis/participants", a.HandleKattisParticipantsExport).Methods(http.MethodGet)
 	r.HandleFunc("/admin/kattis/teams", a.HandleKattisTeamsExport).Methods(http.MethodGet)
+	r.HandleFunc("/admin/zoom/breakout", a.HandleZoomBreakoutExport).Methods(http.MethodGet)
 
 	// Volunteer pages
 	r.HandleFunc("/volunteer", a.ServeTemplate(a.Log, "volunteerhome.html", noArgs)).Methods(http.MethodGet)
