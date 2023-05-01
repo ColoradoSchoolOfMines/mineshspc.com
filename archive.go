@@ -1,6 +1,8 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type Link struct {
 	URL   string
@@ -15,8 +17,9 @@ type WinningTeam struct {
 }
 
 type CompetitionResult struct {
-	Name  string
-	Teams []WinningTeam
+	Name      string
+	Shortname string
+	Teams     []WinningTeam
 }
 
 type YearInfo struct {
@@ -42,32 +45,36 @@ func (a *Application) GetArchiveTemplate(*http.Request) map[string]any {
 				},
 				Results: []CompetitionResult{
 					{
-						"Advanced In-Person",
-						[]WinningTeam{
+						Name:      "Advanced In-Person",
+						Shortname: "AdvancedInPerson",
+						Teams: []WinningTeam{
 							{"1st", "Code Rats", "Futures Lab", "Fort Collins, Colorado"},
 							{"2nd", "The Spanish Inquisition", "Regis Jesuit High School", "Aurora, Colorado"},
 							{"3nd", "CA is 202", "Colorado Academy", "Denver, Colorado"},
 						},
 					},
 					{
-						"Beginner In-Person",
-						[]WinningTeam{
+						Name:      "Beginner In-Person",
+						Shortname: "BeginnerInPerson",
+						Teams: []WinningTeam{
 							{"1st", "Spaghetti Code and Meatballs", "Warren Tech", "Lakewood, Colorado"},
 							{"2nd", "Innovation Center 1", "Innovation Center SVVSD", "Longmont, Colorado"},
 							{"3nd", "Team LuLo", "Colorado Academy", "Denver, Colorado"},
 						},
 					},
 					{
-						"Advanced Remote",
-						[]WinningTeam{
+						Name:      "Advanced Remote",
+						Shortname: "AdvancedRemote",
+						Teams: []WinningTeam{
 							{"1st", "River Hill Team #1", "River Hill High School", "Clarksville, Maryland"},
 							{"2nd", "CreekCyberBruins", "Cherry Creek High School", "Greenwood Village, Colorado"},
 							{"3nd", "rsi encryption", "Bergen County Academies", "Bergen County, New Jersey"},
 						},
 					},
 					{
-						"Beginner Remote",
-						[]WinningTeam{
+						Name:      "Beginner Remote",
+						Shortname: "BeginnerRemote",
+						Teams: []WinningTeam{
 							{"1st", "Wormhole", "Voice of Calling NPO", "Northridge, California"},
 							{"2nd", "Lineup", "Voice of Calling NPO", "Northridge, California"},
 							{"3nd", "River Hill Team #2", "River Hill High School", "Clarksville, Maryland"},
@@ -88,8 +95,8 @@ func (a *Application) GetArchiveTemplate(*http.Request) map[string]any {
 				},
 				Results: []CompetitionResult{
 					{
-						"Advanced",
-						[]WinningTeam{
+						Name: "Advanced",
+						Teams: []WinningTeam{
 							{"1st", "Pen A Team", "PEN Academy", "Cresskill, New Jersey"},
 							{"2nd", "Cherry Creek Cobras", "Cherry Creek High School", "Greenwood Village, Colorado"},
 							{"3nd", "River Hill Team 1", "River Hill High School", "Clarksville, Maryland"},
@@ -97,8 +104,8 @@ func (a *Application) GetArchiveTemplate(*http.Request) map[string]any {
 						},
 					},
 					{
-						"Beginner",
-						[]WinningTeam{
+						Name: "Beginner",
+						Teams: []WinningTeam{
 							{"1st", "LLL", "Future Forward at Bollman", "Thornton, Colorado"},
 							{"2nd", "Error 404: Name not found", "Colorado Academy", "Denver, Colorado"},
 							{"3nd", "Liberty 1", "Liberty Common School", "Fort Collins, Colorado"},
