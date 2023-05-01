@@ -68,7 +68,7 @@ func (a *Application) GetArchiveTemplate(*http.Request) map[string]any {
 						Teams: []WinningTeam{
 							{"1st", "River Hill Team #1", "River Hill High School", "Clarksville, Maryland"},
 							{"2nd", "CreekCyberBruins", "Cherry Creek High School", "Greenwood Village, Colorado"},
-							{"3nd", "rsi encryption", "Bergen County Academies", "Bergen County, New Jersey"},
+							{"3nd", "JMS", "Bergen County Academies", "Bergen County, New Jersey"},
 						},
 					},
 					{
