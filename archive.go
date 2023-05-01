@@ -30,6 +30,52 @@ func (a *Application) GetArchiveTemplate(*http.Request) map[string]any {
 	return map[string]any{
 		"YearInfo": []YearInfo{
 			{
+				Year: 2023,
+				RecapParagraphs: []string{
+					"The 2023 competition again featured two divisions: beginner and advanced. As with 2022, it was a hybrid competition, but we awarded prizes for both in-person and remote winners in both divisions.",
+					"The advanced division featured 31 teams, while the beginner division had 34 teams.",
+				},
+				Links: []Link{
+					{"/static/2023-solutions.pdf", "Solution Sketch Slides"},
+					{"https://mines22advanced.kattis.com/problems", "Advanced Problems"},
+					{"https://mines22beginner.kattis.com/problems", "Beginner Problems"},
+				},
+				Results: []CompetitionResult{
+					{
+						"Advanced In-Person",
+						[]WinningTeam{
+							{"1st", "Code Rats", "Futures Lab", "Fort Collins, Colorado"},
+							{"2nd", "The Spanish Inquisition", "Regis Jesuit High School", "Aurora, Colorado"},
+							{"3nd", "CA is 202", "Colorado Academy", "Denver, Colorado"},
+						},
+					},
+					{
+						"Beginner In-Person",
+						[]WinningTeam{
+							{"1st", "Spaghetti Code and Meatballs", "Warren Tech", "Lakewood, Colorado"},
+							{"2nd", "Innovation Center 1", "Innovation Center SVVSD", "Longmont, Colorado"},
+							{"3nd", "Team LuLo", "Colorado Academy", "Denver, Colorado"},
+						},
+					},
+					{
+						"Advanced Remote",
+						[]WinningTeam{
+							{"1st", "River Hill Team #1", "River Hill High School", "Clarksville, Maryland"},
+							{"2nd", "CreekCyberBruins", "Cherry Creek High School", "Greenwood Village, Colorado"},
+							{"3nd", "rsi encryption", "Bergen County Academies", "Bergen County, New Jersey"},
+						},
+					},
+					{
+						"Beginner Remote",
+						[]WinningTeam{
+							{"1st", "Wormhole", "Voice of Calling NPO", "Northridge, California"},
+							{"2nd", "Lineup", "Voice of Calling NPO", "Northridge, California"},
+							{"3nd", "River Hill Team #2", "River Hill High School", "Clarksville, Maryland"},
+						},
+					},
+				},
+			},
+			{
 				Year: 2022,
 				RecapParagraphs: []string{
 					"The 2022 competition was the first to feature two divisions: a beginner division and an advanced division. It was also the first hybrid competition with both remote and in-person contestants.",
