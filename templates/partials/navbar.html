@@ -16,6 +16,9 @@
           </a>
         </li>
         <li class="nav-item">
+          <a class='nav-link {{ if eq .PageName "info"}}info-link-active{{ end }}' id="info-link" aria-current="page" href="/info">Info</a>
+        </li>
+        <li class="nav-item">
             <a class='nav-link {{ if eq .PageName "rules"}}rules-link-active{{ end }}' id="rules-link" aria-current="page" href="/rules">Rules</a>
         </li>
         {{ if .RegistrationEnabled }}
@@ -34,7 +37,7 @@
         {{ with .Data.Username }}
           Welcome <a href="/register/teacher/teams">{{ . }}</a> <span class="mx-2">|</span> <a href="/register/teacher/logout">Logout</a>
         {{ else }}
-          <a href="/register/teacher/login">Teacher login</a>
+          <a href="/register/teacher/login">Teacher Login</a>
         {{ end }}
       </div>
     </div>

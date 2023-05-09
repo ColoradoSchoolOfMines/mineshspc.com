@@ -69,6 +69,16 @@ a.btn:hover {
   border-bottom: 5px solid #24314b;
 }
 
+.navbar #info-link:hover {
+  color: #6495ED;
+  border-bottom: 5px solid #6495ED;
+}
+
+.navbar .info-link-active {
+  color: #6495ED !important;
+  border-bottom: 5px solid #6495ED;
+}
+
 .navbar #rules-link:hover {
   color: #B44A88;
   border-bottom: 5px solid #B44A88;
