@@ -110,6 +110,7 @@ func (a *Application) Start() {
 		ArgGenerator func(r *http.Request) map[string]any
 	}{
 		"/":         {"home.html", noArgs},
+		"/info":     {"info.html", noArgs},
 		"/authors":  {"authors.html", noArgs},
 		"/rules":    {"rules.html", noArgs},
 		"/register": {"register.html", noArgs},
