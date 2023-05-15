@@ -12,7 +12,14 @@
           pkgs = import nixpkgs-unstable { system = system; };
         in
         {
-          packages.mineshspc = pkgs.callPackage ./mineshspc.nix { };
+          packages.mineshspc = pkgs.buildGoModule rec {
+            pname = "mineshspc.com";
+            version = "unstable-2023-05-15";
+
+            src = ./.;
+
+            vendorSha256 = "sha256-4/KzlfllQzHLiTJupPSOj0v9jCYqhcRMoxCm9fiRgdg=";
+          };
           devShells = {
             default = pkgs.mkShell {
               packages = with pkgs; [
