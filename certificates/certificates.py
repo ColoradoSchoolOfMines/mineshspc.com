@@ -31,4 +31,3 @@ with open(file_name, 'r') as file:
 
 end = time.time()
 print(f"Generated {count} certificates in {end - start:.1f}s")
-
