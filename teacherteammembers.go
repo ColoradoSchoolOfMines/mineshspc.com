@@ -129,7 +129,7 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 	if studentEmail == user {
 		a.TeamAddMemberRenderer(w, r, map[string]any{
 			"Error": map[string]any{
-				"General": htmltemplate.HTML("You cannot join your own team! If you are a student, you are not allowed to be the teacher sponsor for your team."),
+				"General": htmltemplate.HTML("You cannot join your own team."),
 			},
 			"StudentName":            studentName,
 			"StudentEmail":           studentEmail,
