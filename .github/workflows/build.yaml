@@ -71,7 +71,6 @@ jobs:
             **Changes:** https://github.com/ColoradoSchoolOfMines/mineshspc.com/commits/${{ github.sha }}
           branch: update-mineshspc
           delete-branch: true
-          assignees: sumnerevans
           reviewers: sumnerevans
 
       - name: Check outputs

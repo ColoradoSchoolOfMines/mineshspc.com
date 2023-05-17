@@ -16,5 +16,4 @@ jobs:
         uses: DeterminateSystems/update-flake-lock@v19
         with:
           token: ${{ secrets.FLAKE_LOCK_UPDATE_TOKEN }}
-          pr-assignees: sumnerevans
           pr-reviewers: sumnerevans
