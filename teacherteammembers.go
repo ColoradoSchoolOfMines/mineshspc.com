@@ -126,6 +126,18 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 	studentEmail := r.FormValue("student-email")
 	previouslyParticipated := r.FormValue("previously-participated") == "has"
 
+	if studentEmail == user {
+		a.TeamAddMemberRenderer(w, r, map[string]any{
+			"Error": map[string]any{
+				"General": htmltemplate.HTML("You cannot join your own team! If you are a student, you are not allowed to be the teacher sponsor for your team."),
+			},
+			"StudentName":            studentName,
+			"StudentEmail":           studentEmail,
+			"PreviouslyParticipated": previouslyParticipated,
+		})
+		return		
+	}
+
 	if !ageRegex.MatchString(studentAgeStr) {
 		a.TeamAddMemberRenderer(w, r, map[string]any{
 			"Error": map[string]any{
