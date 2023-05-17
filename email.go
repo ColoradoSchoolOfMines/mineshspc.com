@@ -15,6 +15,12 @@ func (a *Application) SendEmail(log zerolog.Logger, subject string, to *mail.Ema
 		Str("subject", subject).
 		Logger()
 
+	if a.Config.DevMode {
+		fmt.Printf("=== EMAIL ===\nTo: %s\nSubject: %s\n\n%s\n\n", to, subject, plainTextContent)
+
+		return nil
+	}
+
 	from := mail.NewEmail("Mines HSPC Support", "support@mineshspc.com")
 	message := mail.NewSingleEmail(from, subject, to, plainTextContent, htmlContent)
 	message.ReplyTo = from

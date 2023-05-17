@@ -10,6 +10,8 @@ import (
 type Configuration struct {
 	secretKeyBytes []byte
 
+	DevMode bool
+
 	Domain              string
 	SendGridAPIKey      string
 	HealthcheckURL      string
@@ -24,6 +26,8 @@ type Configuration struct {
 
 func InitConfiguration() Configuration {
 	return Configuration{
+		DevMode: viper.GetBool("dev_mode"),
+
 		Domain:              viper.GetString("domain"),
 		SendGridAPIKey:      viper.GetString("sendgrid_api_key"),
 		HealthcheckURL:      viper.GetString("healthcheck_url"),

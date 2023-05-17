@@ -6,6 +6,10 @@
 #   domain -> MINESHSPC_DOMAIN
 #   recaptcha.site_key -> MINESHSPC_RECAPTCHA_SITE_KEY
 
+# This will disable sending emails, and instead print the value of the email to
+# stdout.
+dev_mode: false
+
 sendgrid_api_key: SENDGRID_API_KEY
 
 # This will be shown in the footer right after the link to the source code.
