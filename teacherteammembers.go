@@ -126,7 +126,7 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 	studentEmail := r.FormValue("student-email")
 	previouslyParticipated := r.FormValue("previously-participated") == "has"
 
-	if studentEmail == user {
+	if studentEmail == user.Email {
 		a.TeamAddMemberRenderer(w, r, map[string]any{
 			"Error": map[string]any{
 				"General": htmltemplate.HTML("You cannot join your own team."),
@@ -135,7 +135,7 @@ func (a *Application) HandleTeacherAddMember(w http.ResponseWriter, r *http.Requ
 			"StudentEmail":           studentEmail,
 			"PreviouslyParticipated": previouslyParticipated,
 		})
-		return		
+		return
 	}
 
 	if !ageRegex.MatchString(studentAgeStr) {
