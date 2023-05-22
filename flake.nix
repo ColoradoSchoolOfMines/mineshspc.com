@@ -18,7 +18,7 @@
 
             src = ./.;
 
-            vendorSha256 = "sha256-4/KzlfllQzHLiTJupPSOj0v9jCYqhcRMoxCm9fiRgdg=";
+            vendorSha256 = "sha256-fBEEXT0nvAagXpL4Prmrua8g6iNnLyyt1DJcphVbtuM=";
           };
           devShells = {
             default = pkgs.mkShell {
