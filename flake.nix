@@ -1,15 +1,15 @@
 {
   description = "Mines HSPC Website";
   inputs = {
-    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs-unstable, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils }:
     (flake-utils.lib.eachDefaultSystem
       (system:
         let
-          pkgs = import nixpkgs-unstable { system = system; };
+          pkgs = import nixpkgs { system = system; };
         in
         {
           packages.mineshspc = pkgs.buildGoModule rec {
