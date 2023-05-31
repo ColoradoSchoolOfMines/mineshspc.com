@@ -1,0 +1,138 @@
+{{ define "title" }}Sign Forms{{ end }}
+
+{{ define "content" }}
+<div class="container">
+  <div class="row page-header">
+    <div class="col">
+      <h1>Sign Forms</h1>
+    </div>
+  </div>
+</div>
+
+<div class="container page-content register-parent p-4">
+  <div class="row">
+    <div class="col">
+      {{ if .Data.Accepted }}
+        <div class="alert alert-success" role="alert">
+          <b>Thank you for signing!</b> All of the necessary forms have been signed! You may return
+          to this page at any time to view the forms again.
+        </div>
+      {{ else }}
+        <div class="alert alert-secondary" role="alert">
+          <b>Questions?</b> Email
+          <a href="mailto:support@mineshspc.com">support@mineshspc.com</a>.
+        </div>
+      {{ end }}
+    </div>
+  </div>
+  {{ if not .Data.Student }}
+    <div class="row">
+      <div class="col">
+        <div class="alert alert-danger" role="alert">
+          <b>Invalid confirmation token!</b> Please do not edit the URL that we sent over emai.
+          Please email
+          <a href="mailto:support@mineshspc.com">support@mineshspc.com</a>
+          if you have any questions.
+        </div>
+      </div>
+    </div>
+  {{ else }}
+    <div class="row">
+      <div class="col">
+        <p>
+          <b>{{ .Data.Student.Name }}</b> has been registered for the CS@Mines HSPC by
+          <b>{{ .Data.Teacher.Name }}</b>.
+          In order to participate, you need to accept the following forms.
+        </p>
+        <p>
+          <b>
+            You do not need to physically or digitally sign the PDFs, just check "Accept" beside each
+            form and enter your name below.
+          </b>
+        </p>
+      </div>
+    </div>
+    <form method="post" action="/register/parent/signforms?tok={{ .Data.Token }}" class="form-floating">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Form</th>
+            <th scope="col">Accept</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <a href="/static/Sp2023_HighSchoolPaperwork.pdf" target="_blank">Liability Waiver and Photo/Multimedia Model Release</a>
+            </td>
+            <td>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="liability-waiver"
+                  name="liability-waiver" required
+                  {{ if .Data.Accepted }}checked disabled{{ end }} />
+                <label class="form-check-label" for="liability-waiver">
+                  Accept
+                </label>
+              </div>
+            </td>
+          </tr>
+          {{ if .Data.NeedsComputerUseWaiver }}
+            <tr>
+              <td>
+                <a href="/static/HSPC_MinesMinorComputerUseWaiver_2023.pdf" target=_blank>Colorado School of Mines Minor's Computer Use Waiver Form</a>
+              </td>
+              <td>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="" id="computer-use-waiver"
+                    name="computer-use-waiver" required
+                    {{ if .Data.Accepted }}checked disabled{{ end }} />
+                  <label class="form-check-label" for="computer-use-waiver">
+                    Accept
+                  </label>
+                </div>
+              </td>
+            </tr>
+          {{ end }}
+        </tbody>
+      </table>
+      <div class="row my-4">
+        <div class="col">
+          <div class="card">
+            <div class="card-header">Signature</div>
+            <div class="card-body">
+              <div class="form-floating">
+                <input type="text" class="form-control col-12" name="parent-name" id="parent-name"
+                  placeholder="{{ if lt .Data.Student.Age 18 }}Parent/Guardian Name{{ else }}Your Name{{ end }}"
+                  required
+                  {{ if .Data.Accepted }}disabled value="{{ .Data.Student.Signatory }}"{{ end }} />
+                <label for="parent-name">
+                  {{ if lt .Data.Student.Age 18 }}Parent/Guardian Name{{ else }}Your Name{{ end }}
+                </label>
+                <div class="form-text">
+                  By typing your name above and submitting this form, you consent to using your
+                  name as an electronic signature for the above documents.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row text-center mt-4">
+        <div class="col-md-12">
+          {{ if not .Data.Accepted }}
+            <button type="submit" class="btn btn-lg btn-primary">
+              Sign
+            </button>
+          {{ else }}
+            <p class="small text-secondary">
+              You have already signed the forms. If you would like to revoke your signature, please
+              email
+              <a href="mailto:support@mineshspc.com">support@mineshspc.com</a>.
+            </p>
+          {{ end }}
+        </div>
+      </div>
+    </form>
+  {{ end }}
+</div>
+{{ end }}

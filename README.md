@@ -8,7 +8,7 @@ Source code for the [mineshspc.com](https://mineshspc.com) website.
 
 Install Go and [gow](https://github.com/mitranim/gow). Then run:
 ```
-$ LOG_CONSOLE=1 gow -e=yaml,go,html,css run .
+$ LOG_CONSOLE=1 gow -e=yaml,go,html,css run ./cmd/mineshspc/
 ```
 which will automatically restart the app whenever you make a change.
 

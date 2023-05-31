@@ -1,0 +1,46 @@
+{{ define "navbar" }}
+<nav class="navbar sticky-top navbar-expand-lg navbar-light shadow">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <img src="/static/list.svg">
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <a class="navbar-brand" href="/">
+          <img src="/static/hspc_transparent.png" width="90" height="90" class="d-inline-block align-top" alt="HSPC">
+        </a>
+        <li class="nav-item">
+          <a class='nav-link {{ if eq .PageName "home"}}home-link-active{{ end }}' id="home-link" aria-current="page" href="/">
+            <img src="/static/csmines.svg" width="140" height="auto" alt="CS@Mines">
+            HSPC
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class='nav-link {{ if eq .PageName "info"}}info-link-active{{ end }}' id="info-link" aria-current="page" href="/info">Info</a>
+        </li>
+        <li class="nav-item">
+            <a class='nav-link {{ if eq .PageName "rules"}}rules-link-active{{ end }}' id="rules-link" aria-current="page" href="/rules">Rules</a>
+        </li>
+        {{ if .RegistrationEnabled }}
+          <li class="nav-item">
+            <a class='nav-link {{ if eq .PageName "register"}}registration-link-active{{ end }}' id="registration-link" aria-current="page" href="/register">Register</a>
+          </li>
+        {{ end }}
+        <li class="nav-item">
+            <a class='nav-link {{ if eq .PageName "faq"}}faq-link-active{{ end }}' id="faq-link" aria-current="page" href="/faq">FAQ</a>
+        </li>
+        <li class="nav-item">
+            <a class='nav-link {{ if eq .PageName "archive"}}archive-link-active{{ end }}' id="archive-link" aria-current="page" href="/archive">Archive</a>
+        </li>
+      </ul>
+      <div class="logged-in-user nav-link small text-secondary me-4">
+        {{ with .Data.Username }}
+          Welcome <a href="/register/teacher/teams">{{ . }}</a> <span class="mx-2">|</span> <a href="/register/teacher/logout">Logout</a>
+        {{ else }}
+          <a href="/register/teacher/login">Teacher Login</a>
+        {{ end }}
+      </div>
+    </div>
+  </div>
+</nav>
+{{ end }}

@@ -1,0 +1,84 @@
+{{ define "title" }}Archive{{ end }}
+
+{{ define "content" }}
+<div class="container">
+  <div class="row page-header">
+    <div class="col">
+      <h1>Archive</h1>
+      <p class="header-paragraph">
+        Since 2018, the CS@Mines High School Programming
+        Competition has provided high school students an opportunity to
+        demonstrate their programming and problem solving skills in a
+        competitive environment. For more information on all of our competitions
+        and past problems, view <a href="https://sumnerevans.com/tags/high-school-programming-competition/" target="_blank">competition summaries</a>.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="container page-content archive pb-5">
+  {{- range $y := .Data.YearInfo -}}
+    <div class="row mb-4">
+      <div class="col-lg-5 mt-4 mx-4">
+          <h2>{{ .Year }}</h2>
+          {{- range .RecapParagraphs -}}<p>{{ . }}</p>{{- end -}}
+      </div>
+      <div class="col mt-5">
+        <div class="accordion">
+          {{- range $i, $r := .Results -}}
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="heading{{ $y.Year }}{{ .Shortname }}">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#winners{{ $y.Year }}{{ .Shortname }}" aria-expanded="true"
+                aria-controls="winners{{ $y.Year }}{{ .Shortname }}">
+                <strong>{{- .Name }} Competition Winners</strong>
+              </button>
+            </h2>
+            <div id="winners{{ $y.Year }}{{ .Shortname }}" class="accordion-collapse collapse"
+              aria-labelledby="heading{{ $y.Year }}{{ .Shortname }}">
+              <div class="accordion-body">
+                {{- range $j, $t := .Teams -}}
+                <li class="list-group-item">
+                  <span class="badge bg-primary rounded-pill">
+                    {{ if eq $j 0 }}
+                    <i class="fa fa-trophy" style="color: #FFD700;" role="img" aria-label="Trophy"></i>
+                    {{ else if eq $j 1 }}
+                    <i class="fa fa-trophy" style="color: #C0C0C0;" role="img" aria-label="Trophy"></i>
+                    {{ else }}
+                    <i class="fa fa-trophy" style="color: #CD7F32;" role="img" aria-label="Trophy"></i>
+                    {{ end }}
+                    {{ .Place }}
+                  </span>
+                  <strong>{{ .Name }}</strong>
+                  <p class="mb-1 text-secondary">
+                    {{ .School }} &bull; {{ .Location }}
+                  </p>
+                </li>
+                {{- end -}}
+              </div>
+            </div>
+          </div>
+          {{- end -}}
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col mx-4">
+        {{ $length := len .Links }}
+        {{- range $j, $r := .Links -}}
+        <a href="{{ .URL }}", target="_blank">{{- .Title -}}</a>
+        {{ if gt $length 1 }}
+        {{ if eq $j 0 }}
+        &bull;
+        {{ else if eq $j 1 }}
+          {{ if eq $length 3 }}
+            &bull;
+          {{ end }}
+        {{ end }}
+        {{- end -}}
+        {{ end }}
+      </div>
+    </div>
+  {{- end -}}
+</div>
+{{ end }}

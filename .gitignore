@@ -9,17 +9,3 @@ mineshspc.com
 
 # Database
 mineshspc.db
-
-# Generated files by hugo
-/frontend/public/
-/frontend/resources/_gen/
-/frontend/assets/jsconfig.json
-/frontend/hugo_stats.json
-
-# Executable may be added to repository
-/frontend/hugo.exe
-/frontend/hugo.darwin
-/frontend/hugo.linux
-
-# Temporary lock file while building
-/frontend/.hugo_build.lock

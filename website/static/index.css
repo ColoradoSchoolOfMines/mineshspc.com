@@ -1,0 +1,350 @@
+/* Page formatting */
+@font-face {
+  font-family: "Gotham";
+  src: url("./fonts/subset-GothamBold.woff2") format("woff2"),
+    url("./fonts/subset-GothamBold.woff") format("woff");
+  font-weight: 700;
+  font-style: bold;
+}
+
+html {
+  background-color: #AAAAAA;
+}
+
+body {
+  background-color: #E2E2E2;
+  margin: 0 0 160px 0;
+}
+
+@media (max-width: 800px) {
+  body {
+    margin-bottom: 225px;
+  }
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a.btn:hover {
+  text-decoration: none;
+}
+
+/* Navigation */
+.navbar {
+  padding: 0;
+  background-color: white;
+}
+
+.navbar .navbar-brand {
+  color: #24314b;
+}
+
+.navbar .nav-link {
+  color: #24314b;
+  font-size: 25px;
+  height: 100%;
+  line-height: 75px;
+  font-family: "Montserrat", sans-serif;
+}
+
+.navbar a.nav-link:hover {
+  text-decoration: none;
+}
+
+.navbar .nav-link.small {
+  font-size: .875em;
+}
+
+.navbar .home-link-active {
+  border-bottom: 5px solid #24314b;
+}
+
+.navbar #home-link:hover {
+  color: #24314b;
+  border-bottom: 5px solid #24314b;
+}
+
+.navbar #info-link:hover {
+  color: #6495ED;
+  border-bottom: 5px solid #6495ED;
+}
+
+.navbar .info-link-active {
+  color: #6495ED !important;
+  border-bottom: 5px solid #6495ED;
+}
+
+.navbar #rules-link:hover {
+  color: #B44A88;
+  border-bottom: 5px solid #B44A88;
+}
+
+.navbar .rules-link-active {
+  color: #B44A88 !important;
+  border-bottom: 5px solid #B44A88;
+}
+
+.navbar #registration-link:hover {
+  color: #008234;
+  border-bottom: 5px solid #008234;
+}
+
+.navbar .registration-link-active {
+  color: #008234 !important;
+  border-bottom: 5px solid #008234;
+}
+
+.navbar #faq-link:hover {
+  color: #9B6400;
+  border-bottom: 5px solid #9B6400;
+}
+
+.navbar .faq-link-active {
+  color: #9B6400 !important;
+  border-bottom: 5px solid #9B6400;
+}
+
+.navbar #archive-link:hover {
+  color: #268282;
+  border-bottom: 5px solid #268282;
+}
+
+.navbar .archive-link-active {
+  color: #268282 !important;
+  border-bottom: 5px solid #268282;
+}
+
+/* Containers */
+.archive-row {
+  background-color: white;
+  padding-left: 25px;
+  padding-right: 25px;
+}
+
+/* Headers */
+h1,
+h2,
+h3 {
+  font-family: Gotham, sans-serif;
+  font-weight: 700;
+  margin-bottom: 0;
+}
+
+#schedule-header {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.hero .csam-logo {
+  max-height: 50px;
+}
+
+/* Content */
+.content .page-header {
+  text-align: center;
+  background-color: #24314b;
+  color: white;
+  margin-top: 20px;
+  padding: 20px;
+}
+
+.content .page-content {
+  font-size: 20px;
+}
+
+.content .page-content.home h1 {
+  background-color: #24314b;
+  color: white;
+  padding: 25px;
+}
+
+.content .page-content.home .info-box {
+  background-color: white;
+  font-size: 20px;
+}
+
+.content .page-content.home .info-box .content-text {
+  padding: 20px 30px;
+}
+
+.content .page-content.archive,
+.content .page-content.confirm-email,
+.content .page-content.rules,
+.content .page-content.register,
+.content .page-content.register-student,
+.content .page-content.register-parent,
+.content .page-content.volunteer-scan,
+.content .page-content.teacher,
+.content .page-content.team,
+.content .page-content.teams,
+.content .page-content.faq {
+  background-color: white;
+}
+
+.header-paragraph {
+  padding-left: 5%;
+  padding-right: 5%;
+}
+
+footer.footer {
+  background-color: #AAAAAA;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: -100;
+}
+
+footer.footer .acm-logo {
+  margin-left: 10px;
+  max-width: 150px;
+}
+
+footer.footer .hosted-at {
+  margin-left: 8px;
+}
+
+footer.footer .mines-logo {
+  max-width: 160px;
+}
+
+footer.footer a {
+  color: #526b91;
+}
+
+footer.footer a:hover {
+  color: #435c81;
+}
+
+/* Text & Utilities */
+#registration-info {
+  font-size: 20px;
+}
+
+.w-100 hr {
+  margin-block-start: 0.5em;
+  margin-block-end: 0.5em;
+}
+
+/* Registration Team Page */
+.registration-progress {
+  display: flex;
+  align-items: center;
+}
+
+.registration-progress-text {
+  display: flex;
+  align-items: center;
+}
+
+.registration-progress-text div {
+  width: 150px;
+  text-align: center;
+}
+
+.registration-progress-text small {
+  font-size: 0.7em;
+}
+
+.registration-progress-text .line {
+  width: 20px;
+}
+
+.registration-progress .line {
+  width: 130px;
+  height: 6px;
+  background: #a5a5a5;
+}
+.registration-progress .line.completed {
+  background: #63d19e;
+}
+
+.registration-progress .step {
+  display: flex;
+  background-color: #a5a5a5;
+  color: black;
+  font-size: 14px;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.registration-progress .step.completed {
+  background-color: #63d19e;
+  color: white;
+}
+
+/* Volunteer Page */
+.volunteer-scan .step {
+  display: flex;
+  background-color: #ef8f97;
+  color: black;
+  font-size: 14px;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.volunteer-scan .step.completed {
+  background-color: #63d19e;
+  color: white;
+}
+
+/* Scroll Thingy */
+.register-flow {
+  padding-left: 0;
+  list-style: none;
+}
+
+.register-item {
+  z-index: 1;
+  border-radius: 25px;
+  background-color: #0d6efd;
+  color: white;
+  width: 2rem;
+  height: 2rem;
+  line-height: 2rem;
+  position: relative;
+  display: inline-block;
+  text-align: center;
+}
+
+.register-text-header {
+  margin-left: 0.5%;
+}
+
+.register-text {
+  display: block;
+  margin-top: 1%;
+  margin-left: 3.5%;
+  font-size: 18px;
+  border: 1px solid lightslategray;
+  border-radius: 10px;
+}
+
+.register-flow li {
+  position: relative;
+}
+
+.register-flow li:first-child::before {
+  top: 2rem;
+}
+
+.register-flow li::before {
+  background-color: lightslategray;
+  bottom: 0;
+  content: "";
+  display: block;
+  position: absolute;
+  margin-left: 0.9rem;
+  top: 0rem;
+  width: 2px;
+}
