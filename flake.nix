@@ -11,14 +11,16 @@
         let
           pkgs = import nixpkgs { system = system; };
         in
-        {
+        rec {
           packages.mineshspc = pkgs.buildGoModule rec {
             pname = "mineshspc.com";
             version = "unstable-2023-05-15";
             src = self;
-            subPackages = ["cmd/mineshspc"];
-            vendorSha256 = "sha256-fBEEXT0nvAagXpL4Prmrua8g6iNnLyyt1DJcphVbtuM=";
+            subPackages = [ "cmd/mineshspc" ];
+            vendorSha256 = "sha256-DMPGBIDV0zEAw+aTYjD5YsTIYtT0m/bV2VwL7YRlJ64=";
           };
+          defaultPackage = packages.mineshspc;
+
           devShells = {
             default = pkgs.mkShell {
               packages = with pkgs; [
