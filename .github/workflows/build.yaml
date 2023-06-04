@@ -34,12 +34,12 @@ jobs:
         with:
           go-version-file: "go.mod"
 
-      - run: go build
+      - run: go build ./cmd/mineshspc
 
       - uses: actions/upload-artifact@v3
         with:
-          name: mineshspc.com
-          path: mineshspc.com
+          name: mineshspc
+          path: mineshspc
 
   submit-hash-update-pr:
     runs-on: ubuntu-latest

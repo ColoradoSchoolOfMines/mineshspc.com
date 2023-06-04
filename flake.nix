@@ -16,6 +16,7 @@
             pname = "mineshspc.com";
             version = "unstable-2023-05-15";
             src = self;
+            subPackages = ["cmd/mineshspc"];
             vendorSha256 = "sha256-fBEEXT0nvAagXpL4Prmrua8g6iNnLyyt1DJcphVbtuM=";
           };
           devShells = {
