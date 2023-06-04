@@ -3,6 +3,7 @@ module github.com/ColoradoSchoolOfMines/mineshspc.com
 go 1.19
 
 require (
+	github.com/go-chi/chi/v5 v5.0.8
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/rs/zerolog v1.29.1
@@ -39,6 +40,5 @@ require (
 
 require (
 	github.com/google/uuid v1.3.0
-	github.com/gorilla/mux v1.8.0
 	golang.org/x/sys v0.8.0 // indirect
 )

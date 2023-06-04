@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/hlog"
 	"github.com/sendgrid/sendgrid-go"
@@ -95,7 +95,8 @@ func (a *Application) Start() {
 	a.SendGridClient = sendgrid.NewSendClient(a.Config.SendGridAPIKey)
 
 	a.Log.Info().Msg("Starting router")
-	r := mux.NewRouter().StrictSlash(true)
+
+	r := chi.NewRouter()
 
 	noArgs := func(r *http.Request) map[string]any { return nil }
 
@@ -113,11 +114,11 @@ func (a *Application) Start() {
 		"/archive":  {"archive.html", a.GetArchiveTemplate},
 	}
 	for path, templateInfo := range staticPages {
-		r.HandleFunc(path, a.ServeTemplate(a.Log, templateInfo.Template, templateInfo.ArgGenerator)).Methods(http.MethodGet)
+		r.Get(path, a.ServeTemplate(a.Log, templateInfo.Template, templateInfo.ArgGenerator))
 	}
 
 	// Serve static files
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/", http.FileServer(http.FS(website.StaticFS)))).Methods(http.MethodGet)
+	r.Handle("/static/*", http.FileServer(http.FS(website.StaticFS)))
 
 	// Redirect pages
 	redirects := map[string]string{
@@ -131,7 +132,7 @@ func (a *Application) Start() {
 				http.Redirect(w, r, redirectPath, http.StatusTemporaryRedirect)
 			}
 		}
-		r.HandleFunc(path, redirFn(redirectPath)).Methods(http.MethodGet)
+		r.Get(path, redirFn(redirectPath))
 	}
 
 	// Registration renderers
@@ -177,17 +178,17 @@ func (a *Application) Start() {
 				rend.RenderFn(w, r, nil)
 			}
 		}
-		r.HandleFunc(path, renderFn(path, rend)).Methods(http.MethodGet)
+		r.Get(path, renderFn(path, rend))
 	}
 
 	// Delete Team member
-	r.HandleFunc("/register/teacher/team/delete", a.HandleTeacherDeleteMember).Methods(http.MethodGet)
+	r.Get("/register/teacher/team/delete", a.HandleTeacherDeleteMember)
 
 	// Email confirmation code handling
-	r.HandleFunc("/register/teacher/emaillogin", a.HandleTeacherEmailLogin).Methods(http.MethodGet)
+	r.Get("/register/teacher/emaillogin", a.HandleTeacherEmailLogin)
 
 	// Logout
-	r.HandleFunc("/register/teacher/logout", a.HandleTeacherLogout).Methods(http.MethodGet)
+	r.Get("/register/teacher/logout", a.HandleTeacherLogout)
 
 	// Form Post Handlers
 	formHandlers := map[string]func(w http.ResponseWriter, r *http.Request){
@@ -205,35 +206,34 @@ func (a *Application) Start() {
 				handler(w, r)
 			}
 		}
-
-		r.HandleFunc(path, renderFn(fn)).Methods(http.MethodPost)
+		r.Post(path, renderFn(fn))
 	}
 
 	// Admin pages
-	r.HandleFunc("/admin", a.ServeTemplate(a.Log, "adminhome.html", noArgs)).Methods(http.MethodGet)
-	r.HandleFunc("/admin/login", a.ServeTemplate(a.Log, "adminlogin.html", noArgs)).Methods(http.MethodGet)
-	r.HandleFunc("/admin/emaillogin", a.HandleAdminEmailLogin).Methods(http.MethodGet)
-	r.HandleFunc("/admin/emaillogin", a.HandleAdminLogin).Methods(http.MethodPost)
-	r.HandleFunc("/admin/resendstudentemail", a.HandleResendStudentEmail).Methods(http.MethodGet)
-	r.HandleFunc("/admin/resendparentemail", a.HandleResendParentEmail).Methods(http.MethodGet)
-	r.HandleFunc("/admin/confirmationlink/student", a.HandleGetStudentEmailConfirmationLink).Methods(http.MethodGet)
-	r.HandleFunc("/admin/confirmationlink/parent", a.HandleGetParentEmailConfirmationLink).Methods(http.MethodGet)
-	r.HandleFunc("/admin/dietaryrestrictions", a.ServeTemplate(a.Log, "admindietaryrestrictions.html", a.GetAdminDietaryRestrictionsTemplate)).Methods(http.MethodGet)
-	r.HandleFunc("/admin/teams", a.ServeTemplate(a.Log, "adminteams.html", a.GetAdminTeamsTemplate)).Methods(http.MethodGet)
-	r.HandleFunc("/admin/sendemailconfirmationreminders", a.HandleSendEmailConfirmationReminders).Methods(http.MethodGet)
-	r.HandleFunc("/admin/sendparentreminders", a.HandleSendParentReminders).Methods(http.MethodGet)
-	r.HandleFunc("/admin/sendqrcodes", a.HandleSendQRCodes).Methods(http.MethodGet)
-	r.HandleFunc("/admin/kattis/participants", a.HandleKattisParticipantsExport).Methods(http.MethodGet)
-	r.HandleFunc("/admin/kattis/teams", a.HandleKattisTeamsExport).Methods(http.MethodGet)
-	r.HandleFunc("/admin/zoom/breakout", a.HandleZoomBreakoutExport).Methods(http.MethodGet)
+	r.Get("/admin", a.ServeTemplate(a.Log, "adminhome.html", noArgs))
+	r.Get("/admin/login", a.ServeTemplate(a.Log, "adminlogin.html", noArgs))
+	r.Get("/admin/emaillogin", a.HandleAdminEmailLogin)
+	r.Post("/admin/emaillogin", a.HandleAdminLogin)
+	r.Get("/admin/resendstudentemail", a.HandleResendStudentEmail)
+	r.Get("/admin/resendparentemail", a.HandleResendParentEmail)
+	r.Get("/admin/confirmationlink/student", a.HandleGetStudentEmailConfirmationLink)
+	r.Get("/admin/confirmationlink/parent", a.HandleGetParentEmailConfirmationLink)
+	r.Get("/admin/dietaryrestrictions", a.ServeTemplate(a.Log, "admindietaryrestrictions.html", a.GetAdminDietaryRestrictionsTemplate))
+	r.Get("/admin/teams", a.ServeTemplate(a.Log, "adminteams.html", a.GetAdminTeamsTemplate))
+	r.Get("/admin/sendemailconfirmationreminders", a.HandleSendEmailConfirmationReminders)
+	r.Get("/admin/sendparentreminders", a.HandleSendParentReminders)
+	r.Get("/admin/sendqrcodes", a.HandleSendQRCodes)
+	r.Get("/admin/kattis/participants", a.HandleKattisParticipantsExport)
+	r.Get("/admin/kattis/teams", a.HandleKattisTeamsExport)
+	r.Get("/admin/zoom/breakout", a.HandleZoomBreakoutExport)
 
 	// Volunteer pages
-	r.HandleFunc("/volunteer", a.ServeTemplate(a.Log, "volunteerhome.html", noArgs)).Methods(http.MethodGet)
-	r.HandleFunc("/volunteer/login", a.ServeTemplate(a.Log, "volunteerlogin.html", noArgs)).Methods(http.MethodGet)
-	r.HandleFunc("/volunteer/emaillogin", a.HandleVolunteerEmailLogin).Methods(http.MethodGet)
-	r.HandleFunc("/volunteer/emaillogin", a.HandleVolunteerLogin).Methods(http.MethodPost)
-	r.HandleFunc("/volunteer/scan", a.ServeTemplate(a.Log, "volunteerscan.html", a.GetVolunteerScanTemplate)).Methods(http.MethodGet)
-	r.HandleFunc("/volunteer/checkin", a.HandleVolunteerCheckIn).Methods(http.MethodGet)
+	r.Get("/volunteer", a.ServeTemplate(a.Log, "volunteerhome.html", noArgs))
+	r.Get("/volunteer/login", a.ServeTemplate(a.Log, "volunteerlogin.html", noArgs))
+	r.Get("/volunteer/emaillogin", a.HandleVolunteerEmailLogin)
+	r.Post("/volunteer/emaillogin", a.HandleVolunteerLogin)
+	r.Get("/volunteer/scan", a.ServeTemplate(a.Log, "volunteerscan.html", a.GetVolunteerScanTemplate))
+	r.Get("/volunteer/checkin", a.HandleVolunteerCheckIn)
 
 	var handler http.Handler = r
 	handler = hlog.RequestIDHandler("request_id", "RequestID")(handler)
