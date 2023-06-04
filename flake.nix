@@ -15,9 +15,7 @@
           packages.mineshspc = pkgs.buildGoModule rec {
             pname = "mineshspc.com";
             version = "unstable-2023-05-15";
-
-            src = ./.;
-
+            src = self;
             vendorSha256 = "sha256-fBEEXT0nvAagXpL4Prmrua8g6iNnLyyt1DJcphVbtuM=";
           };
           devShells = {
