@@ -26,6 +26,9 @@ jobs:
       - name: Run pre-commit
         uses: pre-commit/action@v3.0.0
 
+      - uses: cachix/install-nix-action@v21
+      - run: nix flake check
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -41,11 +44,19 @@ jobs:
           name: mineshspc
           path: mineshspc
 
+  build-nix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: cachix/install-nix-action@v21
+      - run: nix build
+
   submit-hash-update-pr:
     runs-on: ubuntu-latest
     needs:
       - lint
       - build
+      - build-nix
     if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v3

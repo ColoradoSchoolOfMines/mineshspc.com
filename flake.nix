@@ -17,9 +17,9 @@
             version = "unstable-2023-05-15";
             src = self;
             subPackages = [ "cmd/mineshspc" ];
-            vendorSha256 = "sha256-DMPGBIDV0zEAw+aTYjD5YsTIYtT0m/bV2VwL7YRlJ64=";
+            vendorSha256 = "sha256-W9tKaKqCrEYG6Yb2P/OmesH+P+BAPTo9dQTst2Amwzw=";
           };
-          defaultPackage = packages.mineshspc;
+          packages.default = packages.mineshspc;
 
           devShells = {
             default = pkgs.mkShell {
