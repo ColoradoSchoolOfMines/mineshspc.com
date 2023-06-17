@@ -40,6 +40,7 @@ func (a *Application) GetArchiveTemplate(*http.Request) map[string]any {
 				},
 				Links: []Link{
 					{"/static/2023-solutions.pdf", "Solution Sketch Slides"},
+					{"https://sumnerevans.com/posts/school/2023-hspc/", "Competition Recap and Solution Sketches"},
 					{"https://mines22advanced.kattis.com/problems", "Advanced Problems"},
 					{"https://mines22beginner.kattis.com/problems", "Beginner Problems"},
 				},
