@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"maunium.net/go/mautrix/util/dbutil"
+	"go.mau.fi/util/dbutil"
 )
 
 type Division string

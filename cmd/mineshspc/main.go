@@ -13,7 +13,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
-	"maunium.net/go/mautrix/util/dbutil"
+	"go.mau.fi/util/dbutil"
 
 	"github.com/ColoradoSchoolOfMines/mineshspc.com/database"
 	"github.com/ColoradoSchoolOfMines/mineshspc.com/internal"
