@@ -17,7 +17,7 @@
             version = "unstable-2023-05-15";
             src = self;
             subPackages = [ "cmd/mineshspc" ];
-            vendorSha256 = "sha256-DlM56wO5RuzljTXUMcI1hk/HSz803f88J3wHS96Xn7o=";
+            vendorSha256 = "sha256-68C7Ryx+wnkXEDBs1QoUE/8D4+qKMot8G/zv2R5k524=";
           };
           packages.default = packages.mineshspc;
 
