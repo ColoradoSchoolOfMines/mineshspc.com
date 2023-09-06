@@ -61,12 +61,12 @@
           </div>
           <div class="card-body">
             <div class="row">
-              <div class="col-sm-3">
-                <b>Division:</b> {{ .Division }}
-              </div>
-              <div class="col-sm-3">
-                <b>In Person:</b> {{ if .InPerson }}Yes{{ else }}No{{ end }}
-              </div>
+              <!-- <div class="col-sm-3"> -->
+              <!--   <b>Division:</b> {{ .Division }} -->
+              <!-- </div> -->
+              <!-- <div class="col-sm-3"> -->
+              <!--   <b>In Person:</b> {{ if .InPerson }}Yes{{ else }}No{{ end }} -->
+              <!-- </div> -->
               {{ if gt .RegistrationTS.UnixMilli 0 }}
                 <div class="col-sm-6">
                   <b>Registration Time:</b> {{ .RegistrationTS.Format "2006-01-02 15:04 MST" }}
