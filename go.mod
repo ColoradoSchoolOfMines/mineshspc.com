@@ -10,7 +10,7 @@ require (
 	github.com/sendgrid/sendgrid-go v3.13.0+incompatible
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/spf13/viper v1.17.0
-	go.mau.fi/util v0.0.0-20230906154548-ffc399173e21
+	go.mau.fi/util v0.2.0
 )
 
 require (
