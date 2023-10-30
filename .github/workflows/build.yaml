@@ -26,7 +26,7 @@ jobs:
       - name: Run pre-commit
         uses: pre-commit/action@v3.0.0
 
-      - uses: nixbuild/nix-quick-install-action@v25
+      - uses: nixbuild/nix-quick-install-action@v26
 
       - run: nix flake check
 
@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: nixbuild/nix-quick-install-action@v25
+      - uses: nixbuild/nix-quick-install-action@v26
       - run: nix build
 
   submit-hash-update-pr:
@@ -64,7 +64,7 @@ jobs:
         with:
           repository: nevarro-space/infrastructure
 
-      - uses: nixbuild/nix-quick-install-action@v25
+      - uses: nixbuild/nix-quick-install-action@v26
 
       - name: Update the mineshspc input
         run: |
