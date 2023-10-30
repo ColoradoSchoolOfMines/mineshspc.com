@@ -39,6 +39,6 @@ require (
 )
 
 require (
-	github.com/google/uuid v1.3.1
+	github.com/google/uuid v1.4.0
 	golang.org/x/sys v0.12.0 // indirect
 )
