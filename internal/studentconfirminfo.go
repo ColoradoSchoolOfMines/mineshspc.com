@@ -147,7 +147,7 @@ func (a *Application) HandleStudentConfirmEmail(w http.ResponseWriter, r *http.R
 
 	sendEmail := false
 
-	log.Info().Interface("student", student).Msg("confirming email")
+	log.Info().Any("student", student).Msg("confirming email")
 
 	if !student.EmailConfirmed {
 		if r.Form.Has("confirm-info-correct") {
@@ -170,7 +170,7 @@ func (a *Application) HandleStudentConfirmEmail(w http.ResponseWriter, r *http.R
 		sendEmail = true
 	}
 
-	log.Info().Interface("send_email", sendEmail).Interface("student", student).Msg("done confirming")
+	log.Info().Any("send_email", sendEmail).Any("student", student).Msg("done confirming")
 
 	if team.InPerson {
 		student.CampusTour = r.Form.Has("campus-tour")
@@ -183,7 +183,7 @@ func (a *Application) HandleStudentConfirmEmail(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	log.Info().Interface("s", student).Msg("student confirmed")
+	log.Info().Any("s", student).Msg("student confirmed")
 
 	if sendEmail {
 		if err := a.sendParentEmail(ctx, student, false); err != nil {

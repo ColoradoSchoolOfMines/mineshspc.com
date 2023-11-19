@@ -8,7 +8,7 @@ func (a *Application) GetTeacherSchoolInfoTemplate(r *http.Request) map[string]a
 		a.Log.Warn().Err(err).Msg("Failed to get logged in user")
 		return nil
 	}
-	a.Log.Info().Interface("user", user).Msg("found user")
+	a.Log.Info().Any("user", user).Msg("found user")
 
 	validated := user.SchoolName != "" || user.SchoolCity != "" || user.SchoolState != ""
 	return map[string]any{

@@ -14,7 +14,7 @@ func (a *Application) GetTeacherTeamsTemplate(r *http.Request) map[string]any {
 		a.Log.Warn().Err(err).Msg("Failed to get logged in user")
 		return nil
 	}
-	a.Log.Debug().Interface("user", user).Msg("found user")
+	a.Log.Debug().Any("user", user).Msg("found user")
 
 	teams, err := a.DB.GetTeacherTeams(r.Context(), user.Email)
 	if err != nil {
@@ -39,7 +39,7 @@ func (a *Application) GetTeacherTeamEditTemplate(r *http.Request) map[string]any
 		a.Log.Warn().Err(err).Msg("Failed to get logged in user")
 		return nil
 	}
-	a.Log.Debug().Interface("user", user).Msg("found user")
+	a.Log.Debug().Any("user", user).Msg("found user")
 
 	templateData := map[string]any{
 		"Username":    user.Name,
@@ -66,7 +66,7 @@ func (a *Application) GetTeacherTeamEditTemplate(r *http.Request) map[string]any
 		templateData["Team"] = team
 	}
 
-	a.Log.Info().Interface("template_data", templateData).Msg("team edit template")
+	a.Log.Info().Any("template_data", templateData).Msg("team edit template")
 
 	return templateData
 }

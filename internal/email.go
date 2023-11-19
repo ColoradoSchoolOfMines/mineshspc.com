@@ -31,14 +31,14 @@ func (a *Application) SendEmail(log zerolog.Logger, subject string, to *mail.Ema
 	} else if resp.StatusCode != http.StatusAccepted {
 		log.Error().
 			Int("status_code", resp.StatusCode).
-			Interface("to", to).
+			Any("to", to).
 			Str("response_body", resp.Body).
 			Msg("error sending email")
 		return fmt.Errorf("error sending email (error code %d)", resp.StatusCode)
 	} else {
 		log.Info().
 			Int("status_code", resp.StatusCode).
-			Interface("to", to).
+			Any("to", to).
 			Msg("successfully sent email")
 		return nil
 	}

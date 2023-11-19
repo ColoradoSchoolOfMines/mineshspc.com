@@ -126,7 +126,7 @@ func (a *Application) HandleParentSignForms(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	log.Info().Interface("student", student).Msg("signed forms for student")
+	log.Info().Any("student", student).Msg("signed forms for student")
 
 	http.Redirect(w, r, "/register/parent/signforms?tok="+tok, http.StatusSeeOther)
 }

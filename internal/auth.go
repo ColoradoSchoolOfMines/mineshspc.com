@@ -39,7 +39,7 @@ func (a *Application) GetLoggedInTeacher(r *http.Request) (*database.Teacher, er
 	user, err := a.DB.GetTeacherByEmail(r.Context(), claims.Subject)
 	if err != nil {
 		a.Log.Warn().Err(err).
-			Interface("claims", claims).
+			Any("claims", claims).
 			Msg("couldn't find teacher with that session token")
 		return nil, err
 	}

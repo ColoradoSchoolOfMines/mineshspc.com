@@ -53,7 +53,7 @@ func (a *Application) verifyCaptcha(response string) error {
 	if err != nil {
 		return err
 	}
-	log.Info().Interface("resp", captchaResponse).Msg("captcha response")
+	log.Info().Any("resp", captchaResponse).Msg("captcha response")
 	if !captchaResponse.Success {
 		return errors.New("captcha failed")
 	}
@@ -168,13 +168,13 @@ func (a *Application) HandleTeacherEmailLogin(w http.ResponseWriter, r *http.Req
 
 	claims, ok := token.Claims.(*jwt.RegisteredClaims)
 	if !token.Valid || !ok {
-		a.Log.Warn().Interface("token", token).Msg("failed to validate token")
+		a.Log.Warn().Any("token", token).Msg("failed to validate token")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
 	if claims.Issuer != string(IssuerEmailLogin) {
-		a.Log.Warn().Interface("token", token).Msg("invalid token issuer, should be login")
+		a.Log.Warn().Any("token", token).Msg("invalid token issuer, should be login")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -198,7 +198,7 @@ func (a *Application) HandleTeacherEmailLogin(w http.ResponseWriter, r *http.Req
 		a.Log.Err(err).Msg("failed to sign JWT")
 		return
 	}
-	a.Log.Info().Interface("jwt", jwt).Str("jwt_str", jwtStr).Msg("signed JWT")
+	a.Log.Info().Any("jwt", jwt).Str("jwt_str", jwtStr).Msg("signed JWT")
 	http.SetCookie(w, &http.Cookie{Name: "tok", Value: jwtStr, Path: "/", Expires: expires})
 
 	if teacher.SchoolName == "" || teacher.SchoolCity == "" || teacher.SchoolState == "" {

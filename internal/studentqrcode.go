@@ -72,7 +72,7 @@ func (a *Application) sendQRCodeEmail(ctx context.Context, studentName, email st
 	attachment.SetContent(qrcodeBase64)
 	message.AddAttachment(attachment)
 
-	log.Debug().Interface("pt", plainTextContent.String()).Interface("html", htmlContent.String()).Msg("sending email")
+	log.Debug().Any("pt", plainTextContent.String()).Any("html", htmlContent.String()).Msg("sending email")
 
 	resp, err := a.SendGridClient.Send(message)
 	if err != nil {
