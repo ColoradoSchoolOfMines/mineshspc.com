@@ -205,8 +205,8 @@ func (a *Application) HandleAdminLogin(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	} else if !isAdmin {
-		log.Warn().Err(err).Msg("teacher email not confirmed, not sending login code to avoid amplification attacks")
-		w.WriteHeader(http.StatusBadRequest)
+		log.Warn().Err(err).Msg("user is not an admin, not sending email")
+		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 
