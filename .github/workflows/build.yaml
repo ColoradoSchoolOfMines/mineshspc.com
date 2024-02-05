@@ -72,7 +72,7 @@ jobs:
 
       - name: Create PR against Nevarro's infrastructure repository
         id: cpr
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.PR_CREATOR_TOKEN }}
           commit-message: "mineshspc.com: update to ${{ github.sha }}"
