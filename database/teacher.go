@@ -19,12 +19,12 @@ type Teacher struct {
 }
 
 func (d *Database) NewTeacher(ctx context.Context, name, email string) error {
-	_, err := d.DB.ExecContext(ctx, "INSERT INTO teachers (name, email) VALUES (?, ?)", name, email)
+	_, err := d.DB.Exec(ctx, "INSERT INTO teachers (name, email) VALUES (?, ?)", name, email)
 	return err
 }
 
 func (d *Database) SetEmailConfirmed(ctx context.Context, email string) error {
-	_, err := d.DB.ExecContext(ctx, "UPDATE teachers SET emailconfirmed = TRUE WHERE email = ?", email)
+	_, err := d.DB.Exec(ctx, "UPDATE teachers SET emailconfirmed = TRUE WHERE email = ?", email)
 	return err
 }
 
@@ -49,7 +49,7 @@ func (d *Database) scanTeacher(row dbutil.Scannable) (*Teacher, error) {
 }
 
 func (d *Database) GetTeacherByEmail(ctx context.Context, email string) (*Teacher, error) {
-	row := d.DB.QueryRowContext(ctx, `
+	row := d.DB.QueryRow(ctx, `
 		SELECT t.name, t.email, t.emailconfirmed, t.emailallowance, t.schoolname, t.schoolcity, t.schoolstate
 		FROM teachers t
 		WHERE t.email = ?
@@ -58,7 +58,7 @@ func (d *Database) GetTeacherByEmail(ctx context.Context, email string) (*Teache
 }
 
 func (d *Database) GetTeacherForTeam(ctx context.Context, teamID uuid.UUID) (*Teacher, error) {
-	row := d.DB.QueryRowContext(ctx, `
+	row := d.DB.QueryRow(ctx, `
 		SELECT t.name, t.email, t.emailconfirmed, t.emailallowance, t.schoolname, t.schoolcity, t.schoolstate
 		FROM teachers t
 		JOIN teams tea ON tea.teacheremail = t.email
@@ -68,7 +68,7 @@ func (d *Database) GetTeacherForTeam(ctx context.Context, teamID uuid.UUID) (*Te
 }
 
 func (d *Database) SetTeacherSchoolInfo(ctx context.Context, email, schoolName, schoolCity, schoolState string) error {
-	_, err := d.DB.ExecContext(ctx, `
+	_, err := d.DB.Exec(ctx, `
 		UPDATE teachers
 		SET schoolname = ?, schoolcity = ?, schoolstate = ?
 		WHERE email = ?
@@ -77,7 +77,7 @@ func (d *Database) SetTeacherSchoolInfo(ctx context.Context, email, schoolName, 
 }
 
 func (d *Database) DecrementEmailAllowance(ctx context.Context, email string) error {
-	_, err := d.DB.ExecContext(ctx, `
+	_, err := d.DB.Exec(ctx, `
 		UPDATE teachers
 		SET emailallowance = emailallowance - 1
 		WHERE email = ?

@@ -13,7 +13,7 @@ func (d *Database) IsEmailVolunteer(ctx context.Context, email string) (bool, er
 	}
 
 	var isVolunteer bool
-	err := d.DB.QueryRowContext(ctx, "SELECT true FROM volunteers WHERE email = $1", email).Scan(&isVolunteer)
+	err := d.DB.QueryRow(ctx, "SELECT true FROM volunteers WHERE email = $1", email).Scan(&isVolunteer)
 	if err == sql.ErrNoRows {
 		return false, nil
 	} else if err != nil {

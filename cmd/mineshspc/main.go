@@ -58,7 +58,7 @@ func main() {
 	rawDB.Log = dbutil.ZeroLogger(log)
 
 	db := database.NewDatabase(rawDB)
-	if err := db.DB.Upgrade(); err != nil {
+	if err := db.DB.Upgrade(context.TODO()); err != nil {
 		log.Fatal().Err(err).Msg("failed to upgrade the mineshspc.com database")
 	}
 

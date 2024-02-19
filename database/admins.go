@@ -7,7 +7,7 @@ import (
 
 func (d *Database) IsEmailAdmin(ctx context.Context, email string) (bool, error) {
 	var isAdmin bool
-	err := d.DB.QueryRowContext(ctx, "SELECT true FROM admins WHERE email = $1", email).Scan(&isAdmin)
+	err := d.DB.QueryRow(ctx, "SELECT true FROM admins WHERE email = $1", email).Scan(&isAdmin)
 	if err == sql.ErrNoRows {
 		return false, nil
 	} else if err != nil {

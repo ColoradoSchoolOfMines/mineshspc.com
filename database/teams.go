@@ -84,7 +84,7 @@ func (d *Database) scanTeamWithTeacherName(row dbutil.Scannable) (*TeamWithTeach
 }
 
 func (d *Database) scanTeamStudents(ctx context.Context, team *Team) error {
-	studentRows, err := d.DB.QueryContext(ctx, `
+	studentRows, err := d.DB.Query(ctx, `
 		SELECT s.email, s.name, s.age, s.parentemail, s.signatory, s.previouslyparticipated, s.emailconfirmed,
 			s.liabilitywaiver, s.computerusewaiver, s.campustour, s.dietaryrestrictions, s.qrcodesent, s.checkedin
 		FROM students s
@@ -151,7 +151,7 @@ func (d *Database) scanTeamWithStudentsAndTeacherName(ctx context.Context, row d
 }
 
 func (d *Database) GetTeacherTeams(ctx context.Context, email string) ([]*Team, error) {
-	rows, err := d.DB.QueryContext(ctx, `
+	rows, err := d.DB.Query(ctx, `
 		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname, t.registration_ts
 		FROM teams t
 		JOIN teachers tt ON tt.email = t.teacheremail
@@ -176,7 +176,7 @@ func (d *Database) GetTeacherTeams(ctx context.Context, email string) ([]*Team, 
 }
 
 func (d *Database) GetAdminTeamsWithTeacherName(ctx context.Context) ([]*TeamWithTeacherName, error) {
-	rows, err := d.DB.QueryContext(ctx, `
+	rows, err := d.DB.Query(ctx, `
 		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname, t.registration_ts, tt.name
 		FROM teams t
 		JOIN teachers tt ON tt.email = t.teacheremail
@@ -200,7 +200,7 @@ func (d *Database) GetAdminTeamsWithTeacherName(ctx context.Context) ([]*TeamWit
 }
 
 func (d *Database) GetTeam(ctx context.Context, email string, teamID uuid.UUID) (*Team, error) {
-	row := d.DB.QueryRowContext(ctx, `
+	row := d.DB.QueryRow(ctx, `
 		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname, t.registration_ts
 		FROM teams t
 		JOIN teachers tt ON tt.email = t.teacheremail
@@ -211,7 +211,7 @@ func (d *Database) GetTeam(ctx context.Context, email string, teamID uuid.UUID) 
 }
 
 func (d *Database) GetTeamNoMembers(ctx context.Context, teamID uuid.UUID) (*Team, error) {
-	row := d.DB.QueryRowContext(ctx, `
+	row := d.DB.QueryRow(ctx, `
 		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, '', t.registration_ts
 		FROM teams t
 		WHERE t.id = ?
@@ -220,7 +220,7 @@ func (d *Database) GetTeamNoMembers(ctx context.Context, teamID uuid.UUID) (*Tea
 }
 
 func (d *Database) UpsertTeam(ctx context.Context, teacherEmail string, teamID uuid.UUID, name string, division Division, inPerson bool, divisionExplanation string) error {
-	_, err := d.DB.ExecContext(ctx, `
+	_, err := d.DB.Exec(ctx, `
 		INSERT OR REPLACE INTO teams (id, teacheremail, name, division, inperson, divisionexplanation, registration_ts)
 		VALUES (?, ?, ?, ?, ?, ?, ?)
 	`, teamID, teacherEmail, name, division, inPerson, divisionExplanation, time.Now().UnixMilli())
@@ -228,7 +228,7 @@ func (d *Database) UpsertTeam(ctx context.Context, teacherEmail string, teamID u
 }
 
 func (d *Database) AddTeamMember(ctx context.Context, teamID uuid.UUID, name string, studentAge int, studentEmail string, previouslyParticipated bool) error {
-	_, err := d.DB.ExecContext(ctx, `
+	_, err := d.DB.Exec(ctx, `
 		INSERT INTO students (teamid, name, age, email, previouslyparticipated)
 		VALUES (?, ?, ?, ?, ?)
 	`, teamID, name, studentAge, studentEmail, previouslyParticipated)
@@ -236,7 +236,7 @@ func (d *Database) AddTeamMember(ctx context.Context, teamID uuid.UUID, name str
 }
 
 func (d *Database) RemoveTeamMember(ctx context.Context, teamID uuid.UUID, studentEmail string) error {
-	res, err := d.DB.ExecContext(ctx, `
+	res, err := d.DB.Exec(ctx, `
 		DELETE FROM students
 		WHERE teamid = ?
 			AND email = ?
