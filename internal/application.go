@@ -23,11 +23,13 @@ type Application struct {
 	EmailRegex *regexp.Regexp
 	Config     config.Configuration
 
-	ConfirmEmailRenderer       func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
-	TeacherLoginRenderer       func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
-	EmailLoginRenderer         func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
-	StudentConfirmInfoRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
-	TeamAddMemberRenderer      func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
+	ConfirmEmailRenderer          func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
+	VolunteerConfirmEmailRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
+	AdminConfirmEmailRenderer     func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
+	TeacherLoginRenderer          func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
+	EmailLoginRenderer            func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
+	StudentConfirmInfoRenderer    func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
+	TeamAddMemberRenderer         func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 
 	TeacherCreateAccountRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 
@@ -139,6 +141,9 @@ func (a *Application) Start() {
 	a.TeacherLoginRenderer = a.ServeTemplateExtra(a.Log, "teacherlogin.html", a.GetEmailLoginTemplate)
 	a.TeacherCreateAccountRenderer = a.ServeTemplateExtra(a.Log, "teachercreateaccount.html", a.GetTeacherCreateAccountTemplate)
 	a.ConfirmEmailRenderer = a.ServeTemplateExtra(a.Log, "confirmemail.html", a.GetEmailLoginTemplate)
+	a.VolunteerConfirmEmailRenderer = a.ServeTemplateExtra(a.Log, "volunteerconfirmemail.html", a.GetEmailLoginTemplate)
+	a.AdminConfirmEmailRenderer = a.ServeTemplateExtra(a.Log, "adminconfirmemail.html", a.GetEmailLoginTemplate)
+
 	a.EmailLoginRenderer = a.ServeTemplateExtra(a.Log, "emaillogin.html", a.GetEmailLoginTemplate)
 	a.StudentConfirmInfoRenderer = a.ServeTemplateExtra(a.Log, "student.html", a.GetStudentConfirmInfoTemplate)
 	a.TeamAddMemberRenderer = a.ServeTemplateExtra(a.Log, "teamaddmember.html", a.GetTeacherAddMemberTemplate)
@@ -156,6 +161,10 @@ func (a *Application) Start() {
 
 		// Parent
 		"/register/parent/signforms": {a.ServeTemplateExtra(a.Log, "parent.html", a.GetParentSignFormsTemplate), false},
+
+		// Admin & Volunteer
+		"/register/volunteer/confirmemail": {a.VolunteerConfirmEmailRenderer, true},
+		"/register/admin/confirmemail":     {a.AdminConfirmEmailRenderer, true},
 	}
 	for path, rend := range registrationPages {
 		renderFn := func(path string, rend renderInfo) func(w http.ResponseWriter, r *http.Request) {

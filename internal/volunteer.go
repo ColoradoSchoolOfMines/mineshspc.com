@@ -115,7 +115,7 @@ func (a *Application) HandleVolunteerLogin(w http.ResponseWriter, r *http.Reques
 	} else {
 		log.Info().Msg("sent email")
 		http.SetCookie(w, &http.Cookie{Name: "volunteer_email", Value: emailAddress, Path: "/"})
-		w.Write([]byte("check your email for a login link"))
+		a.VolunteerConfirmEmailRenderer(w, r, map[string]any{"Email": emailAddress})
 	}
 }
 

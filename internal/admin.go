@@ -233,7 +233,7 @@ func (a *Application) HandleAdminLogin(w http.ResponseWriter, r *http.Request) {
 	} else {
 		log.Info().Msg("sent email")
 		http.SetCookie(w, &http.Cookie{Name: "admin_email", Value: emailAddress, Path: "/"})
-		w.Write([]byte("check your email for a login link"))
+		a.AdminConfirmEmailRenderer(w, r, map[string]any{"Email": emailAddress})
 	}
 }
 
