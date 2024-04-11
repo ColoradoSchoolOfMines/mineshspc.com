@@ -11,23 +11,30 @@
 
   <h1 class="display-5">High School Programming Competition</h1>
   <h2 class="mb-2">The 2024 competition will be held April 20th, 2024.</h2>
-  <p id="registration-info" class="mb-4">
+  <p class="registration-info mb-4">
     Engage in exciting problems at the Mines HSPC!
     {{ if .RegistrationEnabled }}
       Registration is now open for the Spring 2024 competition.
     {{ end }}
   </p>
   {{ if .RegistrationEnabled }}
-    <p id="registration-info" class="mb-4">
+    <p class="registration-info mb-4">
       <!-- <span class="badge text-bg-danger py-2 px-4 me-4 fs-5"><b>Registration Deadline</b></span> -->
       The registration deadline is <b>April 13th</b>
     </p>
     <a href="/register" class="btn btn-success btn-lg px-6 fs-3"><b>Register Now</b></a>
   {{ else }}
-    <small class="text-secondary">
-      Registration for this year's competition has closed.
-    </small>
+    <p>
+      <small class="registration-info text-secondary mb-4">
+        Registration for this year's competition has closed.
+      </small>
+    </p>
   {{ end }}
+  <p class="registration-info mb-4">
+    Open Division registration available
+    <a href="https://mines-hspc.kattis.com/contests/mines-hspc24-open" target="_blank">on
+      Kattis</a>. Click on "Join the Contest" to register your team.
+  </p>
 </div>
 
 <div class="container page-content home">
