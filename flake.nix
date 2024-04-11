@@ -11,10 +11,10 @@
       in rec {
         packages.mineshspc = pkgs.buildGo122Module {
           pname = "mineshspc.com";
-          version = "unstable-2024-02-19";
+          version = "unstable-2024-04-11";
           src = self;
           subPackages = [ "cmd/mineshspc" ];
-          vendorHash = "sha256-qc7xBcs2P4zLVkoUAntg2oPCTKqGvpL5Hxj3d3bJDo4=";
+          vendorHash = "sha256-Tum0t4e9T0vP7Y5EE69+2MgR+QsVJ5QzQvM+QldlS8o=";
         };
         packages.default = packages.mineshspc;
 
