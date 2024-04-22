@@ -12,7 +12,7 @@ require (
 	github.com/sendgrid/sendgrid-go v3.14.0+incompatible
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/spf13/viper v1.18.2
-	go.mau.fi/util v0.4.1
+	go.mau.fi/util v0.4.2
 )
 
 require (
@@ -33,7 +33,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/exp v0.0.0-20240314144324-c7f7c6466f7f // indirect
+	golang.org/x/exp v0.0.0-20240409090435-93d18d7e34b8 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
