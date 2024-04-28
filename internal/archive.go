@@ -33,6 +33,38 @@ func (a *Application) GetArchiveTemplate(*http.Request) map[string]any {
 	return map[string]any{
 		"YearInfo": []YearInfo{
 			{
+				Year: 2024,
+				RecapParagraphs: []string{
+					"The 2024 competition returned to an in-person only competition, but we also had an open division. We gave a separate set of prizes for teams consisting of only first-time competitors. We did not award prizes for the open division.",
+					"The in-person competition had 27 teams while the open division had 31 teams.",
+				},
+				Links: []Link{
+					{"/static/2024-solutions.pdf", "Solution Sketch Slides"},
+					// {"https://sumnerevans.com/posts/school/2024-hspc/", "Competition Recap and Solution Sketches"},
+					{"https://mines-hspc.kattis.com/contests/mines-hspc24/problems", "Problems"},
+				},
+				Results: []CompetitionResult{
+					{
+						Name:      "Overall Winners",
+						Shortname: "Overall",
+						Teams: []WinningTeam{
+							{"1st", "Innovation Center 1", "Innovation Center SVVSD", "Longmont"},
+							{"2nd", "Sigma Scripters", "Arapahoe High School", "Centennial"},
+							{"3nd", "CyberRebels2", "Columbine High School", "Littleton"},
+						},
+					},
+					{
+						Name:      "First-Time Team Winners",
+						Shortname: "FirstTime",
+						Teams: []WinningTeam{
+							{"1st", "Loopy Groupies", "Chatfield Senior High School", "Littleton"},
+							{"2nd", "Lorem Ipsum", "Warren Tech", "Lakewood"},
+							{"3nd", "the cows(mooooooooooooo)", "Cherry Creek High School", "Greenwood Village"},
+						},
+					},
+				},
+			},
+			{
 				Year: 2023,
 				RecapParagraphs: []string{
 					"The 2023 competition again featured two divisions: beginner and advanced. As with 2022, it was a hybrid competition, but we awarded prizes for both in-person and remote winners in both divisions.",
