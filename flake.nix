@@ -3,11 +3,20 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+    templ = {
+      url = "github:a-h/templ/v0.2.697";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils, templ }:
     (flake-utils.lib.eachDefaultSystem (system:
-      let pkgs = import nixpkgs { inherit system; };
+      let
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays =
+            [ (final: prev: { inherit (templ.packages.${system}) templ; }) ];
+        };
       in rec {
         packages.mineshspc = pkgs.buildGoModule {
           pname = "mineshspc.com";
@@ -15,11 +24,15 @@
           src = self;
           subPackages = [ "cmd/mineshspc" ];
           vendorHash = "sha256-q4AXwm8QRedjkO3565GASsCIxnmhzMGAYHEr6p0Es+0=";
+
+          preBuild = ''
+            ${pkgs.templ}/bin/templ generate
+          '';
         };
         packages.default = packages.mineshspc;
 
         devShells.default = pkgs.mkShell {
-          packages = with pkgs; [ go gotools pre-commit ];
+          packages = with pkgs; [ go gopls gotools pre-commit pkgs.templ ];
         };
       }));
 }
