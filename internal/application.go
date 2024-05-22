@@ -7,7 +7,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/hlog"
 	"github.com/sendgrid/sendgrid-go"
@@ -98,7 +97,7 @@ func (a *Application) Start() {
 
 	a.Log.Info().Msg("Starting router")
 
-	r := chi.NewRouter()
+	router := http.NewServeMux()
 
 	noArgs := func(r *http.Request) map[string]any { return nil }
 
@@ -107,7 +106,7 @@ func (a *Application) Start() {
 		Template     string
 		ArgGenerator func(r *http.Request) map[string]any
 	}{
-		"/":         {"home.html", noArgs},
+		"/{$}":      {"home.html", noArgs},
 		"/info":     {"info.html", noArgs},
 		"/authors":  {"authors.html", noArgs},
 		"/rules":    {"rules.html", noArgs},
@@ -116,11 +115,11 @@ func (a *Application) Start() {
 		"/archive":  {"archive.html", a.GetArchiveTemplate},
 	}
 	for path, templateInfo := range staticPages {
-		r.Get(path, a.ServeTemplate(a.Log, templateInfo.Template, templateInfo.ArgGenerator))
+		router.HandleFunc("GET "+path, a.ServeTemplate(a.Log, templateInfo.Template, templateInfo.ArgGenerator))
 	}
 
 	// Serve static files
-	r.Handle("/static/*", http.FileServer(http.FS(website.StaticFS)))
+	router.Handle("GET /static/", http.FileServer(http.FS(website.StaticFS)))
 
 	// Redirect pages
 	redirects := map[string]string{
@@ -134,7 +133,7 @@ func (a *Application) Start() {
 				http.Redirect(w, r, redirectPath, http.StatusTemporaryRedirect)
 			}
 		}
-		r.Get(path, redirFn(redirectPath))
+		router.HandleFunc("GET "+path, redirFn(redirectPath))
 	}
 
 	// Registration renderers
@@ -187,17 +186,17 @@ func (a *Application) Start() {
 				rend.RenderFn(w, r, nil)
 			}
 		}
-		r.Get(path, renderFn(path, rend))
+		router.HandleFunc("GET "+path, renderFn(path, rend))
 	}
 
 	// Delete Team member
-	r.Get("/register/teacher/team/delete", a.HandleTeacherDeleteMember)
+	router.HandleFunc("GET /register/teacher/team/delete", a.HandleTeacherDeleteMember)
 
 	// Email confirmation code handling
-	r.Get("/register/teacher/emaillogin", a.HandleTeacherEmailLogin)
+	router.HandleFunc("GET /register/teacher/emaillogin", a.HandleTeacherEmailLogin)
 
 	// Logout
-	r.Get("/register/teacher/logout", a.HandleTeacherLogout)
+	router.HandleFunc("GET /register/teacher/logout", a.HandleTeacherLogout)
 
 	// Form Post Handlers
 	formHandlers := map[string]func(w http.ResponseWriter, r *http.Request){
@@ -215,40 +214,38 @@ func (a *Application) Start() {
 				handler(w, r)
 			}
 		}
-		r.Post(path, renderFn(fn))
+		router.HandleFunc("POST "+path, renderFn(fn))
 	}
 
 	// Admin pages
-	r.Get("/admin", a.ServeTemplate(a.Log, "adminhome.html", noArgs))
-	r.Get("/admin/login", a.ServeTemplate(a.Log, "adminlogin.html", noArgs))
-	r.Get("/admin/emaillogin", a.HandleAdminEmailLogin)
-	r.Post("/admin/emaillogin", a.HandleAdminLogin)
-	r.Get("/admin/resendstudentemail", a.HandleResendStudentEmail)
-	r.Get("/admin/resendparentemail", a.HandleResendParentEmail)
-	r.Get("/admin/confirmationlink/student", a.HandleGetStudentEmailConfirmationLink)
-	r.Get("/admin/confirmationlink/parent", a.HandleGetParentEmailConfirmationLink)
-	r.Get("/admin/dietaryrestrictions", a.ServeTemplate(a.Log, "admindietaryrestrictions.html", a.GetAdminDietaryRestrictionsTemplate))
-	r.Get("/admin/teams", a.ServeTemplate(a.Log, "adminteams.html", a.GetAdminTeamsTemplate))
-	r.Get("/admin/sendemailconfirmationreminders", a.HandleSendEmailConfirmationReminders)
-	r.Get("/admin/sendparentreminders", a.HandleSendParentReminders)
-	r.Get("/admin/sendqrcodes", a.HandleSendQRCodes)
-	r.Get("/admin/kattis/participants", a.HandleKattisParticipantsExport)
-	r.Get("/admin/kattis/teams", a.HandleKattisTeamsExport)
-	r.Get("/admin/zoom/breakout", a.HandleZoomBreakoutExport)
+	router.HandleFunc("GET /admin", a.ServeTemplate(a.Log, "adminhome.html", noArgs))
+	router.HandleFunc("GET /admin/login", a.ServeTemplate(a.Log, "adminlogin.html", noArgs))
+	router.HandleFunc("GET /admin/emaillogin", a.HandleAdminEmailLogin)
+	router.HandleFunc("POST /admin/emaillogin", a.HandleAdminLogin)
+	router.HandleFunc("GET /admin/resendstudentemail", a.HandleResendStudentEmail)
+	router.HandleFunc("GET /admin/resendparentemail", a.HandleResendParentEmail)
+	router.HandleFunc("GET /admin/confirmationlink/student", a.HandleGetStudentEmailConfirmationLink)
+	router.HandleFunc("GET /admin/confirmationlink/parent", a.HandleGetParentEmailConfirmationLink)
+	router.HandleFunc("GET /admin/dietaryrestrictions", a.ServeTemplate(a.Log, "admindietaryrestrictions.html", a.GetAdminDietaryRestrictionsTemplate))
+	router.HandleFunc("GET /admin/teams", a.ServeTemplate(a.Log, "adminteams.html", a.GetAdminTeamsTemplate))
+	router.HandleFunc("GET /admin/sendemailconfirmationreminders", a.HandleSendEmailConfirmationReminders)
+	router.HandleFunc("GET /admin/sendparentreminders", a.HandleSendParentReminders)
+	router.HandleFunc("GET /admin/sendqrcodes", a.HandleSendQRCodes)
+	router.HandleFunc("GET /admin/kattis/participants", a.HandleKattisParticipantsExport)
+	router.HandleFunc("GET /admin/kattis/teams", a.HandleKattisTeamsExport)
+	router.HandleFunc("GET /admin/zoom/breakout", a.HandleZoomBreakoutExport)
 
 	// Volunteer pages
-	r.Get("/volunteer", a.ServeTemplate(a.Log, "volunteerhome.html", noArgs))
-	r.Get("/volunteer/login", a.ServeTemplate(a.Log, "volunteerlogin.html", noArgs))
-	r.Get("/volunteer/emaillogin", a.HandleVolunteerEmailLogin)
-	r.Post("/volunteer/emaillogin", a.HandleVolunteerLogin)
-	r.Get("/volunteer/scan", a.ServeTemplate(a.Log, "volunteerscan.html", a.GetVolunteerScanTemplate))
-	r.Get("/volunteer/checkin", a.HandleVolunteerCheckIn)
+	router.HandleFunc("GET /volunteer", a.ServeTemplate(a.Log, "volunteerhome.html", noArgs))
+	router.HandleFunc("GET /volunteer/login", a.ServeTemplate(a.Log, "volunteerlogin.html", noArgs))
+	router.HandleFunc("GET /volunteer/emaillogin", a.HandleVolunteerEmailLogin)
+	router.HandleFunc("POST /volunteer/emaillogin", a.HandleVolunteerLogin)
+	router.HandleFunc("GET /volunteer/scan", a.ServeTemplate(a.Log, "volunteerscan.html", a.GetVolunteerScanTemplate))
+	router.HandleFunc("GET /volunteer/checkin", a.HandleVolunteerCheckIn)
 
-	var handler http.Handler = r
+	var handler http.Handler = router
 	handler = hlog.RequestIDHandler("request_id", "RequestID")(handler)
 	handler = hlog.NewHandler(*a.Log)(handler)
-
-	http.Handle("/", r)
 
 	a.Log.Info().Msg("Listening on port 8090")
 	http.ListenAndServe(":8090", handler)
