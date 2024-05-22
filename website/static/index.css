@@ -89,12 +89,12 @@ a.btn:hover {
   border-bottom: 5px solid #B44A88;
 }
 
-.navbar #registration-link:hover {
+.navbar #register-link:hover {
   color: #008234;
   border-bottom: 5px solid #008234;
 }
 
-.navbar .registration-link-active {
+.navbar .register-link-active {
   color: #008234 !important;
   border-bottom: 5px solid #008234;
 }
