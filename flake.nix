@@ -11,15 +11,15 @@
       in rec {
         packages.mineshspc = pkgs.buildGo122Module {
           pname = "mineshspc.com";
-          version = "unstable-2024-04-28";
+          version = "unstable-2024-05-21";
           src = self;
           subPackages = [ "cmd/mineshspc" ];
-          vendorHash = "sha256-cr3ILu71Lk0ahVcVMiiHle1TystV8QuQ4pvE2Nm0Y3g=";
+          vendorHash = "sha256-QjNH3O5/Hpu0OuVLUMN//f4d2j4wsDiUEfGLXH/Yf04=";
         };
         packages.default = packages.mineshspc;
 
         devShells.default = pkgs.mkShell {
-          packages = with pkgs; [ go_1_22 gopls gotools pre-commit ];
+          packages = with pkgs; [ go gopls gotools pre-commit ];
         };
       }));
 }
