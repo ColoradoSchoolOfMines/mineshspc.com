@@ -152,19 +152,9 @@ func (a *Application) Start() {
 	}
 
 	// Redirect pages
-	redirects := map[string]string{
-		"/register/teacher": "/register/teacher/createaccount",
-		"/register/student": "/",
-		"/register/parent":  "/",
-	}
-	for path, redirectPath := range redirects {
-		redirFn := func(redirectPath string) func(w http.ResponseWriter, r *http.Request) {
-			return func(w http.ResponseWriter, r *http.Request) {
-				http.Redirect(w, r, redirectPath, http.StatusTemporaryRedirect)
-			}
-		}
-		router.HandleFunc("GET "+path, redirFn(redirectPath))
-	}
+	router.Handle("GET /register/teacher/", http.RedirectHandler("/register/teacher/createaccount", http.StatusTemporaryRedirect))
+	router.Handle("GET /register/student/", http.RedirectHandler("/", http.StatusTemporaryRedirect))
+	router.Handle("GET /register/parent/", http.RedirectHandler("/", http.StatusTemporaryRedirect))
 
 	// Registration renderers
 	a.TeacherLoginRenderer = a.ServeTemplateExtra(a.Log, "teacherlogin.html", a.GetEmailLoginTemplate)
