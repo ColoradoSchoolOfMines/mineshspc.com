@@ -1,18 +1,24 @@
 package internal
 
 import (
+	"context"
 	"fmt"
 	"html/template"
 	"net/http"
 	"regexp"
 	"strings"
 
+	"github.com/a-h/templ"
+	"github.com/beeper/libserv/pkg/requestlog"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/hlog"
 	"github.com/sendgrid/sendgrid-go"
 
 	"github.com/ColoradoSchoolOfMines/mineshspc.com/database"
 	"github.com/ColoradoSchoolOfMines/mineshspc.com/internal/config"
+	"github.com/ColoradoSchoolOfMines/mineshspc.com/internal/contextkeys"
+	"github.com/ColoradoSchoolOfMines/mineshspc.com/internal/templates"
+	"github.com/ColoradoSchoolOfMines/mineshspc.com/internal/templates/partials"
 	"github.com/ColoradoSchoolOfMines/mineshspc.com/website"
 )
 
@@ -91,6 +97,25 @@ type renderInfo struct {
 	RedirectIfLoggedIn bool
 }
 
+func (a *Application) AuthenticatedTeacherMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user, err := a.GetLoggedInTeacher(r)
+		if err == nil {
+			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), contextkeys.ContextKeyLoggedInTeacher, user)))
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (a *Application) SettingsContextMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		ctx = context.WithValue(ctx, contextkeys.ContextKeyRegistrationEnabled, a.Config.RegistrationEnabled)
+		ctx = context.WithValue(ctx, contextkeys.ContextKeyHostedByHTML, a.Config.HostedByHTML)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
 func (a *Application) Start() {
 	a.Log.Info().Msg("connecting to sendgrid")
 	a.SendGridClient = sendgrid.NewSendClient(a.Config.SendgridAPIKey)
@@ -98,28 +123,33 @@ func (a *Application) Start() {
 	a.Log.Info().Msg("Starting router")
 
 	router := http.NewServeMux()
+	router.Handle("GET /static/", http.FileServer(http.FS(website.StaticFS))) // Serve static files
 
 	noArgs := func(r *http.Request) map[string]any { return nil }
 
 	// Static pages
 	staticPages := map[string]struct {
-		Template     string
-		ArgGenerator func(r *http.Request) map[string]any
+		title    string
+		pageName partials.PageName
+		content  templ.Component
 	}{
-		"/{$}":      {"home.html", noArgs},
-		"/info":     {"info.html", noArgs},
-		"/authors":  {"authors.html", noArgs},
-		"/rules":    {"rules.html", noArgs},
-		"/register": {"register.html", noArgs},
-		"/faq":      {"faq.html", noArgs},
-		"/archive":  {"archive.html", a.GetArchiveTemplate},
+		"GET /{$}":       {"Home", partials.PageNameHome, templates.Home()},
+		"GET /info/":     {"Info", partials.PageNameInfo, templates.Info()},
+		"GET /authors/":  {"Authors", "", templates.Authors()},
+		"GET /rules/":    {"Rules", partials.PageNameRules, templates.Rules()},
+		"GET /register/": {"Register", partials.PageNameRegister, templates.Register()},
+		"GET /faq/":      {"FAQ", partials.PageNameFAQ, templates.FAQ()},
+		"GET /archive/":  {"Archive", partials.PageNameArchive, templates.Archive(archiveInfo)},
 	}
-	for path, templateInfo := range staticPages {
-		router.HandleFunc("GET "+path, a.ServeTemplate(a.Log, templateInfo.Template, templateInfo.ArgGenerator))
+	for path, pageInfo := range staticPages {
+		router.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+			if len(pageInfo.pageName) > 0 {
+				ctx = context.WithValue(ctx, contextkeys.ContextKeyPageName, pageInfo.pageName)
+			}
+			templates.Base(pageInfo.title, pageInfo.content).Render(ctx, w)
+		})
 	}
-
-	// Serve static files
-	router.Handle("GET /static/", http.FileServer(http.FS(website.StaticFS)))
 
 	// Redirect pages
 	redirects := map[string]string{
@@ -243,7 +273,11 @@ func (a *Application) Start() {
 	router.HandleFunc("GET /volunteer/scan", a.ServeTemplate(a.Log, "volunteerscan.html", a.GetVolunteerScanTemplate))
 	router.HandleFunc("GET /volunteer/checkin", a.HandleVolunteerCheckIn)
 
+	// Middleware goes from bottom up because it's doing function composition.
 	var handler http.Handler = router
+	handler = a.AuthenticatedTeacherMiddleware(handler)
+	handler = a.SettingsContextMiddleware(handler)
+	handler = requestlog.AccessLogger(false)(handler)
 	handler = hlog.RequestIDHandler("request_id", "RequestID")(handler)
 	handler = hlog.NewHandler(*a.Log)(handler)
 

@@ -1,14 +1,40 @@
 package partials
 
-func getNavLinkClasses(activePageName, pageName string) []string {
+import (
+	"github.com/ColoradoSchoolOfMines/mineshspc.com/database"
+	"github.com/ColoradoSchoolOfMines/mineshspc.com/internal/contextkeys"
+)
+
+func RegistrationEnabled(ctx context.Context) bool {
+	enabled, ok := ctx.Value(contextkeys.ContextKeyRegistrationEnabled).(bool)
+	return ok && enabled
+}
+
+func GetPageName(ctx context.Context) PageName {
+	if pageName, ok := ctx.Value(contextkeys.ContextKeyPageName).(PageName); ok {
+		return pageName
+	} else {
+		return ""
+	}
+}
+
+func GetUsername(ctx context.Context) string {
+	if loggedInUser, ok := ctx.Value(contextkeys.ContextKeyLoggedInTeacher).(*database.Teacher); ok {
+		return loggedInUser.Name
+	} else {
+		return ""
+	}
+}
+
+func getNavLinkClasses(activePageName, pageName PageName) []string {
 	classes := []string{"nav-link"}
 	if activePageName == pageName {
-		classes = append(classes, pageName+"-link-active")
+		classes = append(classes, string(pageName)+"-link-active")
 	}
 	return classes
 }
 
-templ Navbar(pageName string, registrationEnabled bool, username string) {
+templ Navbar() {
 	<nav class="navbar sticky-top navbar-expand-lg navbar-light shadow">
 		<div class="container-fluid">
 			<button
@@ -34,14 +60,19 @@ templ Navbar(pageName string, registrationEnabled bool, username string) {
 						/>
 					</a>
 					<li class="nav-item">
-						<a class={ getNavLinkClasses(pageName, "home") } id="home-link" aria-current="page" href="/">
+						<a
+							class={ getNavLinkClasses(GetPageName(ctx), "home") }
+							id="home-link"
+							aria-current="page"
+							href="/"
+						>
 							<img src="/static/csmines.svg" width="140" height="auto" alt="CS@Mines"/>
 							HSPC
 						</a>
 					</li>
 					<li class="nav-item">
 						<a
-							class={ getNavLinkClasses(pageName, "info") }
+							class={ getNavLinkClasses(GetPageName(ctx), "info") }
 							id="info-link"
 							aria-current="page"
 							href="/info"
@@ -49,16 +80,16 @@ templ Navbar(pageName string, registrationEnabled bool, username string) {
 					</li>
 					<li class="nav-item">
 						<a
-							class={ getNavLinkClasses(pageName, "rules") }
+							class={ getNavLinkClasses(GetPageName(ctx), "rules") }
 							id="rules-link"
 							aria-current="page"
 							href="/rules"
 						>Rules</a>
 					</li>
-					if registrationEnabled {
+					if RegistrationEnabled(ctx) {
 						<li class="nav-item">
 							<a
-								class={ getNavLinkClasses(pageName, "register") }
+								class={ getNavLinkClasses(GetPageName(ctx), "register") }
 								id="register-link"
 								aria-current="page"
 								href="/register"
@@ -67,7 +98,7 @@ templ Navbar(pageName string, registrationEnabled bool, username string) {
 					}
 					<li class="nav-item">
 						<a
-							class={ getNavLinkClasses(pageName, "faq") }
+							class={ getNavLinkClasses(GetPageName(ctx), "faq") }
 							id="faq-link"
 							aria-current="page"
 							href="/faq"
@@ -75,7 +106,7 @@ templ Navbar(pageName string, registrationEnabled bool, username string) {
 					</li>
 					<li class="nav-item">
 						<a
-							class={ getNavLinkClasses(pageName, "archive") }
+							class={ getNavLinkClasses(GetPageName(ctx), "archive") }
 							id="archive-link"
 							aria-current="page"
 							href="/archive"
@@ -83,8 +114,8 @@ templ Navbar(pageName string, registrationEnabled bool, username string) {
 					</li>
 				</ul>
 				<div class="logged-in-user nav-link small text-secondary me-4">
-					if username != "" {
-						Welcome <a href="/register/teacher/teams">{ username }</a>
+					if len(GetUsername(ctx)) > 0 {
+						Welcome <a href="/register/teacher/teams">{ GetUsername(ctx) }</a>
 						<span class="mx-2">|</span>
 						<a href="/register/teacher/logout">Logout</a>
 					} else {

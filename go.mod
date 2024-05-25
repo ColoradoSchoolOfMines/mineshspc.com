@@ -6,6 +6,7 @@ toolchain go1.22.0
 
 require (
 	github.com/a-h/templ v0.2.697
+	github.com/beeper/libserv v0.0.0-20231231202820-c7303abfc32c
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/rs/zerolog v1.32.0
