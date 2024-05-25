@@ -23,7 +23,7 @@
           version = "unstable-2024-05-21";
           src = self;
           subPackages = [ "cmd/mineshspc" ];
-          vendorHash = "sha256-qlDZkMlvzrRhE/GdEz4hIQgk4BI2YrvOLazAFqs8xuY=";
+          vendorHash = "sha256-iVuCWgtuYJ8ai7pSHO1bU9EaC9gEoWvtkEQUb6sUu+o=";
 
           preBuild = ''
             ${pkgs.templ}/bin/templ generate
