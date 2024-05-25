@@ -6,6 +6,22 @@
 #   domain -> MINESHSPC_DOMAIN
 #   recaptcha.site_key -> MINESHSPC_RECAPTCHA_SITE_KEY
 
+# ===== Database Settings =====
+database:
+  # The database type. Only "sqlite3" is supported.
+  type: sqlite3
+  # The database URI.
+  #   SQLite: A raw file path is supported, but `file:<path>?_txlock=immediate` is recommended.
+  #           https://github.com/mattn/go-sqlite3#connection-string#
+  uri: mineshspc.db?_txlock=immediate
+  # Maximum number of connections. Mostly relevant for Postgres.
+  max_open_conns: 20
+  max_idle_conns: 2
+  # Maximum connection idle time and lifetime before they're closed. Disabled if null.
+  # Parsed with https://pkg.go.dev/time#ParseDuration
+  max_conn_idle_time: null
+  max_conn_lifetime: null
+
 # This will disable sending emails, and instead print the value of the email to
 # stdout.
 dev_mode: false
@@ -28,3 +44,11 @@ jwt_secret_key: YOUR_VERY_SECURE_KEY
 recaptcha:
   site_key: RECAPTCHA_SITE_KEY
   secret_key: RECAPTCHA_SECRET_KEY
+
+# ===== Logger Settings =====
+# See https://github.com/tulir/zeroconfig for details.
+logging:
+  min_level: debug
+  writers:
+    - type: stdout
+      format: pretty-colored
