@@ -4,6 +4,7 @@ go 1.25.0
 
 require (
 	github.com/a-h/templ v0.2.697
+	github.com/beeper/libserv v0.0.0-20231231202820-c7303abfc32c
 	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/mattn/go-sqlite3 v1.14.42
 	github.com/rs/zerolog v1.35.0
