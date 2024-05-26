@@ -1,0 +1,145 @@
+package templates
+
+import "strconv"
+
+type Link struct {
+	URL   templ.SafeURL
+	Title string
+}
+
+type WinningTeam struct {
+	Place    string
+	Name     string
+	School   string
+	Location string
+}
+
+type CompetitionResult struct {
+	Name      string
+	Shortname string
+	Teams     []WinningTeam
+}
+
+type YearInfo struct {
+	Year            int
+	RecapParagraphs []string
+	Links           []Link
+	Results         []CompetitionResult
+}
+
+func accordionHeadingID(year int, shortname string) string {
+	return "heading" + strconv.Itoa(year) + shortname
+}
+
+func accordionCollapseCSSID(year int, shortname string) string {
+	return "#" + accordionCollapseID(year, shortname)
+}
+
+func accordionCollapseID(year int, shortname string) string {
+	return "winners" + strconv.Itoa(year) + shortname
+}
+
+func trophyColor(place int) string {
+	switch place + 1 {
+	case 1:
+		return "#FFD700"
+	case 2:
+		return "#C0C0C0"
+	default:
+		return "#CD7F32"
+	}
+}
+
+css trophyColorStyle(place int) {
+	color: { trophyColor(place) };
+}
+
+templ Archive(years []YearInfo) {
+	<div class="container">
+		<div class="row page-header">
+			<div class="col">
+				<h1>Archive</h1>
+				<p class="header-paragraph">
+					Since 2018, the CS@Mines High School Programming
+					Competition has provided high school students an opportunity to
+					demonstrate their programming and problem solving skills in a
+					competitive environment. For more information on all of our competitions
+					and past problems, view
+					<a href="https://sumnerevans.com/tags/high-school-programming-competition/" target="_blank">
+						competition summaries
+					</a>.
+				</p>
+			</div>
+		</div>
+	</div>
+	<div class="container page-content archive pb-5">
+		for _, y := range years {
+			@year(y)
+		}
+	</div>
+}
+
+templ year(y YearInfo) {
+	<div class="row mb-4 pt-4">
+		<div class="col-lg-5 mt-4 mx-4">
+			<h2>{ strconv.Itoa(y.Year) }</h2>
+			for _, p := range y.RecapParagraphs {
+				<p>{ p }</p>
+			}
+		</div>
+		<div class="col mt-5">
+			<div class="accordion">
+				for _, r := range y.Results {
+					<div class="accordion-item">
+						<h2 class="accordion-header" id={ accordionHeadingID(y.Year, r.Shortname) }>
+							<button
+								class="accordion-button collapsed"
+								type="button"
+								data-bs-toggle="collapse"
+								data-bs-target={ accordionCollapseCSSID(y.Year, r.Shortname) }
+								aria-expanded="true"
+								aria-controls={ accordionCollapseID(y.Year, r.Shortname) }
+							>
+								<strong>{ r.Name } Competition Winners</strong>
+							</button>
+						</h2>
+					</div>
+					<div
+						id={ accordionCollapseID(y.Year, r.Shortname) }
+						class="accordion-collapse collapse"
+						aria-labelledby={ accordionHeadingID(y.Year, r.Shortname) }
+					>
+						<div class="accordion-body">
+							for i, t := range r.Teams {
+								@winningTeam(i, t)
+							}
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+		<div class="row">
+			<div class="col mx-4">
+				for i, link := range y.Links {
+					if i > 0 {
+						&nbsp;&bull;
+					}
+					<a href={ link.URL } target="_blank">{ link.Title }</a>
+				}
+			</div>
+		</div>
+	</div>
+}
+
+templ winningTeam(i int, team WinningTeam) {
+	<li class="list-group-item">
+		<span class="badge bg-primary rounded-pill">
+			<i class={ "fa" , "fa-trophy" , trophyColorStyle(i) } role="img" aria-label="Trophy"></i>
+			{ team.Place }
+		</span>
+		<strong>{ team.Name }</strong>
+		<p class="mb-1 text-secondary">
+			{ team.School } &bull; { team.Location }
+		</p>
+	</li>
+}

@@ -1,18 +1,25 @@
 package internal
 
 import (
+	"context"
 	"fmt"
 	"html/template"
 	"net/http"
 	"regexp"
 	"strings"
 
+	"github.com/a-h/templ"
+	"github.com/beeper/libserv/pkg/requestlog"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/hlog"
 	"github.com/sendgrid/sendgrid-go"
 
 	"github.com/ColoradoSchoolOfMines/mineshspc.com/database"
 	"github.com/ColoradoSchoolOfMines/mineshspc.com/internal/config"
+	"github.com/ColoradoSchoolOfMines/mineshspc.com/internal/contextkeys"
+	"github.com/ColoradoSchoolOfMines/mineshspc.com/internal/templates"
+	"github.com/ColoradoSchoolOfMines/mineshspc.com/internal/templates/partials"
+	registerteacher "github.com/ColoradoSchoolOfMines/mineshspc.com/internal/templates/register/teacher"
 	"github.com/ColoradoSchoolOfMines/mineshspc.com/website"
 )
 
@@ -25,7 +32,6 @@ type Application struct {
 	ConfirmEmailRenderer          func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 	VolunteerConfirmEmailRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 	AdminConfirmEmailRenderer     func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
-	TeacherLoginRenderer          func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 	EmailLoginRenderer            func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 	StudentConfirmInfoRenderer    func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 	TeamAddMemberRenderer         func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
@@ -91,6 +97,25 @@ type renderInfo struct {
 	RedirectIfLoggedIn bool
 }
 
+func (a *Application) AuthenticatedTeacherMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user, err := a.GetLoggedInTeacher(r)
+		if err == nil {
+			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), contextkeys.ContextKeyLoggedInTeacher, user)))
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (a *Application) SettingsContextMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		ctx = context.WithValue(ctx, contextkeys.ContextKeyRegistrationEnabled, a.Config.RegistrationEnabled)
+		ctx = context.WithValue(ctx, contextkeys.ContextKeyHostedByHTML, a.Config.HostedByHTML)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
 func (a *Application) Start() {
 	a.Log.Info().Msg("connecting to sendgrid")
 	a.SendGridClient = sendgrid.NewSendClient(a.Config.SendgridAPIKey)
@@ -98,46 +123,55 @@ func (a *Application) Start() {
 	a.Log.Info().Msg("Starting router")
 
 	router := http.NewServeMux()
+	router.Handle("GET /static/", http.FileServer(http.FS(website.StaticFS))) // Serve static files
 
 	noArgs := func(r *http.Request) map[string]any { return nil }
 
 	// Static pages
 	staticPages := map[string]struct {
-		Template     string
-		ArgGenerator func(r *http.Request) map[string]any
+		title    string
+		pageName partials.PageName
+		content  templ.Component
 	}{
-		"/{$}":      {"home.html", noArgs},
-		"/info":     {"info.html", noArgs},
-		"/authors":  {"authors.html", noArgs},
-		"/rules":    {"rules.html", noArgs},
-		"/register": {"register.html", noArgs},
-		"/faq":      {"faq.html", noArgs},
-		"/archive":  {"archive.html", a.GetArchiveTemplate},
+		"GET /{$}":       {"Home", partials.PageNameHome, templates.Home()},
+		"GET /info/":     {"Info", partials.PageNameInfo, templates.Info()},
+		"GET /authors/":  {"Authors", "", templates.Authors()},
+		"GET /rules/":    {"Rules", partials.PageNameRules, templates.Rules()},
+		"GET /register/": {"Register", partials.PageNameRegister, templates.Register()},
+		"GET /faq/":      {"FAQ", partials.PageNameFAQ, templates.FAQ()},
+		"GET /archive/":  {"Archive", partials.PageNameArchive, templates.Archive(archiveInfo)},
 	}
-	for path, templateInfo := range staticPages {
-		router.HandleFunc("GET "+path, a.ServeTemplate(a.Log, templateInfo.Template, templateInfo.ArgGenerator))
+	for path, pageInfo := range staticPages {
+		if len(pageInfo.pageName) == 0 {
+			router.Handle(path, templ.Handler(templates.Base(pageInfo.title, pageInfo.content)))
+		} else {
+			router.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
+				ctx := context.WithValue(r.Context(), contextkeys.ContextKeyPageName, pageInfo.pageName)
+				templates.Base(pageInfo.title, pageInfo.content).Render(ctx, w)
+			})
+		}
 	}
-
-	// Serve static files
-	router.Handle("GET /static/", http.FileServer(http.FS(website.StaticFS)))
 
 	// Redirect pages
-	redirects := map[string]string{
-		"/register/teacher": "/register/teacher/createaccount",
-		"/register/student": "/",
-		"/register/parent":  "/",
-	}
-	for path, redirectPath := range redirects {
-		redirFn := func(redirectPath string) func(w http.ResponseWriter, r *http.Request) {
-			return func(w http.ResponseWriter, r *http.Request) {
-				http.Redirect(w, r, redirectPath, http.StatusTemporaryRedirect)
+	router.Handle("GET /register/teacher/", http.RedirectHandler("/register/teacher/createaccount", http.StatusTemporaryRedirect))
+	router.Handle("GET /register/student/", http.RedirectHandler("/", http.StatusTemporaryRedirect))
+	router.Handle("GET /register/parent/", http.RedirectHandler("/", http.StatusTemporaryRedirect))
+
+	router.HandleFunc("GET /register/teacher/login", func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		if teacher, ok := ctx.Value(contextkeys.ContextKeyLoggedInTeacher).(*database.Teacher); ok {
+			if teacher.SchoolCity == "" || teacher.SchoolName == "" || teacher.SchoolState == "" {
+				http.Redirect(w, r, "/register/teacher/schoolinfo", http.StatusSeeOther)
+			} else {
+				http.Redirect(w, r, "/register/teacher/teams", http.StatusSeeOther)
 			}
 		}
-		router.HandleFunc("GET "+path, redirFn(redirectPath))
-	}
+
+		templates.Base("Teacher Login", registerteacher.Login("", nil)).Render(ctx, w)
+	})
+	router.HandleFunc("POST /register/teacher/login", a.HandleTeacherLogin)
 
 	// Registration renderers
-	a.TeacherLoginRenderer = a.ServeTemplateExtra(a.Log, "teacherlogin.html", a.GetEmailLoginTemplate)
 	a.TeacherCreateAccountRenderer = a.ServeTemplateExtra(a.Log, "teachercreateaccount.html", a.GetTeacherCreateAccountTemplate)
 	a.ConfirmEmailRenderer = a.ServeTemplateExtra(a.Log, "confirmemail.html", a.GetEmailLoginTemplate)
 	a.VolunteerConfirmEmailRenderer = a.ServeTemplateExtra(a.Log, "volunteerconfirmemail.html", a.GetEmailLoginTemplate)
@@ -149,7 +183,6 @@ func (a *Application) Start() {
 	registrationPages := map[string]renderInfo{
 		"/register/teacher/confirmemail":   {a.ConfirmEmailRenderer, true},
 		"/register/teacher/createaccount":  {a.TeacherCreateAccountRenderer, true},
-		"/register/teacher/login":          {a.TeacherLoginRenderer, true},
 		"/register/teacher/schoolinfo":     {a.ServeTemplateExtra(a.Log, "schoolinfo.html", a.GetTeacherSchoolInfoTemplate), false},
 		"/register/teacher/teams":          {a.ServeTemplateExtra(a.Log, "teams.html", a.GetTeacherTeamsTemplate), false},
 		"/register/teacher/team/edit":      {a.ServeTemplateExtra(a.Log, "teamedit.html", a.GetTeacherTeamEditTemplate), false},
@@ -200,7 +233,6 @@ func (a *Application) Start() {
 
 	// Form Post Handlers
 	formHandlers := map[string]func(w http.ResponseWriter, r *http.Request){
-		"/register/teacher/login":          a.HandleTeacherLogin,
 		"/register/teacher/createaccount":  a.HandleTeacherCreateAccount,
 		"/register/teacher/schoolinfo":     a.HandleTeacherSchoolInfo,
 		"/register/teacher/team/edit":      a.HandleTeacherTeamEdit,
@@ -243,7 +275,11 @@ func (a *Application) Start() {
 	router.HandleFunc("GET /volunteer/scan", a.ServeTemplate(a.Log, "volunteerscan.html", a.GetVolunteerScanTemplate))
 	router.HandleFunc("GET /volunteer/checkin", a.HandleVolunteerCheckIn)
 
+	// Middleware goes from bottom up because it's doing function composition.
 	var handler http.Handler = router
+	handler = a.AuthenticatedTeacherMiddleware(handler)
+	handler = a.SettingsContextMiddleware(handler)
+	handler = requestlog.AccessLogger(false)(handler)
 	handler = hlog.RequestIDHandler("request_id", "RequestID")(handler)
 	handler = hlog.NewHandler(*a.Log)(handler)
 

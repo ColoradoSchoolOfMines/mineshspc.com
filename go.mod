@@ -5,6 +5,8 @@ go 1.22
 toolchain go1.22.0
 
 require (
+	github.com/a-h/templ v0.2.697
+	github.com/beeper/libserv v0.0.0-20231231202820-c7303abfc32c
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/rs/zerolog v1.32.0
@@ -25,7 +27,6 @@ require (
 	github.com/rs/xid v1.5.0 // indirect
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	golang.org/x/exp v0.0.0-20240409090435-93d18d7e34b8 // indirect
-	golang.org/x/net v0.24.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 )

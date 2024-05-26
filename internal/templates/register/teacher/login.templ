@@ -1,0 +1,82 @@
+package teacher
+
+templ Login(email string, errText templ.Component) {
+	<div class="container page-header">
+		<div class="row">
+			<div class="col">
+				<div class="header">
+					<h1>Login to Teacher Account</h1>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="container page-content teacher">
+		<form method="post" action="/register/teacher/login" class="form-floating">
+			<div class="row">
+				<div class="col m-4 mb-0">
+					if errText != nil {
+						<div class="alert alert-danger" role="alert">
+							@errText
+						</div>
+					} else {
+						<div class="alert alert-secondary" role="alert">
+							Don't have an account? <a href="/register/teacher/createaccount">Create an account</a> instead.
+						</div>
+					}
+				</div>
+			</div>
+			<div class="row">
+				<div class="col m-4 mt-0">
+					<div class="card">
+						<h4 class="card-header">Login</h4>
+						<div class="card-body">
+							<div class="row">
+								<div class="col-12">
+									<div class="form-floating">
+										<input
+											type="email"
+											name="email-address"
+											class="form-control"
+											id="email-address"
+											placeholder="you@example.com"
+											required
+											value={ email }
+										/>
+										<label for="email-address">Email address</label>
+										<div class="form-text">
+											This site uses
+											<a href="https://en.wikipedia.org/wiki/Passwordless_authentication" target="_blank">
+												passwordless authentication
+											</a>.
+											You will receive a magic link in your email which will allow you to sign in to your account.
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row text-center pb-4">
+				<div class="col-md-12">
+					<button type="submit" class="btn btn-lg btn-primary">Login</button>
+				</div>
+			</div>
+		</form>
+	</div>
+}
+
+templ LoginEmailDoesNotExist() {
+	That email doesn't exist in our system. Did you want to
+	<a href="/register/teacher/createaccount">create an account</a> instead?
+}
+
+templ LoginEmailNotConfirmed() {
+	<p>
+		That email hasn't been confirmed yet. Please confirm your email before logging in.
+	</p>
+	<p>
+		Lost your confirmation email? Send an email to
+		<a href="mailto:support@mineshspc.com">support@mineshspc.com</a>.
+	</p>
+}
