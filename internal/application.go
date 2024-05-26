@@ -142,13 +142,14 @@ func (a *Application) Start() {
 		"GET /archive/":  {"Archive", partials.PageNameArchive, templates.Archive(archiveInfo)},
 	}
 	for path, pageInfo := range staticPages {
-		router.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
-			ctx := r.Context()
-			if len(pageInfo.pageName) > 0 {
-				ctx = context.WithValue(ctx, contextkeys.ContextKeyPageName, pageInfo.pageName)
-			}
-			templates.Base(pageInfo.title, pageInfo.content).Render(ctx, w)
-		})
+		if len(pageInfo.pageName) == 0 {
+			router.Handle(path, templ.Handler(templates.Base(pageInfo.title, pageInfo.content)))
+		} else {
+			router.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
+				ctx := context.WithValue(r.Context(), contextkeys.ContextKeyPageName, pageInfo.pageName)
+				templates.Base(pageInfo.title, pageInfo.content).Render(ctx, w)
+			})
+		}
 	}
 
 	// Redirect pages
