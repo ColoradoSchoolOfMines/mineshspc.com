@@ -19,6 +19,7 @@ import (
 	"github.com/ColoradoSchoolOfMines/mineshspc.com/internal/contextkeys"
 	"github.com/ColoradoSchoolOfMines/mineshspc.com/internal/templates"
 	"github.com/ColoradoSchoolOfMines/mineshspc.com/internal/templates/partials"
+	registerteacher "github.com/ColoradoSchoolOfMines/mineshspc.com/internal/templates/register/teacher"
 	"github.com/ColoradoSchoolOfMines/mineshspc.com/website"
 )
 
@@ -31,7 +32,6 @@ type Application struct {
 	ConfirmEmailRenderer          func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 	VolunteerConfirmEmailRenderer func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 	AdminConfirmEmailRenderer     func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
-	TeacherLoginRenderer          func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 	EmailLoginRenderer            func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 	StudentConfirmInfoRenderer    func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
 	TeamAddMemberRenderer         func(w http.ResponseWriter, r *http.Request, extraData map[string]any)
@@ -157,8 +157,21 @@ func (a *Application) Start() {
 	router.Handle("GET /register/student/", http.RedirectHandler("/", http.StatusTemporaryRedirect))
 	router.Handle("GET /register/parent/", http.RedirectHandler("/", http.StatusTemporaryRedirect))
 
+	router.HandleFunc("GET /register/teacher/login", func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		if teacher, ok := ctx.Value(contextkeys.ContextKeyLoggedInTeacher).(*database.Teacher); ok {
+			if teacher.SchoolCity == "" || teacher.SchoolName == "" || teacher.SchoolState == "" {
+				http.Redirect(w, r, "/register/teacher/schoolinfo", http.StatusSeeOther)
+			} else {
+				http.Redirect(w, r, "/register/teacher/teams", http.StatusSeeOther)
+			}
+		}
+
+		templates.Base("Teacher Login", registerteacher.Login("", nil)).Render(ctx, w)
+	})
+	router.HandleFunc("POST /register/teacher/login", a.HandleTeacherLogin)
+
 	// Registration renderers
-	a.TeacherLoginRenderer = a.ServeTemplateExtra(a.Log, "teacherlogin.html", a.GetEmailLoginTemplate)
 	a.TeacherCreateAccountRenderer = a.ServeTemplateExtra(a.Log, "teachercreateaccount.html", a.GetTeacherCreateAccountTemplate)
 	a.ConfirmEmailRenderer = a.ServeTemplateExtra(a.Log, "confirmemail.html", a.GetEmailLoginTemplate)
 	a.VolunteerConfirmEmailRenderer = a.ServeTemplateExtra(a.Log, "volunteerconfirmemail.html", a.GetEmailLoginTemplate)
@@ -170,7 +183,6 @@ func (a *Application) Start() {
 	registrationPages := map[string]renderInfo{
 		"/register/teacher/confirmemail":   {a.ConfirmEmailRenderer, true},
 		"/register/teacher/createaccount":  {a.TeacherCreateAccountRenderer, true},
-		"/register/teacher/login":          {a.TeacherLoginRenderer, true},
 		"/register/teacher/schoolinfo":     {a.ServeTemplateExtra(a.Log, "schoolinfo.html", a.GetTeacherSchoolInfoTemplate), false},
 		"/register/teacher/teams":          {a.ServeTemplateExtra(a.Log, "teams.html", a.GetTeacherTeamsTemplate), false},
 		"/register/teacher/team/edit":      {a.ServeTemplateExtra(a.Log, "teamedit.html", a.GetTeacherTeamEditTemplate), false},
@@ -221,7 +233,6 @@ func (a *Application) Start() {
 
 	// Form Post Handlers
 	formHandlers := map[string]func(w http.ResponseWriter, r *http.Request){
-		"/register/teacher/login":          a.HandleTeacherLogin,
 		"/register/teacher/createaccount":  a.HandleTeacherCreateAccount,
 		"/register/teacher/schoolinfo":     a.HandleTeacherSchoolInfo,
 		"/register/teacher/team/edit":      a.HandleTeacherTeamEdit,
