@@ -10,6 +10,9 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
+
+	"github.com/ColoradoSchoolOfMines/mineshspc.com/internal/templates"
+	registerteacher "github.com/ColoradoSchoolOfMines/mineshspc.com/internal/templates/register/teacher"
 )
 
 type Issuer string
@@ -35,7 +38,9 @@ func (a *Application) GetEmailLoginTemplate(r *http.Request) map[string]any {
 }
 
 func (a *Application) CreateEmailLoginJWT(email string) *jwt.Token {
-	// TODO invent some way to make this a one-time token
+	// TODO invent some way to make this a one-time token (maybe just add extra
+	// random token in here and then store all of the tokens we have seen in
+	// RAM)
 	return jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.RegisteredClaims{
 		Issuer:    string(IssuerEmailLogin),
 		Subject:   email,
@@ -45,6 +50,7 @@ func (a *Application) CreateEmailLoginJWT(email string) *jwt.Token {
 
 func (a *Application) HandleTeacherLogin(w http.ResponseWriter, r *http.Request) {
 	log := a.Log.With().Str("page_name", "teacher_create_account").Logger()
+	ctx := log.WithContext(r.Context())
 	if err := r.ParseForm(); err != nil {
 		log.Err(err).Msg("failed to parse form")
 		w.WriteHeader(http.StatusBadRequest)
@@ -59,20 +65,14 @@ func (a *Application) HandleTeacherLogin(w http.ResponseWriter, r *http.Request)
 	}
 	log = log.With().Str("email", emailAddress).Logger()
 
-	teacher, err := a.DB.GetTeacherByEmail(r.Context(), emailAddress)
+	teacher, err := a.DB.GetTeacherByEmail(ctx, emailAddress)
 	if err != nil {
 		log.Warn().Err(err).Msg("failed to find teacher by email")
-		a.TeacherLoginRenderer(w, r, map[string]any{
-			"Email":         emailAddress,
-			"EmailNotFound": true,
-		})
+		templates.Base("Teacher Login", registerteacher.Login(emailAddress, registerteacher.LoginEmailDoesNotExist())).Render(ctx, w)
 		return
 	} else if !teacher.EmailConfirmed {
 		log.Warn().Err(err).Msg("teacher email not confirmed, not sending login code to avoid amplification attacks")
-		a.TeacherLoginRenderer(w, r, map[string]any{
-			"Email":             emailAddress,
-			"EmailNotConfirmed": true,
-		})
+		templates.Base("Teacher Login", registerteacher.Login(emailAddress, registerteacher.LoginEmailNotConfirmed())).Render(ctx, w)
 		return
 	}
 
