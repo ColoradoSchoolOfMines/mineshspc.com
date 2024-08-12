@@ -8,7 +8,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/rs/zerolog v1.32.0
-	github.com/sendgrid/sendgrid-go v3.14.0+incompatible
+	github.com/sendgrid/sendgrid-go v3.15.0+incompatible
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	go.mau.fi/util v0.4.2
 	go.mau.fi/zeroconfig v0.1.2
