@@ -1,11 +1,3 @@
-# All of these configuration values can be specified via environment variables
-# as well. Just prefix them with "MINESHSPC_" and upper-case the keys.
-#
-# For example:
-#
-#   domain -> MINESHSPC_DOMAIN
-#   recaptcha.site_key -> MINESHSPC_RECAPTCHA_SITE_KEY
-
 # ===== Database Settings =====
 database:
   # The database type. Only "sqlite3" is supported.
@@ -27,6 +19,8 @@ database:
 dev_mode: false
 
 sendgrid_api_key: SENDGRID_API_KEY
+
+healthcheck_url: null
 
 # This will be shown in the footer right after the link to the source code.
 hosted_by_html: |
