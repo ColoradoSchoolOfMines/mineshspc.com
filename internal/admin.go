@@ -686,3 +686,19 @@ func (a *Application) HandleZoomBreakoutExport(w http.ResponseWriter, r *http.Re
 	}
 	writer.Flush()
 }
+
+func (a *Application) HandleAllEmailsExport(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tok, err := r.Cookie("admin_token")
+	if err != nil {
+		a.Log.Warn().Err(err).Msg("failed to get admin token")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if isAdmin, err := a.isAdminByToken(tok.Value); err != nil || !isAdmin {
+		a.Log.Warn().Err(err).Msg("user is not admin!")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+}

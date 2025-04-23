@@ -119,17 +119,35 @@
         </div>
         <div class="card-body">
           <p>
-            <a href="/admin/kattis/participants?div=Beginner" download="beginner-participants.csv" class="btn btn-outline-primary">
+            <a href="/admin/kattis/participants?div=Beginner" download="beginner-participants.csv"
+              class="btn btn-outline-primary">
               Kattis Beginner Participants (CSV)
             </a>
             <a href="/admin/kattis/teams?div=Beginner" download="beginner-teams.csv" class="btn btn-outline-primary">
               Kattis Beginner Teams (CSV)
             </a>
-            <a href="/admin/kattis/participants?div=Advanced" download="advanced-participants.csv" class="btn btn-outline-primary">
+            <a href="/admin/kattis/participants?div=Advanced" download="advanced-participants.csv"
+              class="btn btn-outline-primary">
               Kattis Advanced Participants (CSV)
             </a>
             <a href="/admin/kattis/teams?div=Advanced" download="advanced-teams.csv" class="btn btn-outline-primary">
               Kattis Advanced Teams (CSV)
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col m-4">
+      <div class="card">
+        <div class="card-header">
+          <b>Kattis Downloads</b>
+        </div>
+        <div class="card-body">
+          <p>
+            <a href="/admin/all-emails" download="all-emails.csv" class="btn btn-outline-primary">
+              All Emails (SendGrid export)
             </a>
           </p>
         </div>
@@ -163,7 +181,8 @@
             <b>WARNING</b> pressing these buttons will send emails to many people IMMEDIATELY!
           </p>
           <p>
-            <a href="/admin/sendemailconfirmationreminders" class="btn btn-outline-danger">Send Email Confirmation Reminders</a>
+            <a href="/admin/sendemailconfirmationreminders" class="btn btn-outline-danger">Send Email Confirmation
+              Reminders</a>
             <br>
             this will send reminder emails to every student that has not confirmed their email.
           </p>
@@ -184,128 +203,132 @@
     </div>
   </div>
   {{ range $t := .Data.Teams }}
-    <div class="row">
-      <div class="col m-4">
-        <div class="card">
-          <div class="card-header">
-            Team <b>{{ .Name }}</b>
+  <div class="row">
+    <div class="col m-4">
+      <div class="card">
+        <div class="card-header">
+          Team <b>{{ .Name }}</b>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-6">
+              <b>School:</b> {{ .SchoolName }}
+            </div>
+            <div class="col-sm-6">
+              <b>Teacher:</b> {{ .TeacherName }}
+            </div>
+            <div class="col-sm-3">
+              <b>Division:</b> {{ .Division }}
+            </div>
+            <div class="col-sm-3">
+              <b>In Person:</b> {{ if .InPerson }}Yes{{ else }}No{{ end }}
+            </div>
+            {{ if gt .RegistrationTS.UnixMilli 0 }}
+            <div class="col-sm-6">
+              <b>Registration Time:</b> {{ .RegistrationTS.Format "2006-01-02 15:04 MST" }}
+            </div>
+            {{ end }}
           </div>
-          <div class="card-body">
-            <div class="row">
-              <div class="col-sm-6">
-                <b>School:</b> {{ .SchoolName }}
-              </div>
-              <div class="col-sm-6">
-                <b>Teacher:</b> {{ .TeacherName }}
-              </div>
-              <div class="col-sm-3">
-                <b>Division:</b> {{ .Division }}
-              </div>
-              <div class="col-sm-3">
-                <b>In Person:</b> {{ if .InPerson }}Yes{{ else }}No{{ end }}
-              </div>
-              {{ if gt .RegistrationTS.UnixMilli 0 }}
-                <div class="col-sm-6">
-                  <b>Registration Time:</b> {{ .RegistrationTS.Format "2006-01-02 15:04 MST" }}
-                </div>
+          <div class="row my-2">
+            <div class="col">
+              <b>Reason for division:</b> {{ .DivisionExplanation }}
+            </div>
+          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {{ range .Members }}
+              <tr>
+                <td class="align-middle w-50">
+                  <b>{{ .Name }}</b>
+                  {{ if .PreviouslyParticipated }}
+                  <i class="fa fa-repeat"></i>
+                  {{ end }}
+                  <p class="small text-secondary mb-0">
+                    {{ .Email }}
+                    {{ if .QRCodeSent }}
+                    <i class="fa fa-qrcode {{ if .CheckedIn }}text-success{{ end }}"
+                      title="QR code has been sent to this user{{ if .CheckedIn }} and the user has checked in{{ end }}"></i>
+                    {{ end }}
+                    {{ if not .EmailConfirmed }}
+                    <br>
+                    <small>
+                      <a href="/admin/resendstudentemail?email={{ .Email }}">
+                        Resend Student Email Confirmation
+                      </a>
+                      &bull;
+                      <a href="/admin/confirmationlink/student?email={{ .Email }}"
+                        title="Get the link for sending via a side-channel. Use if the student's email is blocking our emails.">
+                        Get link
+                      </a>
+                    </small>
+                    {{ end }}
+                    {{ if and .EmailConfirmed (not .LiabilitySigned) }}
+                    <br>
+                    <small>
+                      <a href="/admin/resendparentemail?email={{ .Email }}">
+                        Resend Parent Email ({{ .ParentEmail }})
+                      </a>
+                      &bull;
+                      <a href="/admin/confirmationlink/parent?email={{ .Email }}"
+                        title="Get the link for sending via a side-channel. Use if the parent's email is blocking our emails.">
+                        Get link
+                      </a>
+                    </small>
+                    {{ end }}
+                  </p>
+                </td>
+                <td class="align-middle">
+                  <div class="row">
+                    <div class="col d-flex justify-content-center">
+                      <div class="registration-progress">
+                        <div class="step {{ if .EmailConfirmed }}completed{{ end }}">
+                          <span><i class="fa {{ if .EmailConfirmed }}fa-check{{ else }}fa-times{{ end }}"></i></span>
+                        </div>
+                        <span class="line {{ if .LiabilitySigned }}completed{{ end }}"></span>
+                        <div class="step {{ if .LiabilitySigned }}completed{{ end }}">
+                          <span><i class="fa {{ if .LiabilitySigned }}fa-check{{ else }}fa-times{{ end }}"></i></span>
+                        </div>
+                        {{ if $t.InPerson }}
+                        <span class="line {{ if .ComputerUseWaiverSigned }}completed{{ end }}"></span>
+                        <div class="step {{ if .ComputerUseWaiverSigned }}completed{{ end }}">
+                          <span><i
+                              class="fa {{ if .ComputerUseWaiverSigned }}fa-check{{ else }}fa-times{{ end }}"></i></span>
+                        </div>
+                        {{ end }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col d-flex justify-content-center">
+                      <div class="registration-progress-text">
+                        <div><small class="{{ if not .EmailConfirmed }}text-muted{{ end }}">Email Confirmed</small>
+                        </div>
+                        <span class="line"></span>
+                        <div><small class="{{ if not .LiabilitySigned }}text-muted{{ end }}">Liability Waiver</small>
+                        </div>
+                        {{ if $t.InPerson }}
+                        <span class="line"></span>
+                        <div><small class="{{ if not .ComputerUseWaiverSigned }}text-muted{{ end }}">Computer Use
+                            Waiver</small></div>
+                        {{ end }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
               {{ end }}
-            </div>
-            <div class="row my-2">
-              <div class="col">
-                <b>Reason for division:</b> {{ .DivisionExplanation }}
-              </div>
-            </div>
-            <table class="table">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {{ range .Members }}
-                  <tr>
-                    <td class="align-middle w-50">
-                      <b>{{ .Name }}</b>
-                      {{ if .PreviouslyParticipated }}
-                        <i class="fa fa-repeat"></i>
-                      {{ end }}
-                      <p class="small text-secondary mb-0">
-                        {{ .Email }}
-                        {{ if .QRCodeSent }}
-                          <i class="fa fa-qrcode {{ if .CheckedIn }}text-success{{ end }}"
-                             title="QR code has been sent to this user{{ if .CheckedIn }} and the user has checked in{{ end }}"></i>
-                        {{ end }}
-                        {{ if not .EmailConfirmed }}
-                          <br>
-                          <small>
-                            <a href="/admin/resendstudentemail?email={{ .Email }}">
-                              Resend Student Email Confirmation
-                            </a>
-                            &bull;
-                            <a href="/admin/confirmationlink/student?email={{ .Email }}"
-                               title="Get the link for sending via a side-channel. Use if the student's email is blocking our emails.">
-                              Get link
-                            </a>
-                          </small>
-                        {{ end }}
-                        {{ if and .EmailConfirmed (not .LiabilitySigned) }}
-                          <br>
-                          <small>
-                            <a href="/admin/resendparentemail?email={{ .Email }}">
-                              Resend Parent Email ({{ .ParentEmail }})
-                            </a>
-                            &bull;
-                            <a href="/admin/confirmationlink/parent?email={{ .Email }}"
-                               title="Get the link for sending via a side-channel. Use if the parent's email is blocking our emails.">
-                              Get link
-                            </a>
-                          </small>
-                        {{ end }}
-                      </p>
-                    </td>
-                    <td class="align-middle">
-                      <div class="row">
-                        <div class="col d-flex justify-content-center">
-                          <div class="registration-progress">
-                            <div class="step {{ if .EmailConfirmed }}completed{{ end }}">
-                              <span><i class="fa {{ if .EmailConfirmed }}fa-check{{ else }}fa-times{{ end }}"></i></span>
-                            </div>
-                            <span class="line {{ if .LiabilitySigned }}completed{{ end }}"></span>
-                            <div class="step {{ if .LiabilitySigned }}completed{{ end }}">
-                              <span><i class="fa {{ if .LiabilitySigned }}fa-check{{ else }}fa-times{{ end }}"></i></span>
-                            </div>
-                            {{ if $t.InPerson }}
-                              <span class="line {{ if .ComputerUseWaiverSigned }}completed{{ end }}"></span>
-                              <div class="step {{ if .ComputerUseWaiverSigned }}completed{{ end }}">
-                                <span><i class="fa {{ if .ComputerUseWaiverSigned }}fa-check{{ else }}fa-times{{ end }}"></i></span>
-                              </div>
-                            {{ end }}
-                          </div>
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div class="col d-flex justify-content-center">
-                          <div class="registration-progress-text">
-                            <div><small class="{{ if not .EmailConfirmed }}text-muted{{ end }}">Email Confirmed</small></div>
-                            <span class="line"></span>
-                            <div><small class="{{ if not .LiabilitySigned }}text-muted{{ end }}">Liability Waiver</small></div>
-                            {{ if $t.InPerson }}
-                              <span class="line"></span>
-                              <div><small class="{{ if not .ComputerUseWaiverSigned }}text-muted{{ end }}">Computer Use Waiver</small></div>
-                            {{ end }}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                {{ end }}
-              </tbody>
-            </table>
-          </div>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
+  </div>
   {{ end }}
 </div>
 {{ end }}
