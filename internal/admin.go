@@ -713,3 +713,45 @@ func (a *Application) HandleManualCheckin(w http.ResponseWriter, r *http.Request
 	a.DB.CheckInStudent(ctx, email)
 	w.Write([]byte("Checked in " + email))
 }
+
+func (a *Application) HandleTeamList(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tok, err := r.Cookie("admin_token")
+	if err != nil {
+		a.Log.Warn().Err(err).Msg("failed to get admin token")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if isAdmin, err := a.isAdminByToken(tok.Value); err != nil || !isAdmin {
+		a.Log.Warn().Err(err).Msg("user is not admin!")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	onlyFirstTime := r.URL.Query().Get("firsttime") == "true"
+
+	teamsWithTeachers, err := a.DB.GetAdminTeamsWithTeacherName(ctx)
+	if err != nil {
+		a.Log.Err(err).Msg("failed to get teams with teachers")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	for _, team := range teamsWithTeachers {
+		isOnlyFirstTime := true
+		for _, member := range team.Members {
+			if member.PreviouslyParticipated {
+				isOnlyFirstTime = false
+			}
+		}
+		if onlyFirstTime && !isOnlyFirstTime {
+			continue
+		}
+
+		w.Write([]byte(team.Name + "\n"))
+		for _, member := range team.Members {
+			w.Write([]byte("  " + member.Name + " (" + member.Email + ")\n"))
+		}
+	}
+}

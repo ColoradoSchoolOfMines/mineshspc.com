@@ -156,6 +156,25 @@
   <div class="row">
     <div class="col m-4">
       <div class="card">
+        <div class="card-header">
+          <b>Team Lists</b>
+        </div>
+        <div class="card-body">
+          <p>
+            <a href="/admin/team-list" download="team-list.txt" class="btn btn-outline-primary">
+              Team List
+            </a>
+            <a href="/admin/team-list?firsttime=true" download="first-time-team-list.txt" class="btn btn-outline-primary">
+              First Time Team List
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col m-4">
+      <div class="card">
         <div class="card-header text-white bg-danger">
           <b>Send Reminders and QR Codes</b>
         </div>
@@ -229,7 +248,8 @@
                     <td class="align-middle w-50">
                       <b>{{ .Name }}</b>
                       {{ if .PreviouslyParticipated }}
-                        <i class="fa fa-repeat"></i>
+                        <i class="fa fa-repeat"
+                          title="This student has previously participated in a Mines HSPC event"></i>
                       {{ end }}
                       <p class="small text-secondary mb-0">
                         {{ .Email }}

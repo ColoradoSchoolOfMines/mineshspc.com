@@ -235,6 +235,7 @@ func (a *Application) Start() {
 	router.HandleFunc("GET /admin/kattis/teams", a.HandleKattisTeamsExport)
 	router.HandleFunc("GET /admin/zoom/breakout", a.HandleZoomBreakoutExport)
 	router.HandleFunc("GET /admin/manualcheckin", a.HandleManualCheckin)
+	router.HandleFunc("GET /admin/team-list", a.HandleTeamList)
 
 	// Volunteer pages
 	router.HandleFunc("GET /volunteer", a.ServeTemplate(a.Log, "volunteerhome.html", noArgs))
