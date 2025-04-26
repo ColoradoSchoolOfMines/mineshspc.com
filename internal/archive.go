@@ -33,6 +33,36 @@ func (a *Application) GetArchiveTemplate(*http.Request) map[string]any {
 	return map[string]any{
 		"YearInfo": []YearInfo{
 			{
+				Year: 2025,
+				RecapParagraphs: []string{
+					"The 2025 competition saw 25 teams compete. We gave a separate set of prizes for teams consisting of only first-time competitors.",
+				},
+				Links: []Link{
+					{"/static/2025-solutions.pdf", "Solution Sketch Slides"},
+					{"https://mines-hspc.kattis.com/contests/mhvmbn/problems", "Problems"},
+				},
+				Results: []CompetitionResult{
+					{
+						Name:      "Overall Winners",
+						Shortname: "Overall",
+						Teams: []WinningTeam{
+							{"1st", "Fairview High School", "Fairview High School", "Boulder"},
+							{"2nd", "Mohakos Koders", "Niwot High School", "Longmont"},
+							{"3nd", "Lobos 3", "Rocky Mountain High School", "Fort Collins"},
+						},
+					},
+					{
+						Name:      "First-Time Team Winners",
+						Shortname: "FirstTime",
+						Teams: []WinningTeam{
+							{"1st", "Importing Iguanas", "Niwot High School", "Longmont"},
+							{"2nd", "Name Deleted", "Innovation Center SVVSD", "Longmont"},
+							{"3nd", "Runtime Terror", "George Washington High School", "Denver"},
+						},
+					},
+				},
+			},
+			{
 				Year: 2024,
 				RecapParagraphs: []string{
 					"The 2024 competition returned to an in-person only competition, but we also had an open division. We gave a separate set of prizes for teams consisting of only first-time competitors. We did not award prizes for the open division.",
