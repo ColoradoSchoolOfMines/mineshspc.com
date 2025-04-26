@@ -703,6 +703,7 @@ func (a *Application) HandleManualCheckin(w http.ResponseWriter, r *http.Request
 	}
 
 	email := r.URL.Query().Get("email")
+	a.DB.SignFormsForStudent(ctx, email, "SIGNED IN PERSON", true)
 	a.DB.CheckInStudent(ctx, email)
 	w.Write([]byte("Checked in " + email))
 }
