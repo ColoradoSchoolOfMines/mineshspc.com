@@ -235,6 +235,14 @@
                         {{ if .QRCodeSent }}
                           <i class="fa fa-qrcode {{ if .CheckedIn }}text-success{{ end }}"
                              title="QR code has been sent to this user{{ if .CheckedIn }} and the user has checked in{{ end }}"></i>
+                          <br>
+                          <small>
+                            &bull;
+                            <a href="/admin/manualcheckin?email={{ .Email }}"
+                               title="Check in the student manually. Automatically approves all waivers.">
+                              Checkin Manually
+                            </a>
+                          </small>
                         {{ end }}
                         {{ if not .EmailConfirmed }}
                           <br>
@@ -246,6 +254,11 @@
                             <a href="/admin/confirmationlink/student?email={{ .Email }}"
                                title="Get the link for sending via a side-channel. Use if the student's email is blocking our emails.">
                               Get link
+                            </a>
+                            &bull;
+                            <a href="/admin/manualcheckin?email={{ .Email }}"
+                               title="Check in the student manually. Automatically approves all waivers.">
+                              Checkin Manually (WARNING: automatically approves all waivers)
                             </a>
                           </small>
                         {{ end }}
@@ -259,6 +272,11 @@
                             <a href="/admin/confirmationlink/parent?email={{ .Email }}"
                                title="Get the link for sending via a side-channel. Use if the parent's email is blocking our emails.">
                               Get link
+                            </a>
+                            &bull;
+                            <a href="/admin/manualcheckin?email={{ .Email }}"
+                               title="Check in the student manually. Automatically approves all waivers.">
+                              Checkin Manually (WARNING: automatically approves all waivers)
                             </a>
                           </small>
                         {{ end }}
