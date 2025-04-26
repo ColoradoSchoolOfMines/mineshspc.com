@@ -76,6 +76,7 @@ func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
 	var beginnerInPersonTeams, advancedInPersonTeams int
 	var beginnerInPersonStudents, advancedInPersonStudents int
 	var campusTour, emailConfirmed, formsSigned int
+	var checkedIn int
 	for _, team := range teamsWithTeachers {
 		if team.Division == database.DivisionBeginner {
 			beginnerTeams++
@@ -104,6 +105,10 @@ func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
 
 			if member.LiabilitySigned {
 				formsSigned++
+			}
+
+			if member.CheckedIn {
+				checkedIn++
 			}
 		}
 	}
@@ -143,6 +148,7 @@ func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
 		"CampusTourStudents":     campusTour,
 		"EmailConfirmedStudents": emailConfirmed,
 		"FormsSignedStudents":    formsSigned,
+		"CheckedInStudents":      checkedIn,
 	}
 }
 
