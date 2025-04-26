@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"context"
 	"embed"
 	"encoding/json"
 	"errors"
@@ -14,7 +15,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/mattn/go-sqlite3"
-	"github.com/rs/zerolog/log"
+	"github.com/rs/zerolog"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
@@ -34,11 +35,11 @@ type captchaResponse struct {
 	ErrorCodes  []string  `json:"error-codes"`
 }
 
-func (a *Application) verifyCaptcha(response string) error {
+func (a *Application) verifyCaptcha(ctx context.Context, response string) error {
 	form := url.Values{}
 	form.Add("secret", a.Config.Recaptcha.SecretKey)
 	form.Add("response", response)
-	req, err := http.NewRequest(http.MethodPost, "https://www.google.com/recaptcha/api/siteverify", strings.NewReader(form.Encode()))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://www.google.com/recaptcha/api/siteverify", strings.NewReader(form.Encode()))
 	if err != nil {
 		return err
 	}
@@ -53,7 +54,7 @@ func (a *Application) verifyCaptcha(response string) error {
 	if err != nil {
 		return err
 	}
-	log.Info().Any("resp", captchaResponse).Msg("captcha response")
+	zerolog.Ctx(ctx).Info().Any("resp", captchaResponse).Msg("captcha response")
 	if !captchaResponse.Success {
 		return errors.New("captcha failed")
 	}
@@ -77,7 +78,7 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 	name := r.FormValue("your-name")
 
 	captchaResponse := r.FormValue("g-recaptcha-response")
-	if err := a.verifyCaptcha(captchaResponse); err != nil {
+	if err := a.verifyCaptcha(r.Context(), captchaResponse); err != nil {
 		log.Warn().Err(err).Msg("failed to verify captcha")
 		w.WriteHeader(http.StatusBadRequest)
 		a.TeacherCreateAccountRenderer(w, r, map[string]any{

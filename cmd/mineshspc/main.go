@@ -11,7 +11,7 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/rs/zerolog"
-	globallog "github.com/rs/zerolog/log"
+	globallog "github.com/rs/zerolog/log" // zerolog-allow-global-log
 	"go.mau.fi/util/dbutil"
 	"go.mau.fi/util/exerrors"
 	"go.mau.fi/util/exzerolog"

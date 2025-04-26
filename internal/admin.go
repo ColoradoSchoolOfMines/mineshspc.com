@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/hlog"
-	"github.com/rs/zerolog/log"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 
 	"github.com/ColoradoSchoolOfMines/mineshspc.com/database"
@@ -177,10 +177,11 @@ func (a *Application) GetAdminDietaryRestrictionsTemplate(r *http.Request) map[s
 
 func (a *Application) HandleAdminEmailLogin(w http.ResponseWriter, r *http.Request) {
 	tok := r.URL.Query().Get("tok")
+	log := zerolog.Ctx(r.Context())
 	log.Info().Str("token", tok).Msg("got token")
 	isAdmin, err := a.isAdminByToken(tok)
 	if err != nil || !isAdmin {
-		a.Log.Warn().Msg("failed to get admin")
+		log.Warn().Msg("failed to get admin")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -245,6 +246,7 @@ func (a *Application) HandleAdminLogin(w http.ResponseWriter, r *http.Request) {
 
 func (a *Application) HandleResendStudentEmail(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	log := zerolog.Ctx(ctx)
 	email := r.URL.Query().Get("email")
 	if email == "" {
 		a.Log.Warn().Msg("no email address provided in query string")

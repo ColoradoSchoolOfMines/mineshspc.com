@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/rs/zerolog/log"
+	"github.com/rs/zerolog"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 
 	"github.com/ColoradoSchoolOfMines/mineshspc.com/database"
@@ -53,7 +53,7 @@ func (a *Application) isVolunteerByToken(tokenStr string) (bool, error) {
 
 func (a *Application) HandleVolunteerEmailLogin(w http.ResponseWriter, r *http.Request) {
 	tok := r.URL.Query().Get("tok")
-	log.Info().Str("token", tok).Msg("got token")
+	zerolog.Ctx(r.Context()).Info().Str("token", tok).Msg("got token")
 	isVolunteer, err := a.isVolunteerByToken(tok)
 	if err != nil || !isVolunteer {
 		a.Log.Warn().Msg("failed to get volunteer")
