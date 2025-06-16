@@ -27,7 +27,7 @@ jobs:
         uses: pre-commit/action@v3.0.1
 
       - uses: DeterminateSystems/nix-installer-action@v16
-      - uses: DeterminateSystems/magic-nix-cache-action@v9
+      - uses: DeterminateSystems/magic-nix-cache-action@v10
       - run: nix flake check
 
   build:
@@ -50,7 +50,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@v16
-      - uses: DeterminateSystems/magic-nix-cache-action@v9
+      - uses: DeterminateSystems/magic-nix-cache-action@v10
       - run: nix build
 
   submit-hash-update-pr:
@@ -66,7 +66,7 @@ jobs:
           repository: nevarro-space/infrastructure
 
       - uses: DeterminateSystems/nix-installer-action@v16
-      - uses: DeterminateSystems/magic-nix-cache-action@v9
+      - uses: DeterminateSystems/magic-nix-cache-action@v10
 
       - name: Update the mineshspc input
         run: |
