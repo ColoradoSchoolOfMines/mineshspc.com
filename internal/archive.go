@@ -39,7 +39,7 @@ func (a *Application) GetArchiveTemplate(*http.Request) map[string]any {
 				},
 				Links: []Link{
 					{"/static/2025-solutions.pdf", "Solution Sketch Slides"},
-					{"https://mines-hspc.kattis.com/contests/mhvmbn/problems", "Problems"},
+					{"https://open.kattis.com/problem-sources/CS%40Mines%20High%20School%20Programming%20Competition%202025", "Problems"},
 				},
 				Results: []CompetitionResult{
 					{
@@ -71,7 +71,7 @@ func (a *Application) GetArchiveTemplate(*http.Request) map[string]any {
 				Links: []Link{
 					{"/static/2024-solutions.pdf", "Solution Sketch Slides"},
 					{"https://sumnerevans.com/posts/school/2024-hspc/", "Competition Recap and Solution Sketches"},
-					{"https://mines-hspc.kattis.com/contests/mines-hspc24/problems", "Problems"},
+					{"https://open.kattis.com/problem-sources/CS%40Mines%20High%20School%20Programming%20Competition%202024", "Problems"},
 				},
 				Results: []CompetitionResult{
 					{
@@ -103,8 +103,7 @@ func (a *Application) GetArchiveTemplate(*http.Request) map[string]any {
 				Links: []Link{
 					{"/static/2023-solutions.pdf", "Solution Sketch Slides"},
 					{"https://sumnerevans.com/posts/school/2023-hspc/", "Competition Recap and Solution Sketches"},
-					{"https://mines23advanced.kattis.com/problems", "Advanced Problems"},
-					{"https://mines23beginner.kattis.com/problems", "Beginner Problems"},
+					{"https://open.kattis.com/problem-sources/CS%40Mines%20High%20School%20Programming%20Competition%202023", "Problems"},
 				},
 				Results: []CompetitionResult{
 					{
@@ -153,8 +152,7 @@ func (a *Application) GetArchiveTemplate(*http.Request) map[string]any {
 				},
 				Links: []Link{
 					{"https://sumnerevans.com/posts/school/2022-hspc/", "Competition Recap and Solution Sketches"},
-					{"https://mines22advanced.kattis.com/problems", "Advanced Problems"},
-					{"https://mines22beginner.kattis.com/problems", "Beginner Problems"},
+					{"https://open.kattis.com/problem-sources/CS%40Mines%20High%20School%20Programming%20Competition%202022", "Problems"},
 				},
 				Results: []CompetitionResult{
 					{
@@ -184,7 +182,7 @@ func (a *Application) GetArchiveTemplate(*http.Request) map[string]any {
 				},
 				Links: []Link{
 					{"https://sumnerevans.com/posts/school/2021-hspc/", "Competition Recap and Solution Sketches"},
-					{"https://mines21.kattis.com/problems", "Problems"},
+					{"https://open.kattis.com/problem-sources/CS%40Mines%20High%20School%20Programming%20Competition%202021", "Problems"},
 				},
 				Results: []CompetitionResult{
 					{
@@ -203,7 +201,7 @@ func (a *Application) GetArchiveTemplate(*http.Request) map[string]any {
 				},
 				Links: []Link{
 					{"https://sumnerevans.com/posts/school/2020-hspc/", "Competition Recap and Solution Sketches"},
-					{"https://mines20.kattis.com/problems", "Problems"},
+					{"https://open.kattis.com/problem-sources/CS%40Mines%20High%20School%20Programming%20Competition%202020", "Problems"},
 				},
 				Results: []CompetitionResult{
 					{
@@ -222,7 +220,7 @@ func (a *Application) GetArchiveTemplate(*http.Request) map[string]any {
 				},
 				Links: []Link{
 					{"https://sumnerevans.com/posts/school/2019-hspc/", "Competition Recap and Solution Sketches"},
-					{"https://mines19.kattis.com/problems", "Problems"},
+					{"https://open.kattis.com/problem-sources/CS%40Mines%20High%20School%20Programming%20Competition%202019", "Problems"},
 				},
 				Results: []CompetitionResult{
 					{
@@ -240,7 +238,7 @@ func (a *Application) GetArchiveTemplate(*http.Request) map[string]any {
 					"The first ever CS@Mines High School Programming Competition featured 22 teams.",
 				},
 				Links: []Link{
-					{"https://mines18.kattis.com/problems", "Problems"},
+					{"https://open.kattis.com/problem-sources/CS%40Mines%20High%20School%20Programming%20Competition%202018", "Problems"},
 				},
 				Results: []CompetitionResult{
 					{
