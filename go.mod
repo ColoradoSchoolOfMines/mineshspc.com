@@ -1,6 +1,6 @@
 module github.com/ColoradoSchoolOfMines/mineshspc.com
 
-go 1.23.3
+go 1.24.0
 
 require (
 	github.com/golang-jwt/jwt/v4 v4.5.2
@@ -9,7 +9,7 @@ require (
 	github.com/sendgrid/sendgrid-go v3.16.0+incompatible
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	go.mau.fi/util v0.8.6
-	go.mau.fi/zeroconfig v0.1.3
+	go.mau.fi/zeroconfig v0.2.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
