@@ -3,6 +3,7 @@ credentials.json
 token.json
 secret_key
 result
+.claude/settings.local.json
 
 # Executables
 mineshspc.com
