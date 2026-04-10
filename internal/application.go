@@ -90,12 +90,9 @@ type renderInfo struct {
 	RedirectIfLoggedIn bool
 }
 
-func (a *Application) Start() {
-	a.Log.Info().Msg("connecting to sendgrid")
-	a.SendGridClient = sendgrid.NewSendClient(a.Config.SendgridAPIKey)
-
-	a.Log.Info().Msg("Starting router")
-
+// BuildRouter sets up all HTTP routes and returns the handler. Separated from
+// Start so tests can exercise routing without starting a real server.
+func (a *Application) BuildRouter() http.Handler {
 	router := http.NewServeMux()
 
 	noArgs := func(r *http.Request) map[string]any { return nil }
@@ -257,6 +254,16 @@ func (a *Application) Start() {
 	var handler http.Handler = router
 	handler = hlog.RequestIDHandler("request_id", "RequestID")(handler)
 	handler = hlog.NewHandler(*a.Log)(handler)
+
+	return handler
+}
+
+func (a *Application) Start() {
+	a.Log.Info().Msg("connecting to sendgrid")
+	a.SendGridClient = sendgrid.NewSendClient(a.Config.SendgridAPIKey)
+
+	a.Log.Info().Msg("Starting router")
+	handler := a.BuildRouter()
 
 	a.Log.Info().Msg("Listening on port 8090")
 	http.ListenAndServe(":8090", handler)
