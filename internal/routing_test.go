@@ -74,73 +74,48 @@ func assertNotRedirectTo(t *testing.T, rec *httptest.ResponseRecorder, location 
 }
 
 // --- Admin route protection ---
+//
+// Tests cover: no cookie, malformed token, wrong-issuer token (volunteer
+// token used on admin route), and valid token. Each case is verified on
+// one representative route; the remaining admin routes are spot-checked
+// for the no-cookie case to confirm they're all wired up.
 
-func TestRouting_AdminHome_NoCookie(t *testing.T) {
+func TestRouting_Admin_NoCookie(t *testing.T) {
 	router := newTestAppWithDB(t).BuildRouter()
-	assertRedirectsTo(t, doRequest(router, http.MethodGet, "/admin"), "/admin/login")
-}
-
-func TestRouting_AdminHome_WrongCookie(t *testing.T) {
-	router := newTestAppWithDB(t).BuildRouter()
-	rec := doRequest(router, http.MethodGet, "/admin",
-		&http.Cookie{Name: "volunteer_token", Value: volunteerToken(t)})
-	assertRedirectsTo(t, rec, "/admin/login")
-}
-
-func TestRouting_AdminHome_ValidCookie(t *testing.T) {
-	router := newTestAppWithDB(t).BuildRouter()
-	rec := doRequest(router, http.MethodGet, "/admin",
-		&http.Cookie{Name: "admin_token", Value: adminToken(t)})
-	assertNotRedirectTo(t, rec, "/admin/login")
-}
-
-func TestRouting_AdminTeams_NoCookie(t *testing.T) {
-	router := newTestAppWithDB(t).BuildRouter()
-	assertRedirectsTo(t, doRequest(router, http.MethodGet, "/admin/teams"), "/admin/login")
-}
-
-func TestRouting_AdminTeams_WrongCookie(t *testing.T) {
-	router := newTestAppWithDB(t).BuildRouter()
-	rec := doRequest(router, http.MethodGet, "/admin/teams",
-		&http.Cookie{Name: "volunteer_token", Value: volunteerToken(t)})
-	assertRedirectsTo(t, rec, "/admin/login")
-}
-
-func TestRouting_AdminTeams_ValidCookie(t *testing.T) {
-	router := newTestAppWithDB(t).BuildRouter()
-	rec := doRequest(router, http.MethodGet, "/admin/teams",
-		&http.Cookie{Name: "admin_token", Value: adminToken(t)})
-	assertNotRedirectTo(t, rec, "/admin/login")
-}
-
-func TestRouting_AdminDietaryRestrictions_NoCookie(t *testing.T) {
-	router := newTestAppWithDB(t).BuildRouter()
-	assertRedirectsTo(t, doRequest(router, http.MethodGet, "/admin/dietaryrestrictions"), "/admin/login")
-}
-
-func TestRouting_AdminDietaryRestrictions_ValidCookie(t *testing.T) {
-	router := newTestAppWithDB(t).BuildRouter()
-	rec := doRequest(router, http.MethodGet, "/admin/dietaryrestrictions",
-		&http.Cookie{Name: "admin_token", Value: adminToken(t)})
-	assertNotRedirectTo(t, rec, "/admin/login")
-}
-
-func TestRouting_AdminAPI_NoCookie(t *testing.T) {
-	router := newTestAppWithDB(t).BuildRouter()
-	// Spot-check a few API endpoints
 	for _, path := range []string{
+		"/admin",
+		"/admin/teams",
+		"/admin/dietaryrestrictions",
 		"/admin/api/resendstudentemail",
 		"/admin/api/sendqrcodes",
 		"/admin/api/kattis/teams",
+		"/admin/api/zoom/breakout",
+		"/admin/api/team-list",
 	} {
-		rec := doRequest(router, http.MethodGet, path)
-		assertRedirectsTo(t, rec, "/admin/login")
+		assertRedirectsTo(t, doRequest(router, http.MethodGet, path), "/admin/login")
 	}
 }
 
-func TestRouting_AdminAPI_ValidCookie(t *testing.T) {
+func TestRouting_Admin_MalformedToken(t *testing.T) {
+	router := newTestAppWithDB(t).BuildRouter()
+	rec := doRequest(router, http.MethodGet, "/admin/teams",
+		&http.Cookie{Name: "admin_token", Value: "not-a-jwt"})
+	assertRedirectsTo(t, rec, "/admin/login")
+}
+
+func TestRouting_Admin_WrongIssuer(t *testing.T) {
+	router := newTestAppWithDB(t).BuildRouter()
+	rec := doRequest(router, http.MethodGet, "/admin/teams",
+		&http.Cookie{Name: "admin_token", Value: volunteerToken(t)})
+	assertRedirectsTo(t, rec, "/admin/login")
+}
+
+func TestRouting_Admin_ValidToken(t *testing.T) {
 	router := newTestAppWithDB(t).BuildRouter()
 	for _, path := range []string{
+		"/admin",
+		"/admin/teams",
+		"/admin/dietaryrestrictions",
 		"/admin/api/kattis/teams",
 		"/admin/api/zoom/breakout",
 		"/admin/api/team-list",
@@ -155,60 +130,55 @@ func TestRouting_AdminAPI_ValidCookie(t *testing.T) {
 
 func TestRouting_AdminLogin_NoCookie(t *testing.T) {
 	router := newTestAppWithDB(t).BuildRouter()
-	rec := doRequest(router, http.MethodGet, "/admin/login")
-	assertNotRedirectTo(t, rec, "/admin/login")
+	assertNotRedirectTo(t, doRequest(router, http.MethodGet, "/admin/login"), "/admin/login")
 }
 
 // --- Volunteer route protection ---
+//
+// Same structure: all protected routes checked for no-cookie, then one
+// representative route for malformed/wrong-issuer/valid-token.
 
-func TestRouting_VolunteerScan_NoCookie(t *testing.T) {
+func TestRouting_Volunteer_NoCookie(t *testing.T) {
 	router := newTestAppWithDB(t).BuildRouter()
-	assertRedirectsTo(t, doRequest(router, http.MethodGet, "/volunteer/scan"), "/volunteer/login")
+	for _, path := range []string{
+		"/volunteer/scan",
+		"/volunteer/checkin",
+	} {
+		assertRedirectsTo(t, doRequest(router, http.MethodGet, path), "/volunteer/login")
+	}
 }
 
-func TestRouting_VolunteerScan_WrongCookie(t *testing.T) {
+func TestRouting_Volunteer_MalformedToken(t *testing.T) {
 	router := newTestAppWithDB(t).BuildRouter()
 	rec := doRequest(router, http.MethodGet, "/volunteer/scan",
-		&http.Cookie{Name: "admin_token", Value: adminToken(t)})
+		&http.Cookie{Name: "volunteer_token", Value: "not-a-jwt"})
 	assertRedirectsTo(t, rec, "/volunteer/login")
 }
 
-func TestRouting_VolunteerScan_ValidCookie(t *testing.T) {
+func TestRouting_Volunteer_WrongIssuer(t *testing.T) {
 	router := newTestAppWithDB(t).BuildRouter()
 	rec := doRequest(router, http.MethodGet, "/volunteer/scan",
-		&http.Cookie{Name: "volunteer_token", Value: volunteerToken(t)})
-	assertNotRedirectTo(t, rec, "/volunteer/login")
-}
-
-func TestRouting_VolunteerCheckin_NoCookie(t *testing.T) {
-	router := newTestAppWithDB(t).BuildRouter()
-	assertRedirectsTo(t, doRequest(router, http.MethodGet, "/volunteer/checkin"), "/volunteer/login")
-}
-
-func TestRouting_VolunteerCheckin_WrongCookie(t *testing.T) {
-	router := newTestAppWithDB(t).BuildRouter()
-	rec := doRequest(router, http.MethodGet, "/volunteer/checkin",
-		&http.Cookie{Name: "admin_token", Value: adminToken(t)})
+		&http.Cookie{Name: "volunteer_token", Value: adminToken(t)})
 	assertRedirectsTo(t, rec, "/volunteer/login")
 }
 
-func TestRouting_VolunteerCheckin_ValidCookie(t *testing.T) {
+func TestRouting_Volunteer_ValidToken(t *testing.T) {
 	router := newTestAppWithDB(t).BuildRouter()
-	rec := doRequest(router, http.MethodGet, "/volunteer/checkin",
-		&http.Cookie{Name: "volunteer_token", Value: volunteerToken(t)})
-	assertNotRedirectTo(t, rec, "/volunteer/login")
+	for _, path := range []string{
+		"/volunteer/scan",
+		"/volunteer/checkin",
+	} {
+		rec := doRequest(router, http.MethodGet, path,
+			&http.Cookie{Name: "volunteer_token", Value: volunteerToken(t)})
+		assertNotRedirectTo(t, rec, "/volunteer/login")
+	}
 }
 
 // --- Volunteer unprotected routes ---
 
-func TestRouting_VolunteerLogin_NoCookie(t *testing.T) {
+func TestRouting_VolunteerPublic_NoCookie(t *testing.T) {
 	router := newTestAppWithDB(t).BuildRouter()
-	rec := doRequest(router, http.MethodGet, "/volunteer/login")
-	assertNotRedirectTo(t, rec, "/volunteer/login")
-}
-
-func TestRouting_VolunteerHome_NoCookie(t *testing.T) {
-	router := newTestAppWithDB(t).BuildRouter()
-	rec := doRequest(router, http.MethodGet, "/volunteer")
-	assertNotRedirectTo(t, rec, "/volunteer/login")
+	for _, path := range []string{"/volunteer", "/volunteer/login"} {
+		assertNotRedirectTo(t, doRequest(router, http.MethodGet, path), "/volunteer/login")
+	}
 }

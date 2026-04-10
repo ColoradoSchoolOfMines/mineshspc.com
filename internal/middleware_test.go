@@ -1,8 +1,6 @@
 package internal
 
 import (
-	"net/http"
-	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -74,92 +72,4 @@ func TestParseTokenByIssuer_WrongSigningKey(t *testing.T) {
 	ok, err := a.parseTokenByIssuer(tok, IssuerAdminLogin)
 	assert.False(t, ok)
 	assert.Error(t, err)
-}
-
-// --- AdminAuthMiddleware ---
-
-var okHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-})
-
-func TestAdminAuthMiddleware_NoCookie(t *testing.T) {
-	a := newTestApp()
-	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/admin/teams", nil)
-	a.AdminAuthMiddleware(okHandler).ServeHTTP(rec, req)
-	assert.Equal(t, http.StatusSeeOther, rec.Code)
-	assert.Equal(t, "/admin/login", rec.Header().Get("Location"))
-}
-
-func TestAdminAuthMiddleware_InvalidToken(t *testing.T) {
-	a := newTestApp()
-	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/admin/teams", nil)
-	req.AddCookie(&http.Cookie{Name: "admin_token", Value: "not-a-jwt"})
-	a.AdminAuthMiddleware(okHandler).ServeHTTP(rec, req)
-	assert.Equal(t, http.StatusSeeOther, rec.Code)
-	assert.Equal(t, "/admin/login", rec.Header().Get("Location"))
-}
-
-func TestAdminAuthMiddleware_WrongIssuer(t *testing.T) {
-	a := newTestApp()
-	tok := makeSignedToken(t, IssuerVolunteerLogin, []byte(testSecretKey), time.Now().Add(time.Hour))
-	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/admin/teams", nil)
-	req.AddCookie(&http.Cookie{Name: "admin_token", Value: tok})
-	a.AdminAuthMiddleware(okHandler).ServeHTTP(rec, req)
-	assert.Equal(t, http.StatusSeeOther, rec.Code)
-	assert.Equal(t, "/admin/login", rec.Header().Get("Location"))
-}
-
-func TestAdminAuthMiddleware_ValidToken(t *testing.T) {
-	a := newTestApp()
-	tok := makeSignedToken(t, IssuerAdminLogin, []byte(testSecretKey), time.Now().Add(time.Hour))
-	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/admin/teams", nil)
-	req.AddCookie(&http.Cookie{Name: "admin_token", Value: tok})
-	a.AdminAuthMiddleware(okHandler).ServeHTTP(rec, req)
-	assert.Equal(t, http.StatusOK, rec.Code)
-}
-
-// --- VolunteerAuthMiddleware ---
-
-func TestVolunteerAuthMiddleware_NoCookie(t *testing.T) {
-	a := newTestApp()
-	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/volunteer/scan", nil)
-	a.VolunteerAuthMiddleware(okHandler).ServeHTTP(rec, req)
-	assert.Equal(t, http.StatusSeeOther, rec.Code)
-	assert.Equal(t, "/volunteer/login", rec.Header().Get("Location"))
-}
-
-func TestVolunteerAuthMiddleware_InvalidToken(t *testing.T) {
-	a := newTestApp()
-	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/volunteer/scan", nil)
-	req.AddCookie(&http.Cookie{Name: "volunteer_token", Value: "not-a-jwt"})
-	a.VolunteerAuthMiddleware(okHandler).ServeHTTP(rec, req)
-	assert.Equal(t, http.StatusSeeOther, rec.Code)
-	assert.Equal(t, "/volunteer/login", rec.Header().Get("Location"))
-}
-
-func TestVolunteerAuthMiddleware_WrongIssuer(t *testing.T) {
-	a := newTestApp()
-	tok := makeSignedToken(t, IssuerAdminLogin, []byte(testSecretKey), time.Now().Add(time.Hour))
-	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/volunteer/scan", nil)
-	req.AddCookie(&http.Cookie{Name: "volunteer_token", Value: tok})
-	a.VolunteerAuthMiddleware(okHandler).ServeHTTP(rec, req)
-	assert.Equal(t, http.StatusSeeOther, rec.Code)
-	assert.Equal(t, "/volunteer/login", rec.Header().Get("Location"))
-}
-
-func TestVolunteerAuthMiddleware_ValidToken(t *testing.T) {
-	a := newTestApp()
-	tok := makeSignedToken(t, IssuerVolunteerLogin, []byte(testSecretKey), time.Now().Add(time.Hour))
-	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/volunteer/scan", nil)
-	req.AddCookie(&http.Cookie{Name: "volunteer_token", Value: tok})
-	a.VolunteerAuthMiddleware(okHandler).ServeHTTP(rec, req)
-	assert.Equal(t, http.StatusOK, rec.Code)
 }
