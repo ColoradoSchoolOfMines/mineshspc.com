@@ -8,6 +8,8 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/rs/zerolog"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/ColoradoSchoolOfMines/mineshspc.com/internal/config"
 )
@@ -29,9 +31,7 @@ func makeSignedToken(t *testing.T, issuer Issuer, key []byte, expiry time.Time) 
 		ExpiresAt: jwt.NewNumericDate(expiry),
 	})
 	signed, err := tok.SignedString(key)
-	if err != nil {
-		t.Fatalf("failed to sign token: %v", err)
-	}
+	require.NoError(t, err)
 	return signed
 }
 
@@ -40,45 +40,40 @@ func makeSignedToken(t *testing.T, issuer Issuer, key []byte, expiry time.Time) 
 func TestParseTokenByIssuer_Empty(t *testing.T) {
 	a := newTestApp()
 	ok, err := a.parseTokenByIssuer("", IssuerAdminLogin)
-	if ok || err == nil {
-		t.Error("expected error for empty token")
-	}
+	assert.False(t, ok)
+	assert.Error(t, err)
 }
 
 func TestParseTokenByIssuer_CorrectIssuer(t *testing.T) {
 	a := newTestApp()
 	tok := makeSignedToken(t, IssuerAdminLogin, []byte(testSecretKey), time.Now().Add(time.Hour))
 	ok, err := a.parseTokenByIssuer(tok, IssuerAdminLogin)
-	if !ok || err != nil {
-		t.Errorf("expected valid token to pass: %v", err)
-	}
+	assert.True(t, ok)
+	assert.NoError(t, err)
 }
 
 func TestParseTokenByIssuer_WrongIssuer(t *testing.T) {
 	a := newTestApp()
 	tok := makeSignedToken(t, IssuerVolunteerLogin, []byte(testSecretKey), time.Now().Add(time.Hour))
 	ok, err := a.parseTokenByIssuer(tok, IssuerAdminLogin)
-	if ok || err == nil {
-		t.Error("expected error for wrong issuer")
-	}
+	assert.False(t, ok)
+	assert.Error(t, err)
 }
 
 func TestParseTokenByIssuer_ExpiredToken(t *testing.T) {
 	a := newTestApp()
 	tok := makeSignedToken(t, IssuerAdminLogin, []byte(testSecretKey), time.Now().Add(-time.Hour))
 	ok, err := a.parseTokenByIssuer(tok, IssuerAdminLogin)
-	if ok || err == nil {
-		t.Error("expected error for expired token")
-	}
+	assert.False(t, ok)
+	assert.Error(t, err)
 }
 
 func TestParseTokenByIssuer_WrongSigningKey(t *testing.T) {
 	a := newTestApp()
 	tok := makeSignedToken(t, IssuerAdminLogin, []byte("different-key"), time.Now().Add(time.Hour))
 	ok, err := a.parseTokenByIssuer(tok, IssuerAdminLogin)
-	if ok || err == nil {
-		t.Error("expected error for token signed with wrong key")
-	}
+	assert.False(t, ok)
+	assert.Error(t, err)
 }
 
 // --- AdminAuthMiddleware ---
@@ -92,12 +87,8 @@ func TestAdminAuthMiddleware_NoCookie(t *testing.T) {
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/admin/teams", nil)
 	a.AdminAuthMiddleware(okHandler).ServeHTTP(rec, req)
-	if rec.Code != http.StatusSeeOther {
-		t.Errorf("expected 303, got %d", rec.Code)
-	}
-	if loc := rec.Header().Get("Location"); loc != "/admin/login" {
-		t.Errorf("expected redirect to /admin/login, got %q", loc)
-	}
+	assert.Equal(t, http.StatusSeeOther, rec.Code)
+	assert.Equal(t, "/admin/login", rec.Header().Get("Location"))
 }
 
 func TestAdminAuthMiddleware_InvalidToken(t *testing.T) {
@@ -106,12 +97,8 @@ func TestAdminAuthMiddleware_InvalidToken(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/admin/teams", nil)
 	req.AddCookie(&http.Cookie{Name: "admin_token", Value: "not-a-jwt"})
 	a.AdminAuthMiddleware(okHandler).ServeHTTP(rec, req)
-	if rec.Code != http.StatusSeeOther {
-		t.Errorf("expected 303, got %d", rec.Code)
-	}
-	if loc := rec.Header().Get("Location"); loc != "/admin/login" {
-		t.Errorf("expected redirect to /admin/login, got %q", loc)
-	}
+	assert.Equal(t, http.StatusSeeOther, rec.Code)
+	assert.Equal(t, "/admin/login", rec.Header().Get("Location"))
 }
 
 func TestAdminAuthMiddleware_WrongIssuer(t *testing.T) {
@@ -121,9 +108,8 @@ func TestAdminAuthMiddleware_WrongIssuer(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/admin/teams", nil)
 	req.AddCookie(&http.Cookie{Name: "admin_token", Value: tok})
 	a.AdminAuthMiddleware(okHandler).ServeHTTP(rec, req)
-	if rec.Code != http.StatusSeeOther {
-		t.Errorf("expected 303, got %d", rec.Code)
-	}
+	assert.Equal(t, http.StatusSeeOther, rec.Code)
+	assert.Equal(t, "/admin/login", rec.Header().Get("Location"))
 }
 
 func TestAdminAuthMiddleware_ValidToken(t *testing.T) {
@@ -133,9 +119,7 @@ func TestAdminAuthMiddleware_ValidToken(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/admin/teams", nil)
 	req.AddCookie(&http.Cookie{Name: "admin_token", Value: tok})
 	a.AdminAuthMiddleware(okHandler).ServeHTTP(rec, req)
-	if rec.Code != http.StatusOK {
-		t.Errorf("expected 200, got %d", rec.Code)
-	}
+	assert.Equal(t, http.StatusOK, rec.Code)
 }
 
 // --- VolunteerAuthMiddleware ---
@@ -145,12 +129,8 @@ func TestVolunteerAuthMiddleware_NoCookie(t *testing.T) {
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/volunteer/scan", nil)
 	a.VolunteerAuthMiddleware(okHandler).ServeHTTP(rec, req)
-	if rec.Code != http.StatusSeeOther {
-		t.Errorf("expected 303, got %d", rec.Code)
-	}
-	if loc := rec.Header().Get("Location"); loc != "/volunteer/login" {
-		t.Errorf("expected redirect to /volunteer/login, got %q", loc)
-	}
+	assert.Equal(t, http.StatusSeeOther, rec.Code)
+	assert.Equal(t, "/volunteer/login", rec.Header().Get("Location"))
 }
 
 func TestVolunteerAuthMiddleware_InvalidToken(t *testing.T) {
@@ -159,12 +139,8 @@ func TestVolunteerAuthMiddleware_InvalidToken(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/volunteer/scan", nil)
 	req.AddCookie(&http.Cookie{Name: "volunteer_token", Value: "not-a-jwt"})
 	a.VolunteerAuthMiddleware(okHandler).ServeHTTP(rec, req)
-	if rec.Code != http.StatusSeeOther {
-		t.Errorf("expected 303, got %d", rec.Code)
-	}
-	if loc := rec.Header().Get("Location"); loc != "/volunteer/login" {
-		t.Errorf("expected redirect to /volunteer/login, got %q", loc)
-	}
+	assert.Equal(t, http.StatusSeeOther, rec.Code)
+	assert.Equal(t, "/volunteer/login", rec.Header().Get("Location"))
 }
 
 func TestVolunteerAuthMiddleware_WrongIssuer(t *testing.T) {
@@ -174,9 +150,8 @@ func TestVolunteerAuthMiddleware_WrongIssuer(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/volunteer/scan", nil)
 	req.AddCookie(&http.Cookie{Name: "volunteer_token", Value: tok})
 	a.VolunteerAuthMiddleware(okHandler).ServeHTTP(rec, req)
-	if rec.Code != http.StatusSeeOther {
-		t.Errorf("expected 303, got %d", rec.Code)
-	}
+	assert.Equal(t, http.StatusSeeOther, rec.Code)
+	assert.Equal(t, "/volunteer/login", rec.Header().Get("Location"))
 }
 
 func TestVolunteerAuthMiddleware_ValidToken(t *testing.T) {
@@ -186,7 +161,5 @@ func TestVolunteerAuthMiddleware_ValidToken(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/volunteer/scan", nil)
 	req.AddCookie(&http.Cookie{Name: "volunteer_token", Value: tok})
 	a.VolunteerAuthMiddleware(okHandler).ServeHTTP(rec, req)
-	if rec.Code != http.StatusOK {
-		t.Errorf("expected 200, got %d", rec.Code)
-	}
+	assert.Equal(t, http.StatusOK, rec.Code)
 }
