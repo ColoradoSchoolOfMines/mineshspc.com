@@ -248,8 +248,13 @@ func (a *Application) HandleTeacherDeleteMember(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	email := r.URL.Query().Get("email")
-	teamIDStr := r.URL.Query().Get("team_id")
+	if err := r.ParseForm(); err != nil {
+		a.Log.Err(err).Msg("failed to parse form")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	email := r.FormValue("email")
+	teamIDStr := r.FormValue("team_id")
 	log := a.Log.With().
 		Str("page_name", "teacher_delete_member").
 		Str("team_id", teamIDStr).
