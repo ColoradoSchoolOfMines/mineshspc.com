@@ -174,11 +174,14 @@
                     <td>{{ if .PreviouslyParticipated }}Yes{{ else }}No{{ end }}</td>
                     <td>{{ .ParentEmail }}</td>
                     <td class="text-center">
-                      <a href="/register/teacher/team/delete?team_id={{ $t.ID }}&email={{ .Email }}"
-                         onclick="return confirm('Are you sure you want to remove {{ .Name }} from {{ $t.Name }}?')"
-                         class="btn btn-danger">
-                        <i class="fa fa-times"></i>
-                      </a>
+                      <form method="POST" action="/register/teacher/team/delete"
+                            onsubmit="return confirm('Are you sure you want to remove {{ .Name }} from {{ $t.Name }}?')">
+                        <input type="hidden" name="team_id" value="{{ $t.ID }}">
+                        <input type="hidden" name="email" value="{{ .Email }}">
+                        <button type="submit" class="btn btn-danger">
+                          <i class="fa fa-times"></i>
+                        </button>
+                      </form>
                     </td>
                   </tr>
                 {{ end }}

@@ -190,7 +190,7 @@ func (a *Application) Start() {
 	}
 
 	// Delete Team member
-	router.HandleFunc("GET /register/teacher/team/delete", a.HandleTeacherDeleteMember)
+	router.HandleFunc("POST /register/teacher/team/delete", a.HandleTeacherDeleteMember)
 
 	// Email confirmation code handling
 	router.HandleFunc("GET /register/teacher/emaillogin", a.HandleTeacherEmailLogin)
