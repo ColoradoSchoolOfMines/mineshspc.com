@@ -61,18 +61,14 @@ func (a *Application) HandleTeacherLogin(w http.ResponseWriter, r *http.Request)
 
 	teacher, err := a.DB.GetTeacherByEmail(r.Context(), emailAddress)
 	if err != nil {
-		log.Warn().Err(err).Msg("failed to find teacher by email")
-		a.TeacherLoginRenderer(w, r, map[string]any{
-			"Email":         emailAddress,
-			"EmailNotFound": true,
-		})
+		log.Warn().Err(err).Msg("failed to find teacher by email, redirecting without sending email")
+		http.SetCookie(w, &http.Cookie{Name: "email", Value: emailAddress, Path: "/", HttpOnly: true, SameSite: http.SameSiteLaxMode})
+		http.Redirect(w, r, "/register/teacher/emaillogin", http.StatusSeeOther)
 		return
 	} else if !teacher.EmailConfirmed {
-		log.Warn().Err(err).Msg("teacher email not confirmed, not sending login code to avoid amplification attacks")
-		a.TeacherLoginRenderer(w, r, map[string]any{
-			"Email":             emailAddress,
-			"EmailNotConfirmed": true,
-		})
+		log.Warn().Msg("teacher email not confirmed, redirecting without sending email")
+		http.SetCookie(w, &http.Cookie{Name: "email", Value: emailAddress, Path: "/", HttpOnly: true, SameSite: http.SameSiteLaxMode})
+		http.Redirect(w, r, "/register/teacher/emaillogin", http.StatusSeeOther)
 		return
 	}
 
