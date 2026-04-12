@@ -73,6 +73,20 @@ func assertNotRedirectTo(t *testing.T, rec *httptest.ResponseRecorder, location 
 	}
 }
 
+// --- Teacher route protection ---
+
+func TestRouting_Teacher_NoCookie(t *testing.T) {
+	router := newTestAppWithDB(t).BuildRouter()
+	for _, path := range []string{
+		"/register/teacher/schoolinfo",
+		"/register/teacher/teams",
+		"/register/teacher/team/edit",
+		"/register/teacher/team/addmember",
+	} {
+		assertRedirectsTo(t, doRequest(router, http.MethodGet, path), "/register/teacher/login")
+	}
+}
+
 // --- Admin route protection ---
 //
 // Tests cover: no cookie, malformed token, wrong-issuer token (volunteer

@@ -168,6 +168,10 @@ func (a *Application) BuildRouter() http.Handler {
 					a.Log.Info().Err(err).
 						Bool("redirect_if_logged_in", rend.RedirectIfLoggedIn).
 						Msg("Failed to get logged in teacher")
+					if !rend.RedirectIfLoggedIn && strings.HasPrefix(path, "/register/teacher/") {
+						http.Redirect(w, r, "/register/teacher/login", http.StatusSeeOther)
+						return
+					}
 					if rend.RedirectIfLoggedIn && path != "/register/teacher/login" && path != "/register/teacher/createaccount" && path != "/register/teacher/confirmemail" {
 						http.Redirect(w, r, "/register/teacher/login", http.StatusTemporaryRedirect)
 					}
