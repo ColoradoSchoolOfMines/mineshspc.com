@@ -13,13 +13,6 @@ html {
 
 body {
   background-color: #E2E2E2;
-  margin: 0 0 160px 0;
-}
-
-@media (max-width: 800px) {
-  body {
-    margin-bottom: 225px;
-  }
 }
 
 a {
@@ -193,10 +186,7 @@ h3 {
 
 footer.footer {
   background-color: #AAAAAA;
-  position: fixed;
-  bottom: 0;
   width: 100%;
-  z-index: -100;
 }
 
 footer.footer .acm-logo {
