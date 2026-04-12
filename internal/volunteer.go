@@ -22,39 +22,10 @@ func (a *Application) createVolunteerLoginJWT(email string) *jwt.Token {
 	})
 }
 
-func (a *Application) isVolunteerByToken(tokenStr string) (bool, error) {
-	if tokenStr == "" {
-		return false, errors.New("no token")
-	}
-
-	token, err := jwt.ParseWithClaims(tokenStr, &jwt.RegisteredClaims{}, func(token *jwt.Token) (any, error) {
-		// Don't forget to validate the alg is what you expect:
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-
-		return a.Config.ReadSecretKey(), nil
-	})
-	if err != nil {
-		return false, fmt.Errorf("failed to parse admin token: %w", err)
-	}
-
-	claims, ok := token.Claims.(*jwt.RegisteredClaims)
-	if !token.Valid || !ok {
-		return false, fmt.Errorf("failed to validate token: %w", err)
-	}
-
-	if claims.Issuer != string(IssuerVolunteerLogin) {
-		return false, fmt.Errorf("invalid student verify token: %w", err)
-	}
-
-	return true, nil
-}
-
 func (a *Application) HandleVolunteerEmailLogin(w http.ResponseWriter, r *http.Request) {
 	tok := r.URL.Query().Get("tok")
 	zerolog.Ctx(r.Context()).Info().Str("token", tok).Msg("got token")
-	isVolunteer, err := a.isVolunteerByToken(tok)
+	isVolunteer, err := a.parseTokenByIssuer(tok, IssuerVolunteerLogin)
 	if err != nil || !isVolunteer {
 		a.Log.Warn().Msg("failed to get volunteer")
 		w.WriteHeader(http.StatusBadRequest)
@@ -121,23 +92,13 @@ func (a *Application) HandleVolunteerLogin(w http.ResponseWriter, r *http.Reques
 
 func (a *Application) GetVolunteerScanTemplate(r *http.Request) map[string]any {
 	ctx := r.Context()
-	tok, err := r.Cookie("volunteer_token")
-	if err != nil {
-		a.Log.Warn().Err(err).Msg("failed to get volunteer token")
-		return nil
-	}
-
-	if isVolunteer, err := a.isVolunteerByToken(tok.Value); err != nil || !isVolunteer {
-		a.Log.Warn().Err(err).Msg("user is not volunteer!")
-		return nil
-	}
 
 	res := map[string]any{
 		"LoggedInAsVolunteer": true,
 	}
 
 	if adminTok, err := r.Cookie("admin_token"); err == nil {
-		if isAdmin, err := a.isAdminByToken(adminTok.Value); err == nil && isAdmin {
+		if isAdmin, err := a.parseTokenByIssuer(adminTok.Value, IssuerAdminLogin); err == nil && isAdmin {
 			res["LoggedInAsAdmin"] = true
 		}
 	}
@@ -174,18 +135,6 @@ func (a *Application) GetVolunteerScanTemplate(r *http.Request) map[string]any {
 
 func (a *Application) HandleVolunteerCheckIn(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	tok, err := r.Cookie("volunteer_token")
-	if err != nil {
-		a.Log.Warn().Err(err).Msg("failed to get volunteer token")
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	if isVolunteer, err := a.isVolunteerByToken(tok.Value); err != nil || !isVolunteer {
-		a.Log.Warn().Err(err).Msg("user is not volunteer!")
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
 
 	studentSignInToken := r.URL.Query().Get("tok")
 	student, err := a.getStudentByQRToken(ctx, studentSignInToken)
