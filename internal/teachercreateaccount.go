@@ -131,7 +131,7 @@ func (a *Application) HandleTeacherCreateAccount(w http.ResponseWriter, r *http.
 		return
 	} else {
 		log.Info().Msg("successfully sent email")
-		http.SetCookie(w, &http.Cookie{Name: "email", Value: emailAddress, Path: "/"})
+		http.SetCookie(w, &http.Cookie{Name: "email", Value: emailAddress, Path: "/", HttpOnly: true, SameSite: http.SameSiteLaxMode})
 		http.Redirect(w, r, "/register/teacher/confirmemail", http.StatusSeeOther)
 	}
 }
@@ -200,7 +200,7 @@ func (a *Application) HandleTeacherEmailLogin(w http.ResponseWriter, r *http.Req
 		return
 	}
 	a.Log.Info().Any("jwt", jwt).Str("jwt_str", jwtStr).Msg("signed JWT")
-	http.SetCookie(w, &http.Cookie{Name: "tok", Value: jwtStr, Path: "/", Expires: expires})
+	http.SetCookie(w, &http.Cookie{Name: "tok", Value: jwtStr, Path: "/", Expires: expires, HttpOnly: true, Secure: !a.Config.DevMode, SameSite: http.SameSiteLaxMode})
 
 	if teacher.SchoolName == "" || teacher.SchoolCity == "" || teacher.SchoolState == "" {
 		http.Redirect(w, r, "/register/teacher/schoolinfo", http.StatusSeeOther)
