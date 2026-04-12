@@ -102,7 +102,7 @@ func (a *Application) HandleTeacherLogin(w http.ResponseWriter, r *http.Request)
 		return
 	} else {
 		log.Info().Msg("sent email")
-		http.SetCookie(w, &http.Cookie{Name: "email", Value: emailAddress, Path: "/"})
+		http.SetCookie(w, &http.Cookie{Name: "email", Value: emailAddress, Path: "/", HttpOnly: true, SameSite: http.SameSiteLaxMode})
 		http.Redirect(w, r, "/register/teacher/emaillogin", http.StatusSeeOther)
 	}
 }

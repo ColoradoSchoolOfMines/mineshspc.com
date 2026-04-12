@@ -186,7 +186,7 @@ func (a *Application) HandleAdminEmailLogin(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{Name: "admin_token", Value: tok, Path: "/"})
+	http.SetCookie(w, &http.Cookie{Name: "admin_token", Value: tok, Path: "/", HttpOnly: true, Secure: !a.Config.DevMode, SameSite: http.SameSiteLaxMode})
 	http.Redirect(w, r, "/admin/teams", http.StatusSeeOther)
 }
 
@@ -239,7 +239,7 @@ func (a *Application) HandleAdminLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	} else {
 		log.Info().Msg("sent email")
-		http.SetCookie(w, &http.Cookie{Name: "admin_email", Value: emailAddress, Path: "/"})
+		http.SetCookie(w, &http.Cookie{Name: "admin_email", Value: emailAddress, Path: "/", HttpOnly: true, SameSite: http.SameSiteLaxMode})
 		a.AdminConfirmEmailRenderer(w, r, map[string]any{"Email": emailAddress})
 	}
 }
