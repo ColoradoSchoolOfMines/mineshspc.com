@@ -63,12 +63,12 @@ func (a *Application) HandleTeacherLogin(w http.ResponseWriter, r *http.Request)
 	if err != nil {
 		log.Warn().Err(err).Msg("failed to find teacher by email, redirecting without sending email")
 		http.SetCookie(w, &http.Cookie{Name: "email", Value: emailAddress, Path: "/", HttpOnly: true, SameSite: http.SameSiteLaxMode})
-		http.Redirect(w, r, "/register/teacher/emaillogin", http.StatusSeeOther)
+		http.Redirect(w, r, "/register/teacher/confirmemail", http.StatusSeeOther)
 		return
 	} else if !teacher.EmailConfirmed {
 		log.Warn().Msg("teacher email not confirmed, redirecting without sending email")
 		http.SetCookie(w, &http.Cookie{Name: "email", Value: emailAddress, Path: "/", HttpOnly: true, SameSite: http.SameSiteLaxMode})
-		http.Redirect(w, r, "/register/teacher/emaillogin", http.StatusSeeOther)
+		http.Redirect(w, r, "/register/teacher/confirmemail", http.StatusSeeOther)
 		return
 	}
 
@@ -99,6 +99,6 @@ func (a *Application) HandleTeacherLogin(w http.ResponseWriter, r *http.Request)
 	} else {
 		log.Info().Msg("sent email")
 		http.SetCookie(w, &http.Cookie{Name: "email", Value: emailAddress, Path: "/", HttpOnly: true, SameSite: http.SameSiteLaxMode})
-		http.Redirect(w, r, "/register/teacher/emaillogin", http.StatusSeeOther)
+		http.Redirect(w, r, "/register/teacher/confirmemail", http.StatusSeeOther)
 	}
 }
