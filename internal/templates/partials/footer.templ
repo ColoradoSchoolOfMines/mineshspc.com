@@ -1,0 +1,43 @@
+package partials
+
+import (
+	"html/template"
+
+	"github.com/ColoradoSchoolOfMines/mineshspc.com/internal/contextkeys"
+)
+
+func GetHostedByHTML(ctx context.Context) template.HTML {
+	hostedByHTML, _ := ctx.Value(contextkeys.ContextKeyHostedByHTML).(template.HTML)
+	return hostedByHTML
+}
+
+templ Footer() {
+	<footer class="footer mt-4 pt-4 ps-4 pe-4">
+		<div class="row">
+			<div class="col text-center text-secondary">
+				<p>
+					Organized by
+					<a href="https://acm.mines.edu" target="_blank">
+						<img class="img-fluid acm-logo" src="/static/acm.png" alt="Mines ACM"/>
+					</a>
+					<span class="hosted-at">and hosted at</span>
+					<a href="https://www.mines.edu" target="_blank">
+						<img class="img-fluid mines-logo" src="/static/mines.png" alt="Colorado School of Mines"/>
+					</a>
+				</p>
+				<p class="small">
+					Need help? You can always <a href="mailto:support@mineshspc.com">email support</a> with any
+					questions you have.
+				</p>
+				<p class="small">
+					&copy; 2023 Mines ACM.
+					View the
+					<a href="https://github.com/ColoradoSchoolOfMines/mineshspc.com" target="_blank">
+						source code
+					</a>.
+					@templ.Raw(GetHostedByHTML(ctx))
+				</p>
+			</div>
+		</div>
+	</footer>
+}

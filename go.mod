@@ -3,6 +3,7 @@ module github.com/ColoradoSchoolOfMines/mineshspc.com
 go 1.25.0
 
 require (
+	github.com/a-h/templ v0.2.697
 	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/mattn/go-sqlite3 v1.14.42
 	github.com/rs/zerolog v1.35.0
@@ -10,6 +11,7 @@ require (
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	go.mau.fi/util v0.9.7
 	go.mau.fi/zeroconfig v0.2.0
+	golang.org/x/net v0.52.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 

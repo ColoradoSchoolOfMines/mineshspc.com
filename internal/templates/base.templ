@@ -1,0 +1,54 @@
+package templates
+
+import "github.com/ColoradoSchoolOfMines/mineshspc.com/internal/templates/partials"
+
+templ Base(title string, content templ.Component) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<meta name="theme-color" content="#000000"/>
+			<meta
+				name="description"
+				content="The CS@Mines High School Programming Competition is a competition for high school students to write programs that solve problems."
+			/>
+			<title>{ title } | CS@Mines High School Programming Competition</title>
+			<link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png"/>
+			<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png"/>
+			<link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png"/>
+			<link rel="manifest" href="/static/site.webmanifest"/>
+			<link rel="preconnect" href="https://fonts.googleapis.com"/>
+			<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+			<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet"/>
+			<link
+				href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"
+				rel="stylesheet"
+				integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+				crossorigin="anonymous"
+			/>
+			<link rel="stylesheet" type="text/css" href="/static/index.css" media="screen"/>
+			<script defer data-domain="mineshspc.com" src="https://plausible.io/js/script.js"></script>
+			<script>
+		window.goatcounter = {
+			path: location.pathname || '/',
+		}
+	</script>
+			<script data-goatcounter="https://mineshspc.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+			<link
+				rel="stylesheet"
+				href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css"
+				integrity="sha256-XoaMnoYC5TH6/+ihMEnospgm0J1PM/nioxbOUdnM8HY="
+				crossorigin="anonymous"
+			/>
+		</head>
+		<body class="pb-4 shadow">
+			@partials.Navbar()
+			<div class="content">
+				@content
+			</div>
+			@partials.Footer()
+			<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
+		</body>
+	</html>
+}
