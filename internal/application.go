@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"html/template"
+	"maps"
 	"net/http"
 	"regexp"
 	"strings"
@@ -66,9 +67,7 @@ func (a *Application) ServeTemplateExtra(logger *zerolog.Logger, templateName st
 		if data == nil {
 			data = map[string]any{}
 		}
-		for k, v := range extraData {
-			data[k] = v
-		}
+		maps.Copy(data, extraData)
 		user, err := a.GetLoggedInTeacher(r)
 		if err == nil {
 			data["Username"] = user.Name
@@ -91,12 +90,9 @@ type renderInfo struct {
 	RedirectIfLoggedIn bool
 }
 
-func (a *Application) Start() {
-	a.Log.Info().Msg("connecting to sendgrid")
-	a.SendGridClient = sendgrid.NewSendClient(a.Config.SendgridAPIKey)
-
-	a.Log.Info().Msg("Starting router")
-
+// BuildRouter sets up all HTTP routes and returns the handler. Separated from
+// Start so tests can exercise routing without starting a real server.
+func (a *Application) BuildRouter() http.Handler {
 	router := http.NewServeMux()
 
 	noArgs := func(r *http.Request) map[string]any { return nil }
@@ -172,6 +168,10 @@ func (a *Application) Start() {
 					a.Log.Info().Err(err).
 						Bool("redirect_if_logged_in", rend.RedirectIfLoggedIn).
 						Msg("Failed to get logged in teacher")
+					if !rend.RedirectIfLoggedIn && strings.HasPrefix(path, "/register/teacher/") {
+						http.Redirect(w, r, "/register/teacher/login", http.StatusSeeOther)
+						return
+					}
 					if rend.RedirectIfLoggedIn && path != "/register/teacher/login" && path != "/register/teacher/createaccount" && path != "/register/teacher/confirmemail" {
 						http.Redirect(w, r, "/register/teacher/login", http.StatusTemporaryRedirect)
 					}
@@ -217,40 +217,57 @@ func (a *Application) Start() {
 		router.HandleFunc("POST "+path, renderFn(fn))
 	}
 
-	// Admin pages
-	router.HandleFunc("GET /admin", a.ServeTemplate(a.Log, "adminhome.html", noArgs))
+	// Admin pages (unprotected — these exact patterns beat the /admin/ prefix below)
 	router.HandleFunc("GET /admin/login", a.ServeTemplate(a.Log, "adminlogin.html", noArgs))
-	router.HandleFunc("GET /admin/dietaryrestrictions", a.ServeTemplate(a.Log, "admindietaryrestrictions.html", a.GetAdminDietaryRestrictionsTemplate))
-	router.HandleFunc("GET /admin/teams", a.ServeTemplate(a.Log, "adminteams.html", a.GetAdminTeamsTemplate))
 	router.HandleFunc("GET /admin/emaillogin", a.HandleAdminEmailLogin)
 	router.HandleFunc("POST /admin/emaillogin", a.HandleAdminLogin)
 
-	adminAPIRouter := http.NewServeMux()
-	adminAPIRouter.HandleFunc("GET /resendstudentemail", a.HandleResendStudentEmail)
-	adminAPIRouter.HandleFunc("GET /resendparentemail", a.HandleResendParentEmail)
-	adminAPIRouter.HandleFunc("GET /confirmationlink/student", a.HandleGetStudentEmailConfirmationLink)
-	adminAPIRouter.HandleFunc("GET /confirmationlink/parent", a.HandleGetParentEmailConfirmationLink)
-	adminAPIRouter.HandleFunc("GET /sendemailconfirmationreminders", a.HandleSendEmailConfirmationReminders)
-	adminAPIRouter.HandleFunc("GET /sendparentreminders", a.HandleSendParentReminders)
-	adminAPIRouter.HandleFunc("GET /sendqrcodes", a.HandleSendQRCodes)
-	adminAPIRouter.HandleFunc("GET /kattis/teams", a.HandleKattisTeamsExport)
-	adminAPIRouter.HandleFunc("GET /kattis/participants", a.HandleKattisParticipantsExport)
-	adminAPIRouter.HandleFunc("GET /zoom/breakout", a.HandleZoomBreakoutExport)
-	adminAPIRouter.HandleFunc("GET /manualcheckin", a.HandleManualCheckin)
-	adminAPIRouter.HandleFunc("GET /team-list", a.HandleTeamList)
-	router.Handle("/admin/api/", http.StripPrefix("/admin/api", a.AdminAuthMiddleware(adminAPIRouter)))
+	// Admin pages (protected) — subrouter consolidates all protected admin routes
+	adminRouter := http.NewServeMux()
+	adminRouter.HandleFunc("GET /{$}", a.ServeTemplate(a.Log, "adminhome.html", noArgs))
+	adminRouter.HandleFunc("GET /dietaryrestrictions", a.ServeTemplate(a.Log, "admindietaryrestrictions.html", a.GetAdminDietaryRestrictionsTemplate))
+	adminRouter.HandleFunc("GET /teams", a.ServeTemplate(a.Log, "adminteams.html", a.GetAdminTeamsTemplate))
+	adminRouter.HandleFunc("GET /api/resendstudentemail", a.HandleResendStudentEmail)
+	adminRouter.HandleFunc("GET /api/resendparentemail", a.HandleResendParentEmail)
+	adminRouter.HandleFunc("GET /api/confirmationlink/student", a.HandleGetStudentEmailConfirmationLink)
+	adminRouter.HandleFunc("GET /api/confirmationlink/parent", a.HandleGetParentEmailConfirmationLink)
+	adminRouter.HandleFunc("GET /api/sendemailconfirmationreminders", a.HandleSendEmailConfirmationReminders)
+	adminRouter.HandleFunc("GET /api/sendparentreminders", a.HandleSendParentReminders)
+	adminRouter.HandleFunc("GET /api/sendqrcodes", a.HandleSendQRCodes)
+	adminRouter.HandleFunc("GET /api/kattis/teams", a.HandleKattisTeamsExport)
+	adminRouter.HandleFunc("GET /api/kattis/participants", a.HandleKattisParticipantsExport)
+	adminRouter.HandleFunc("GET /api/zoom/breakout", a.HandleZoomBreakoutExport)
+	adminRouter.HandleFunc("GET /api/manualcheckin", a.HandleManualCheckin)
+	adminRouter.HandleFunc("GET /api/team-list", a.HandleTeamList)
+	router.Handle("/admin/", http.StripPrefix("/admin", a.AdminAuthMiddleware(adminRouter)))
+	router.Handle("GET /admin", a.AdminAuthMiddleware(
+		http.HandlerFunc(a.ServeTemplate(a.Log, "adminhome.html", noArgs))))
 
-	// Volunteer pages
+	// Volunteer pages (unprotected)
 	router.HandleFunc("GET /volunteer", a.ServeTemplate(a.Log, "volunteerhome.html", noArgs))
 	router.HandleFunc("GET /volunteer/login", a.ServeTemplate(a.Log, "volunteerlogin.html", noArgs))
 	router.HandleFunc("GET /volunteer/emaillogin", a.HandleVolunteerEmailLogin)
 	router.HandleFunc("POST /volunteer/emaillogin", a.HandleVolunteerLogin)
-	router.HandleFunc("GET /volunteer/scan", a.ServeTemplate(a.Log, "volunteerscan.html", a.GetVolunteerScanTemplate))
-	router.HandleFunc("GET /volunteer/checkin", a.HandleVolunteerCheckIn)
+
+	// Volunteer pages (protected)
+	router.Handle("GET /volunteer/scan", a.VolunteerAuthMiddleware(
+		http.HandlerFunc(a.ServeTemplate(a.Log, "volunteerscan.html", a.GetVolunteerScanTemplate))))
+	router.Handle("GET /volunteer/checkin", a.VolunteerAuthMiddleware(
+		http.HandlerFunc(a.HandleVolunteerCheckIn)))
 
 	var handler http.Handler = router
 	handler = hlog.RequestIDHandler("request_id", "RequestID")(handler)
 	handler = hlog.NewHandler(*a.Log)(handler)
+
+	return handler
+}
+
+func (a *Application) Start() {
+	a.Log.Info().Msg("connecting to sendgrid")
+	a.SendGridClient = sendgrid.NewSendClient(a.Config.SendgridAPIKey)
+
+	a.Log.Info().Msg("Starting router")
+	handler := a.BuildRouter()
 
 	a.Log.Info().Msg("Listening on port 8090")
 	http.ListenAndServe(":8090", handler)

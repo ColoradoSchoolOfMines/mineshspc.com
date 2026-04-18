@@ -8,6 +8,7 @@ require (
 	github.com/rs/zerolog v1.35.0
 	github.com/sendgrid/sendgrid-go v3.16.1+incompatible
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
+	github.com/stretchr/testify v1.11.1
 	go.mau.fi/util v0.9.7
 	go.mau.fi/zeroconfig v0.2.0
 	gopkg.in/yaml.v3 v3.0.1
