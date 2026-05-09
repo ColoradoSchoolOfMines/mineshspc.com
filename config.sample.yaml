@@ -39,6 +39,30 @@ recaptcha:
   site_key: RECAPTCHA_SITE_KEY
   secret_key: RECAPTCHA_SECRET_KEY
 
+homepage:
+  # Text for the <h2> in the hero. Examples by phase:
+  #   Phase 1 (post-comp): "Thanks for a great 2025 competition!"
+  #   Phase 2-4:           "The 2026 competition will be held on 25 April."
+  h2_text: "The 2026 competition will be held on 25 April."
+
+  # Hero paragraph text (HTML allowed). Omit or leave empty to hide the paragraph.
+  #   Phase 1: "Registration for this year's competition is closed."
+  #   Phase 2/3: "Registration is now open for the Spring 2026 competition."
+  #   Phase 4: (empty)
+  hero_text: ""
+
+  # Deadline date string shown when registration_enabled is true.
+  registration_deadline: "10 April"
+
+  # When true, shows "Late Registration Deadline" badge (danger) instead of "Registration Deadline" (warning).
+  late_registration: false
+
+  # When true (and open_division_url is empty), shows "will be available closer to the competition."
+  open_division_coming_soon: false
+
+  # When non-empty, shows the Open Division / Kattis registration link block.
+  open_division_url: ""
+
 # ===== Logger Settings =====
 # See https://github.com/tulir/zeroconfig for details.
 logging:

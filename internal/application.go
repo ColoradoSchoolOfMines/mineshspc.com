@@ -100,13 +100,16 @@ func (a *Application) Start() {
 	router := http.NewServeMux()
 
 	noArgs := func(r *http.Request) map[string]any { return nil }
+	homeArgs := func(r *http.Request) map[string]any {
+		return map[string]any{"Homepage": a.Config.Homepage}
+	}
 
 	// Static pages
 	staticPages := map[string]struct {
 		Template     string
 		ArgGenerator func(r *http.Request) map[string]any
 	}{
-		"/{$}":      {"home.html", noArgs},
+		"/{$}":      {"home.html", homeArgs},
 		"/info":     {"info.html", noArgs},
 		"/authors":  {"authors.html", noArgs},
 		"/rules":    {"rules.html", noArgs},

@@ -9,36 +9,37 @@
     </a>
   </div>
 
-  <h1 class="display-5">High School Programming Competition</h1>
-  <!--<h2 class="mb-2">Thanks for a great 2025 competition!</h2>-->
-  <h2 class="mb-2">The 2026 competition will be held on 25 April.</h2>
-  <p class="registration-info mb-4">
-    Engage in exciting problems at the Mines HSPC!
-    {{ if .RegistrationEnabled }}
-      Registration is now open for the Spring 2026 competition.
-    {{ end }}
-  </p>
+  <h1 class="mb-4">High School Programming Competition</h1>
+  {{ if .Data.Homepage.H2Text }}
+    <h2 class="my-4">{{ .Data.Homepage.H2Text }}</h2>
+  {{ end }}
+  {{ if .Data.Homepage.HeroText }}
+    <p class="registration-info mb-4">{{ .Data.Homepage.HeroText }}</p>
+  {{ end }}
   {{ if .RegistrationEnabled }}
     <p class="registration-info mb-4">
-      <!-- <span class="badge text-bg-danger py-2 px-4 me-4 fs-5"><b>Registration Deadline</b></span> -->
-      The registration deadline is <b>10 April</b>
+      {{ if .Data.Homepage.LateRegistration }}
+        <span class="badge text-bg-danger py-2 px-2 me-2 fs-5"><b>Late Registration Deadline</b></span>
+      {{ else }}
+        <span class="badge text-bg-warning py-2 px-2 me-2 fs-5"><b>Registration Deadline</b></span>
+      {{ end }}
+      <b>{{ .Data.Homepage.RegistrationDeadline }}</b>
     </p>
     <a href="/register" class="btn btn-success btn-lg px-6 fs-3 mb-4">
       <b>Register Now for In-Person Competition</b>
     </a>
-  {{ else }}
-    <p>
-      <small class="registration-info text-secondary mb-4">
-        Registration for this year's in-person competition is not yet open.
-      </small>
+  {{ end }}
+  {{ if .Data.Homepage.OpenDivisionURL }}
+    <p class="registration-info mb-4">
+      Open Division registration available
+      <a href="{{ .Data.Homepage.OpenDivisionURL }}" target="_blank">on Kattis</a>.
+      Click on "Join the Contest" to register your team.
+    </p>
+  {{ else if .Data.Homepage.OpenDivisionComingSoon }}
+    <p class="registration-info mb-4 text-secondary small">
+      Open Division registration will be available closer to the competition.
     </p>
   {{ end }}
-  <p class="registration-info mb-4">
-    <!-- Open Division registration will be available closer the competition. -->
-    Open Division registration available
-    <a href="https://mines-hspc.kattis.com/contests/amkfgw" target="_blank">
-      on Kattis</a>. Click on "Join the Contest" to register your team.
-  </p>
 </div>
 
 <div class="container page-content home">

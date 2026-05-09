@@ -26,6 +26,15 @@ type RecaptchaConfig struct {
 	SecretKey string `yaml:"secret_key"`
 }
 
+type HomepageConfig struct {
+	H2Text                 string        `yaml:"h2_text"`
+	HeroText               template.HTML `yaml:"hero_text"`
+	RegistrationDeadline   string        `yaml:"registration_deadline"`
+	LateRegistration       bool          `yaml:"late_registration"`
+	OpenDivisionComingSoon bool          `yaml:"open_division_coming_soon"`
+	OpenDivisionURL        string        `yaml:"open_division_url"`
+}
+
 type Configuration struct {
 	secretKeyBytes []byte
 
@@ -33,11 +42,12 @@ type Configuration struct {
 
 	DevMode bool `yaml:"dev_mode"`
 
-	Domain              string        `yaml:"domain"`
-	SendgridAPIKey      string        `yaml:"sendgrid_api_key"`
-	HealthcheckURL      string        `yaml:"healthcheck_url"`
-	HostedByHTML        template.HTML `yaml:"hosted_by_html"`
-	RegistrationEnabled bool          `yaml:"registration_enabled"`
+	Domain              string         `yaml:"domain"`
+	SendgridAPIKey      string         `yaml:"sendgrid_api_key"`
+	HealthcheckURL      string         `yaml:"healthcheck_url"`
+	HostedByHTML        template.HTML  `yaml:"hosted_by_html"`
+	RegistrationEnabled bool           `yaml:"registration_enabled"`
+	Homepage            HomepageConfig `yaml:"homepage"`
 
 	JWTSecretKeyFile string `yaml:"jwt_secret_key_file"`
 	JWTSecretKey     string `yaml:"jwt_secret_key"`
