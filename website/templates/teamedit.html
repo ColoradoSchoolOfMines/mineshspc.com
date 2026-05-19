@@ -71,149 +71,74 @@
                 </div>
               </div>
             </div>
-            <!-- <div class="row"> -->
-            <!--   <div class="col"> -->
-            <!--     This team will compete -->
-            <!--     <div class="btn-group" role="group" aria-label="Select team location"> -->
-            <!--       <input type="radio" class="btn-check" name="team-location" -->
-            <!--         value="in-person" id="in-person" autocomplete="off" required -->
-            <!--         {{ with .Data.Team }}{{ if .InPerson }}checked{{ else }}disabled{{ end }}{{ end }}> -->
-            <!--       <label class="btn btn-outline-primary" for="in-person">in person</label> -->
-
-            <!--       <input type="radio" class="btn-check" name="team-location" -->
-            <!--         value="remote" id="remote" autocomplete="off" required -->
-            <!--         {{ with .Data.Team }}{{ if not .InPerson }}checked{{ else }}disabled{{ end }}{{ end }}> -->
-            <!--       <label class="btn btn-outline-primary" for="remote">remotely</label> -->
-            <!--     </div> -->
-            <!--     <div class="form-text"> -->
-            <!--       In-person competitors will have the opportunity to do a campus tour after the -->
-            <!--       competition. -->
-            <!--       {{ with .Data.Team -}} -->
-            <!--         If you need to change this, please email -->
-            <!--         <a href="mailto:support@mineshspc.com">support@mineshspc.com</a>. -->
-            <!--       {{- end -}} -->
-            <!--     </div> -->
-            <!--   </div> -->
-            <!-- </div> -->
+          </div>
+          <div class="card-footer text-center">
+            <button type="submit" class="btn btn-lg btn-primary"
+              {{ if not .RegistrationEnabled }}disabled{{ end }}
+            >
+              {{- if .Data.Team -}}
+                Save Team Information
+              {{- else -}}
+                Create Team
+              {{- end -}}
+            </button>
           </div>
         </div>
-      </div>
-    </div>
-    <!-- <div class="row"> -->
-    <!--   <div class="col m-4 mt-0"> -->
-    <!--     <div class="card"> -->
-    <!--       <h4 class="card-header">Team Division</h4> -->
-    <!--       <div class="card-body"> -->
-    <!--         <div class="row mb-2"> -->
-    <!--           <div class="col-md-12"> -->
-    <!--             <div class="btn-group" role="group" aria-label="Select team division"> -->
-    <!--               <input type="radio" class="btn-check" name="team-division" -->
-    <!--                 value="Beginner" id="beginner" autocomplete="off" required -->
-    <!--                 {{ if not .RegistrationEnabled }}disabled{{ end }} -->
-    <!--                 {{ with .Data.Team }}{{ if eq .Division "Beginner" }}checked{{ end }}{{ end }}> -->
-    <!--               <label class="btn w-100 btn-outline-primary" for="beginner"> -->
-    <!--                 <h4>Beginner</h4> -->
-    <!--                 <p> -->
-    <!--                   For students who have never competed in HSPC before and who do not have any -->
-    <!--                   experience with data structures or algorithms. -->
-    <!--                 </p> -->
-    <!--               </label> -->
-
-    <!--               <input type="radio" class="btn-check" name="team-division" -->
-    <!--                 value="Advanced" id="advanced" autocomplete="off" required -->
-    <!--                 {{ if not .RegistrationEnabled }}disabled{{ end }} -->
-    <!--                 {{ with .Data.Team }}{{ if eq .Division "Advanced" }}checked{{ end }}{{ end }}> -->
-    <!--               <label class="btn w-100 btn-outline-primary" for="advanced"> -->
-    <!--                 <h4>Advanced</h4> -->
-    <!--                 <p> -->
-    <!--                   For students who know anything about data structures or algorithms. -->
-    <!--                 </p> -->
-    <!--               </label> -->
-    <!--             </div> -->
-    <!--           </div> -->
-    <!--         </div> -->
-    <!--         <div class="row mb-2"> -->
-    <!--           <div class="col-md-12"> -->
-    <!--             <label for="team-division-explanation" class="form-label"> -->
-    <!--               Why do you think that the division you selected is the best fit for this team? -->
-    <!--             </label> -->
-    <!--             <textarea class="form-control" name="team-division-explanation" -->
-    <!--               id="team-division-explanation" rows="4" required>{{ with .Data.Team }}{{ .DivisionExplanation }}{{ end }}</textarea> -->
-    <!--             <div class="form-text"> -->
-    <!--               We will use this information to ensure that teams are placed in the correct -->
-    <!--               division. -->
-    <!--             </div> -->
-    <!--           </div> -->
-    <!--         </div> -->
-    <!--       </div> -->
-    <!--     </div> -->
-    <!--   </div> -->
-    <!-- </div> -->
-    {{ with $t := .Data.Team }}
-      <div class="row">
-        <div class="col m-4 mt-0">
-          <div class="card">
-            <h4 class="card-header">Team Members</h4>
-            <table class="table mb-0 small">
-              <thead>
-                <tr>
-                  <th scope="col">Name</th>
-                  <th scope="col">Email</th>
-                  <th scope="col">Age</th>
-                  <th scope="col">Previously Participated</th>
-                  <th scope="col">Parent/Guardian Email</th>
-                  <th scope="col" class="text-center">Delete</th>
-                </tr>
-              </thead>
-              <tbody>
-                {{ range .Members }}
-                  <tr>
-                    <th scope="row">{{ .Name }}</th>
-                    <td>{{ .Email }}</td>
-                    <td>{{ .Age }}</td>
-                    <td>{{ if .PreviouslyParticipated }}Yes{{ else }}No{{ end }}</td>
-                    <td>{{ .ParentEmail }}</td>
-                    <td class="text-center">
-                      <form method="POST" action="/register/teacher/team/delete"
-                            onsubmit="return confirm('Are you sure you want to remove {{ .Name }} from {{ $t.Name }}?')">
-                        <input type="hidden" name="team_id" value="{{ $t.ID }}">
-                        <input type="hidden" name="email" value="{{ .Email }}">
-                        <button type="submit" class="btn btn-danger">
-                          <i class="fa fa-times"></i>
-                        </button>
-                      </form>
-                    </td>
-                  </tr>
-                {{ end }}
-              </tbody>
-            </table>
-            <div class="card-footer">
-              {{ if lt (len .Members) 4 }}
-                <a href="/register/teacher/team/addmember?team_id={{ .ID }}" type="button"
-                   class="btn btn-primary {{ if not $.RegistrationEnabled }}disabled{{ end }}">
-                  Add Member
-                </a>
-              {{ else }}
-                You cannot add more than 4 members to a team. Please delete a member to add a new one.
-              {{ end }}
-            </div>
-          </div>
-        </div>
-      </div>
-    {{ end }}
-    <div class="row text-center pb-4">
-      <div class="col-md-12">
-        <button type="submit" class="btn btn-lg btn-primary"
-          {{ if not .RegistrationEnabled }}disabled{{ end }}
-        >
-          {{- if .Data.Team -}}
-            Save Team
-          {{- else -}}
-            Create Team
-          {{- end -}}
-        </button>
       </div>
     </div>
   </form>
+
+  {{ with $t := .Data.Team }}
+    <div class="row">
+      <div class="col m-4 mt-0">
+        <div class="card">
+          <h4 class="card-header">Team Members</h4>
+          <table class="table mb-0 small">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Age</th>
+                <th scope="col">Previously Participated</th>
+                <th scope="col">Parent/Guardian Email</th>
+                <th scope="col" class="text-center">Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{ range .Members }}
+                <tr>
+                  <th scope="row">{{ .Name }}</th>
+                  <td>{{ .Email }}</td>
+                  <td>{{ .Age }}</td>
+                  <td>{{ if .PreviouslyParticipated }}Yes{{ else }}No{{ end }}</td>
+                  <td>{{ .ParentEmail }}</td>
+                  <td class="text-center">
+                    <form method="POST" action="/register/teacher/team/delete"
+                          onsubmit="return confirm('Are you sure you want to remove {{ .Name }} from {{ $t.Name }}?')">
+                      <input type="hidden" name="team_id" value="{{ $t.ID }}">
+                      <input type="hidden" name="email" value="{{ .Email }}">
+                      <button type="submit" class="btn btn-danger">
+                        <i class="fa fa-times"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              {{ end }}
+            </tbody>
+          </table>
+          <div class="card-footer">
+            {{ if lt (len .Members) 4 }}
+              <a href="/register/teacher/team/addmember?team_id={{ .ID }}" type="button"
+                 class="btn btn-primary {{ if not $.RegistrationEnabled }}disabled{{ end }}">
+                Add Member
+              </a>
+            {{ else }}
+              You cannot add more than 4 members to a team. Please delete a member to add a new one.
+            {{ end }}
+          </div>
+        </div>
+      </div>
+    </div>
+  {{ end }}
 </div>
 {{ end }}
