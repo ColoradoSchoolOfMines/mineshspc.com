@@ -5,21 +5,30 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    (flake-utils.lib.eachDefaultSystem (system:
-      let pkgs = import nixpkgs { inherit system; };
-      in rec {
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+    }:
+    (flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+      in
+      rec {
         packages.mineshspc = pkgs.buildGoModule {
           pname = "mineshspc.com";
           version = "unstable-2026-01-11";
           src = self;
           subPackages = [ "cmd/mineshspc" ];
-          vendorHash = "sha256-RC1MUy5RyQZ0YJbADByk1c8lcG/3GkddDQyV1dw2BFc=";
+          vendorHash = "sha256-MqiajLO7Rns+espIPo+GYlG03AsiEzLnI9skN7eTZHo=";
         };
         packages.default = packages.mineshspc;
 
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [ gcc go gotools pre-commit ];
         };
-      }));
+      }
+    ));
 }

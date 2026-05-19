@@ -3,7 +3,6 @@ package internal
 import (
 	"context"
 	"encoding/csv"
-	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -24,47 +23,7 @@ func (a *Application) createAdminLoginJWT(email string) *jwt.Token {
 	})
 }
 
-func (a *Application) isAdminByToken(tokenStr string) (bool, error) {
-	if tokenStr == "" {
-		return false, errors.New("no token")
-	}
-
-	token, err := jwt.ParseWithClaims(tokenStr, &jwt.RegisteredClaims{}, func(token *jwt.Token) (any, error) {
-		// Don't forget to validate the alg is what you expect:
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-
-		return a.Config.ReadSecretKey(), nil
-	})
-	if err != nil {
-		return false, fmt.Errorf("failed to parse admin token: %w", err)
-	}
-
-	claims, ok := token.Claims.(*jwt.RegisteredClaims)
-	if !token.Valid || !ok {
-		return false, fmt.Errorf("failed to validate token: %w", err)
-	}
-
-	if claims.Issuer != string(IssuerAdminLogin) {
-		return false, fmt.Errorf("invalid student verify token: %w", err)
-	}
-
-	return true, nil
-}
-
 func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
-	tok, err := r.Cookie("admin_token")
-	if err != nil {
-		a.Log.Warn().Err(err).Msg("failed to get admin token")
-		return nil
-	}
-
-	if isAdmin, err := a.isAdminByToken(tok.Value); err != nil || !isAdmin {
-		a.Log.Warn().Err(err).Msg("user is not admin!")
-		return nil
-	}
-
 	teamsWithTeachers, err := a.DB.GetAdminTeamsWithTeacherName(r.Context())
 	if err != nil {
 		a.Log.Err(err).Msg("failed to get teams")
@@ -153,17 +112,6 @@ func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
 }
 
 func (a *Application) GetAdminDietaryRestrictionsTemplate(r *http.Request) map[string]any {
-	tok, err := r.Cookie("admin_token")
-	if err != nil {
-		a.Log.Warn().Err(err).Msg("failed to get admin token")
-		return nil
-	}
-
-	if isAdmin, err := a.isAdminByToken(tok.Value); err != nil || !isAdmin {
-		a.Log.Warn().Err(err).Msg("user is not admin!")
-		return nil
-	}
-
 	dietaryRestrictions, err := a.DB.GetAllDietaryRestrictions(r.Context())
 	if err != nil {
 		a.Log.Err(err).Msg("failed to get dietary restrictions")
@@ -179,7 +127,7 @@ func (a *Application) HandleAdminEmailLogin(w http.ResponseWriter, r *http.Reque
 	tok := r.URL.Query().Get("tok")
 	log := zerolog.Ctx(r.Context())
 	log.Info().Str("token", tok).Msg("got token")
-	isAdmin, err := a.isAdminByToken(tok)
+	isAdmin, err := a.parseTokenByIssuer(tok, IssuerAdminLogin)
 	if err != nil || !isAdmin {
 		log.Warn().Msg("failed to get admin")
 		w.WriteHeader(http.StatusBadRequest)
