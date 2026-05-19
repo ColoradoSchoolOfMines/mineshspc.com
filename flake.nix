@@ -19,7 +19,7 @@
         packages.default = packages.mineshspc;
 
         devShells.default = pkgs.mkShell {
-          packages = with pkgs; [ go gotools pre-commit ];
+          packages = with pkgs; [ gcc go gotools pre-commit ];
         };
       }));
 }
