@@ -24,7 +24,7 @@ func (a *Application) createVolunteerLoginJWT(email string) *jwt.Token {
 
 func (a *Application) HandleVolunteerEmailLogin(w http.ResponseWriter, r *http.Request) {
 	tok := r.URL.Query().Get("tok")
-	zerolog.Ctx(r.Context()).Info().Str("token", tok).Msg("got token")
+	zerolog.Ctx(r.Context()).Info().Msg("received volunteer login token")
 	isVolunteer, err := a.parseTokenByIssuer(tok, IssuerVolunteerLogin)
 	if err != nil || !isVolunteer {
 		a.Log.Warn().Msg("failed to get volunteer")

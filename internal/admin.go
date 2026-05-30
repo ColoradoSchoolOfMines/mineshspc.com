@@ -126,7 +126,7 @@ func (a *Application) GetAdminDietaryRestrictionsTemplate(r *http.Request) map[s
 func (a *Application) HandleAdminEmailLogin(w http.ResponseWriter, r *http.Request) {
 	tok := r.URL.Query().Get("tok")
 	log := zerolog.Ctx(r.Context())
-	log.Info().Str("token", tok).Msg("got token")
+	log.Info().Msg("got admin login token")
 	isAdmin, err := a.parseTokenByIssuer(tok, IssuerAdminLogin)
 	if err != nil || !isAdmin {
 		log.Warn().Msg("failed to get admin")
