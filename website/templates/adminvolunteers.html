@@ -1,0 +1,54 @@
+{{ define "title" }}Admin Volunteers{{ end }}
+
+{{ define "content" }}
+<div class="container page-header">
+  <div class="row">
+    <div class="col">
+      <h1>Volunteers</h1>
+    </div>
+  </div>
+</div>
+
+<div class="container page-content">
+  <div class="row mb-4">
+    <div class="col">
+      <h2>Add Volunteer</h2>
+      <form method="POST" action="/admin/volunteers/add" class="d-flex gap-2">
+        <input type="email" name="email" class="form-control" placeholder="volunteer@example.com" required>
+        <button type="submit" class="btn btn-primary">Add</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <h2>Current Volunteers</h2>
+      {{ if .Data.Volunteers }}
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ range .Data.Volunteers }}
+          <tr>
+            <td>{{ . }}</td>
+            <td>
+              <form method="POST" action="/admin/volunteers/remove">
+                <input type="hidden" name="email" value="{{ . }}">
+                <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+              </form>
+            </td>
+          </tr>
+          {{ end }}
+        </tbody>
+      </table>
+      {{ else }}
+      <p class="text-muted">No volunteers registered.</p>
+      {{ end }}
+    </div>
+  </div>
+</div>
+{{ end }}
