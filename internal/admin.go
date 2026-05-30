@@ -510,6 +510,53 @@ func (a *Application) HandleZoomBreakoutExport(w http.ResponseWriter, r *http.Re
 	writer.Flush()
 }
 
+func (a *Application) GetAdminVolunteersTemplate(r *http.Request) map[string]any {
+	volunteers, err := a.DB.GetAllVolunteers(r.Context())
+	if err != nil {
+		a.Log.Err(err).Msg("failed to get volunteers")
+		return nil
+	}
+	return map[string]any{"Volunteers": volunteers}
+}
+
+func (a *Application) HandleAdminAddVolunteer(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		a.Log.Warn().Err(err).Msg("failed to parse form")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	email := r.FormValue("email")
+	if email == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if err := a.DB.AddVolunteer(r.Context(), email); err != nil {
+		a.Log.Err(err).Msg("failed to add volunteer")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/admin/volunteers", http.StatusSeeOther)
+}
+
+func (a *Application) HandleAdminRemoveVolunteer(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		a.Log.Warn().Err(err).Msg("failed to parse form")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	email := r.FormValue("email")
+	if email == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if err := a.DB.RemoveVolunteer(r.Context(), email); err != nil {
+		a.Log.Err(err).Msg("failed to remove volunteer")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/admin/volunteers", http.StatusSeeOther)
+}
+
 func (a *Application) HandleManualCheckin(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	email := r.URL.Query().Get("email")
