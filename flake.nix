@@ -22,12 +22,16 @@
           version = "unstable-2026-01-11";
           src = self;
           subPackages = [ "cmd/mineshspc" ];
-          vendorHash = "sha256-MqiajLO7Rns+espIPo+GYlG03AsiEzLnI9skN7eTZHo=";
+          vendorHash = "sha256-4VfpjGqisc2vNgLLP1FkzSi4krIcgs5ZlilwIMVi6/k=";
         };
         packages.default = packages.mineshspc;
 
         devShells.default = pkgs.mkShell {
-          packages = with pkgs; [ gcc go gotools pre-commit ];
+          packages = with pkgs; [
+            gcc
+            go
+            pre-commit
+          ];
         };
       }
     ));
