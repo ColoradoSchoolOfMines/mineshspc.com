@@ -8,16 +8,27 @@ repos:
       - id: check-yaml
       - id: check-added-large-files
 
+  - repo: local
+    hooks:
+      - id: goimports
+        name: goimports
+        description: Run goimports on the repository
+        entry: go tool goimports -local github.com/ColoradoSchoolOfMines/mineshspc.com -w .
+        language: unsupported
+        pass_filenames: false
+        types: [ go ]
+      - id: staticcheck
+        name: staticcheck
+        description: Run staticcheck on the repository
+        entry: go tool staticcheck ./...
+        language: unsupported
+        pass_filenames: false
+        types: [ go ]
+
   - repo: https://github.com/tekwizely/pre-commit-golang
     rev: v1.0.0-rc.4
     hooks:
-      - id: go-imports-repo
-        args:
-          - "-local"
-          - "github.com/ColoradoSchoolOfMines/mineshspc.com"
-          - "-w"
       - id: go-vet-repo-mod
-      - id: go-staticcheck-repo-mod
 
   - repo: https://github.com/beeper/pre-commit-go
     rev: v0.4.2
