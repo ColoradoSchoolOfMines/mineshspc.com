@@ -243,8 +243,10 @@ func (a *Application) BuildRouter() http.Handler {
 	adminRouter.HandleFunc("GET /api/manualcheckin", a.HandleManualCheckin)
 	adminRouter.HandleFunc("GET /api/team-list", a.HandleTeamList)
 	router.Handle("/admin/", http.StripPrefix("/admin", a.AdminAuthMiddleware(adminRouter)))
+	// Redirect /admin → /admin/ so the subrouter handles the home page in one place.
+	// Auth check here prevents leaking the redirect to unauthenticated requests.
 	router.Handle("GET /admin", a.AdminAuthMiddleware(
-		http.HandlerFunc(a.ServeTemplate(a.Log, "adminhome.html", noArgs))))
+		http.RedirectHandler("/admin/", http.StatusMovedPermanently)))
 
 	// Volunteer pages (unprotected)
 	router.HandleFunc("GET /volunteer", a.ServeTemplate(a.Log, "volunteerhome.html", noArgs))

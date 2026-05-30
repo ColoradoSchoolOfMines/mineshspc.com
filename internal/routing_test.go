@@ -65,11 +65,18 @@ func assertRedirectsTo(t *testing.T, rec *httptest.ResponseRecorder, location st
 	assert.Equal(t, location, rec.Header().Get("Location"))
 }
 
-func assertNotRedirectTo(t *testing.T, rec *httptest.ResponseRecorder, location string) {
+// assertPassedAuth verifies the auth middleware let the request through.
+// Handlers may still return 4xx/5xx in the test environment; what matters
+// is that the response is not a redirect to the given login page.
+func assertPassedAuth(t *testing.T, rec *httptest.ResponseRecorder, loginPath string) {
 	t.Helper()
-	if rec.Code == http.StatusSeeOther || rec.Code == http.StatusFound || rec.Code == http.StatusTemporaryRedirect {
-		assert.NotEqual(t, location, rec.Header().Get("Location"),
-			"expected route NOT to redirect to %s but it did", location)
+	codes := []int{http.StatusMovedPermanently, http.StatusFound, http.StatusSeeOther, http.StatusTemporaryRedirect}
+	for _, code := range codes {
+		if rec.Code == code {
+			assert.NotEqual(t, loginPath, rec.Header().Get("Location"),
+				"expected auth to pass, but was redirected to login (status %d)", code)
+			return
+		}
 	}
 }
 
@@ -127,7 +134,7 @@ func TestRouting_Admin_WrongIssuer(t *testing.T) {
 func TestRouting_Admin_ValidToken(t *testing.T) {
 	router := newTestAppWithDB(t).BuildRouter()
 	for _, path := range []string{
-		"/admin",
+		"/admin/",
 		"/admin/teams",
 		"/admin/dietaryrestrictions",
 		"/admin/api/kattis/teams",
@@ -136,7 +143,7 @@ func TestRouting_Admin_ValidToken(t *testing.T) {
 	} {
 		rec := doRequest(router, http.MethodGet, path,
 			&http.Cookie{Name: "admin_token", Value: adminToken(t)})
-		assertNotRedirectTo(t, rec, "/admin/login")
+		assertPassedAuth(t, rec, "/admin/login")
 	}
 }
 
@@ -144,7 +151,7 @@ func TestRouting_Admin_ValidToken(t *testing.T) {
 
 func TestRouting_AdminLogin_NoCookie(t *testing.T) {
 	router := newTestAppWithDB(t).BuildRouter()
-	assertNotRedirectTo(t, doRequest(router, http.MethodGet, "/admin/login"), "/admin/login")
+	assertPassedAuth(t, doRequest(router, http.MethodGet, "/admin/login"), "/admin/login")
 }
 
 // --- Volunteer route protection ---
@@ -184,7 +191,7 @@ func TestRouting_Volunteer_ValidToken(t *testing.T) {
 	} {
 		rec := doRequest(router, http.MethodGet, path,
 			&http.Cookie{Name: "volunteer_token", Value: volunteerToken(t)})
-		assertNotRedirectTo(t, rec, "/volunteer/login")
+		assertPassedAuth(t, rec, "/volunteer/login")
 	}
 }
 
@@ -193,6 +200,6 @@ func TestRouting_Volunteer_ValidToken(t *testing.T) {
 func TestRouting_VolunteerPublic_NoCookie(t *testing.T) {
 	router := newTestAppWithDB(t).BuildRouter()
 	for _, path := range []string{"/volunteer", "/volunteer/login"} {
-		assertNotRedirectTo(t, doRequest(router, http.MethodGet, path), "/volunteer/login")
+		assertPassedAuth(t, doRequest(router, http.MethodGet, path), "/volunteer/login")
 	}
 }
