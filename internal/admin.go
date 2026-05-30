@@ -154,13 +154,8 @@ func (a *Application) HandleAdminLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	log = log.With().Str("email", emailAddress).Logger()
 
-	isAdmin, err := a.DB.IsEmailAdmin(r.Context(), emailAddress)
-	if err != nil {
-		log.Warn().Err(err).Msg("failed to find admin by email")
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	} else if !isAdmin {
-		log.Warn().Err(err).Msg("user is not an admin, not sending email")
+	if !a.Config.IsAdminEmail(emailAddress) {
+		log.Warn().Msg("user is not an admin, not sending email")
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}

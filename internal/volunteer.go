@@ -52,14 +52,15 @@ func (a *Application) HandleVolunteerLogin(w http.ResponseWriter, r *http.Reques
 	}
 	log = log.With().Str("email", emailAddress).Logger()
 
-	isVolunteer, err := a.DB.IsEmailVolunteer(r.Context(), emailAddress)
-	if err != nil {
+	if a.Config.IsAdminEmail(emailAddress) {
+		log.Info().Msg("email is an admin email, allowing login")
+	} else if isVolunteer, err := a.DB.IsEmailVolunteer(r.Context(), emailAddress); err != nil {
 		log.Warn().Err(err).Msg("failed to find volunteer by email")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	} else if !isVolunteer {
-		log.Warn().Err(err).Msg("teacher email not confirmed, not sending login code to avoid amplification attacks")
-		w.WriteHeader(http.StatusBadRequest)
+		log.Warn().Msg("user is not a volunteer, not sending login code to avoid amplification attacks")
+		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 

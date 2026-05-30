@@ -49,12 +49,23 @@ type Configuration struct {
 	RegistrationEnabled bool           `yaml:"registration_enabled"`
 	Homepage            HomepageConfig `yaml:"homepage"`
 
+	AdminEmails []string `yaml:"admin_emails"`
+
 	JWTSecretKeyFile string `yaml:"jwt_secret_key_file"`
 	JWTSecretKey     string `yaml:"jwt_secret_key"`
 
 	Recaptcha RecaptchaConfig `yaml:"recaptcha"`
 
 	Logging zeroconfig.Config `yaml:"logging"`
+}
+
+func (c *Configuration) IsAdminEmail(email string) bool {
+	for _, e := range c.AdminEmails {
+		if e == email {
+			return true
+		}
+	}
+	return false
 }
 
 func (c *Configuration) ReadSecretKey() []byte {

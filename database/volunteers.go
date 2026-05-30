@@ -6,12 +6,6 @@ import (
 )
 
 func (d *Database) IsEmailVolunteer(ctx context.Context, email string) (bool, error) {
-	// TODO this check probably should not be in database layer, but whatever
-	if isAdmin, err := d.IsEmailAdmin(ctx, email); err == nil && isAdmin {
-		// Admins are always volunteers
-		return true, nil
-	}
-
 	var isVolunteer bool
 	err := d.DB.QueryRow(ctx, "SELECT true FROM volunteers WHERE email = $1", email).Scan(&isVolunteer)
 	if err == sql.ErrNoRows {

@@ -29,6 +29,10 @@ hosted_by_html: |
 # Use the following domain for email links.
 domain: http://localhost:8090
 
+# List of email addresses with admin access.
+admin_emails:
+  - admin@example.com
+
 # A file that contains the HMAC secret key for signing the JWT tokens.
 jwt_secret_key_file: secret_key_file
 
