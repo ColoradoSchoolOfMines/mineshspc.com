@@ -124,6 +124,49 @@ func (a *Application) GetAdminDietaryRestrictionsTemplate(r *http.Request) map[s
 	}
 }
 
+type PreflightStudent struct {
+	Name     string
+	Email    string
+	TeamName string
+}
+
+func (a *Application) GetAdminPreflightTemplate(r *http.Request) map[string]any {
+	teams, err := a.DB.GetAdminTeamsWithTeacherName(r.Context())
+	if err != nil {
+		a.Log.Err(err).Msg("failed to get teams for preflight")
+		return nil
+	}
+
+	var unconfirmedEmail, unsignedForms, noQRCode, notCheckedIn []PreflightStudent
+	for _, team := range teams {
+		for _, student := range team.Members {
+			s := PreflightStudent{Name: student.Name, Email: student.Email, TeamName: team.Name}
+			if !student.EmailConfirmed {
+				unconfirmedEmail = append(unconfirmedEmail, s)
+				continue
+			}
+			if !student.LiabilitySigned || (team.InPerson && !student.ComputerUseWaiverSigned) {
+				unsignedForms = append(unsignedForms, s)
+				continue
+			}
+			if !student.QRCodeSent {
+				noQRCode = append(noQRCode, s)
+				continue
+			}
+			if team.InPerson && !student.CheckedIn {
+				notCheckedIn = append(notCheckedIn, s)
+			}
+		}
+	}
+
+	return map[string]any{
+		"UnconfirmedEmail": unconfirmedEmail,
+		"UnsignedForms":    unsignedForms,
+		"NoQRCode":         noQRCode,
+		"NotCheckedIn":     notCheckedIn,
+	}
+}
+
 func (a *Application) GetAdminTeachersTemplate(r *http.Request) map[string]any {
 	teachers, err := a.DB.GetAllTeachers(r.Context())
 	if err != nil {

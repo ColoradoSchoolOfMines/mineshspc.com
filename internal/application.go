@@ -229,6 +229,7 @@ func (a *Application) BuildRouter() http.Handler {
 	adminRouter := http.NewServeMux()
 	adminRouter.HandleFunc("GET /{$}", a.ServeTemplate(a.Log, "adminhome.html", noArgs))
 	adminRouter.HandleFunc("GET /dietaryrestrictions", a.ServeTemplate(a.Log, "admindietaryrestrictions.html", a.GetAdminDietaryRestrictionsTemplate))
+	adminRouter.HandleFunc("GET /preflight", a.ServeTemplate(a.Log, "adminpreflight.html", a.GetAdminPreflightTemplate))
 	adminRouter.HandleFunc("GET /teachers", a.ServeTemplate(a.Log, "adminteachers.html", a.GetAdminTeachersTemplate))
 	adminRouter.HandleFunc("POST /teachers/allowance", a.HandleAdminSetEmailAllowance)
 	adminRouter.HandleFunc("GET /teams", a.ServeTemplate(a.Log, "adminteams.html", a.GetAdminTeamsTemplate))
