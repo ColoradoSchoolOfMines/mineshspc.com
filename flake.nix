@@ -22,7 +22,7 @@
           version = "unstable-2026-01-11";
           src = self;
           subPackages = [ "cmd/mineshspc" ];
-          vendorHash = "sha256-4VfpjGqisc2vNgLLP1FkzSi4krIcgs5ZlilwIMVi6/k=";
+          vendorHash = "sha256-yEXplnaY4rYZ0WUTy3S92PGizXPJ9j6wOHly70R1lMY=";
         };
         packages.default = packages.mineshspc;
 
