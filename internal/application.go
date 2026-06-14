@@ -248,6 +248,7 @@ func (a *Application) BuildRouter() http.Handler {
 	adminRouter.HandleFunc("GET /api/kattis/participants", a.HandleKattisParticipantsExport)
 	adminRouter.HandleFunc("GET /api/zoom/breakout", a.HandleZoomBreakoutExport)
 	adminRouter.HandleFunc("GET /api/manualcheckin", a.HandleManualCheckin)
+	adminRouter.HandleFunc("GET /api/manualuncheckin", a.HandleManualUncheckin)
 	adminRouter.HandleFunc("GET /api/team-list", a.HandleTeamList)
 	router.Handle("/admin/", http.StripPrefix("/admin", a.AdminAuthMiddleware(adminRouter)))
 	// Redirect /admin → /admin/ so the subrouter handles the home page in one place.

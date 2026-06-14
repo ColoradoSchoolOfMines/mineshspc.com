@@ -104,3 +104,8 @@ func (d *Database) CheckInStudent(ctx context.Context, email string) error {
 	`, email)
 	return err
 }
+
+func (d *Database) UncheckInStudent(ctx context.Context, email string) error {
+	_, err := d.DB.Exec(ctx, `UPDATE students SET checkedin = false WHERE email = $1`, email)
+	return err
+}

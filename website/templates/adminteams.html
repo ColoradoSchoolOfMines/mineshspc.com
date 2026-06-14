@@ -264,6 +264,14 @@
                                 Checkin Manually
                               </a>
                             </small>
+                          {{ else }}
+                            <br>
+                            <small>
+                              <a href="/admin/api/manualuncheckin?email={{ .Email }}"
+                                 title="Reverse the check-in for this student.">
+                                Undo Check-in
+                              </a>
+                            </small>
                           {{ end }}
                         {{ end }}
                         {{ if not .EmailConfirmed }}

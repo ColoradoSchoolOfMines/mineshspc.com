@@ -661,6 +661,21 @@ func (a *Application) HandleManualCheckin(w http.ResponseWriter, r *http.Request
 	http.Redirect(w, r, "/admin/teams", http.StatusSeeOther)
 }
 
+func (a *Application) HandleManualUncheckin(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	email := r.URL.Query().Get("email")
+	if email == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if err := a.DB.UncheckInStudent(ctx, email); err != nil {
+		a.Log.Err(err).Msg("failed to uncheck-in student")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/admin/teams", http.StatusSeeOther)
+}
+
 func (a *Application) HandleTeamList(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	onlyFirstTime := r.URL.Query().Get("firsttime") == "true"
