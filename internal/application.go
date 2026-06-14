@@ -233,6 +233,7 @@ func (a *Application) BuildRouter() http.Handler {
 	adminRouter.HandleFunc("GET /volunteers", a.ServeTemplate(a.Log, "adminvolunteers.html", a.GetAdminVolunteersTemplate))
 	adminRouter.HandleFunc("POST /volunteers/add", a.HandleAdminAddVolunteer)
 	adminRouter.HandleFunc("POST /volunteers/remove", a.HandleAdminRemoveVolunteer)
+	adminRouter.HandleFunc("GET /api/dietaryrestrictions", a.HandleDietaryRestrictionsExport)
 	adminRouter.HandleFunc("GET /api/resendstudentemail", a.HandleResendStudentEmail)
 	adminRouter.HandleFunc("GET /api/resendparentemail", a.HandleResendParentEmail)
 	adminRouter.HandleFunc("GET /api/confirmationlink/student", a.HandleGetStudentEmailConfirmationLink)

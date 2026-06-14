@@ -123,6 +123,24 @@ func (a *Application) GetAdminDietaryRestrictionsTemplate(r *http.Request) map[s
 	}
 }
 
+func (a *Application) HandleDietaryRestrictionsExport(w http.ResponseWriter, r *http.Request) {
+	restrictions, err := a.DB.GetAllDietaryRestrictions(r.Context())
+	if err != nil {
+		a.Log.Err(err).Msg("failed to get dietary restrictions")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/csv")
+	w.Header().Set("Content-Disposition", `attachment; filename="dietary-restrictions.csv"`)
+	writer := csv.NewWriter(w)
+	writer.Write([]string{"Dietary Restriction"})
+	for _, r := range restrictions {
+		writer.Write([]string{r})
+	}
+	writer.Flush()
+}
+
 func (a *Application) HandleAdminEmailLogin(w http.ResponseWriter, r *http.Request) {
 	tok := r.URL.Query().Get("tok")
 	log := zerolog.Ctx(r.Context())
