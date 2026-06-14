@@ -1,0 +1,59 @@
+{{ define "title" }}Admin Teachers{{ end }}
+
+{{ define "content" }}
+<div class="container page-header">
+  <div class="row">
+    <div class="col">
+      <h1>Teachers</h1>
+    </div>
+  </div>
+</div>
+
+<div class="container page-content">
+  {{ if .Data.Teachers }}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>School</th>
+        <th>Confirmed</th>
+        <th>Email Allowance</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range .Data.Teachers }}
+      <tr>
+        <td>{{ .Name }}</td>
+        <td>{{ .Email }}</td>
+        <td>
+          {{ if .SchoolName }}
+            {{ .SchoolName }}<br>
+            <small class="text-muted">{{ .SchoolCity }}, {{ .SchoolState }}</small>
+          {{ else }}
+            <span class="text-muted">—</span>
+          {{ end }}
+        </td>
+        <td>
+          {{ if .EmailConfirmed }}
+            <span class="badge bg-success">Yes</span>
+          {{ else }}
+            <span class="badge bg-warning text-dark">No</span>
+          {{ end }}
+        </td>
+        <td>
+          <form method="POST" action="/admin/teachers/allowance" class="d-flex gap-2 align-items-center">
+            <input type="hidden" name="email" value="{{ .Email }}">
+            <input type="number" name="allowance" value="{{ .EmailAllowance }}" min="0" class="form-control form-control-sm" style="width: 5rem;">
+            <button type="submit" class="btn btn-sm btn-primary">Update</button>
+          </form>
+        </td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
+  {{ else }}
+  <p class="text-muted">No teachers registered.</p>
+  {{ end }}
+</div>
+{{ end }}

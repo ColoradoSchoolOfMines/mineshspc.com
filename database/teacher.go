@@ -48,6 +48,37 @@ func (d *Database) scanTeacher(row dbutil.Scannable) (*Teacher, error) {
 	return &t, nil
 }
 
+func (d *Database) GetAllTeachers(ctx context.Context) ([]*Teacher, error) {
+	rows, err := d.DB.Query(ctx, `
+		SELECT t.name, t.email, t.emailconfirmed, t.emailallowance, t.schoolname, t.schoolcity, t.schoolstate
+		FROM teachers t
+		ORDER BY t.name
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var teachers []*Teacher
+	for rows.Next() {
+		teacher, err := d.scanTeacher(rows)
+		if err != nil {
+			return nil, err
+		}
+		teachers = append(teachers, teacher)
+	}
+	return teachers, rows.Err()
+}
+
+func (d *Database) SetEmailAllowance(ctx context.Context, email string, allowance int) error {
+	_, err := d.DB.Exec(ctx, `
+		UPDATE teachers
+		SET emailallowance = ?
+		WHERE email = ?
+	`, allowance, email)
+	return err
+}
+
 func (d *Database) GetTeacherByEmail(ctx context.Context, email string) (*Teacher, error) {
 	row := d.DB.QueryRow(ctx, `
 		SELECT t.name, t.email, t.emailconfirmed, t.emailallowance, t.schoolname, t.schoolcity, t.schoolstate

@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -121,6 +122,40 @@ func (a *Application) GetAdminDietaryRestrictionsTemplate(r *http.Request) map[s
 	return map[string]any{
 		"DietaryRestrictions": dietaryRestrictions,
 	}
+}
+
+func (a *Application) GetAdminTeachersTemplate(r *http.Request) map[string]any {
+	teachers, err := a.DB.GetAllTeachers(r.Context())
+	if err != nil {
+		a.Log.Err(err).Msg("failed to get teachers")
+		return nil
+	}
+	return map[string]any{"Teachers": teachers}
+}
+
+func (a *Application) HandleAdminSetEmailAllowance(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		a.Log.Warn().Err(err).Msg("failed to parse form")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	email := r.FormValue("email")
+	allowanceStr := r.FormValue("allowance")
+	if email == "" || allowanceStr == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	allowance, err := strconv.Atoi(allowanceStr)
+	if err != nil || allowance < 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if err := a.DB.SetEmailAllowance(r.Context(), email, allowance); err != nil {
+		a.Log.Err(err).Msg("failed to set email allowance")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/admin/teachers", http.StatusSeeOther)
 }
 
 func (a *Application) HandleDietaryRestrictionsExport(w http.ResponseWriter, r *http.Request) {
