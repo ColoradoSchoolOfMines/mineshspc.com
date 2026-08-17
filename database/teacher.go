@@ -6,16 +6,29 @@ import (
 
 	"github.com/google/uuid"
 	"go.mau.fi/util/dbutil"
+	"go.mau.fi/util/exerrors"
 )
 
 type Teacher struct {
-	Name           string
-	Email          string
-	EmailConfirmed bool
-	EmailAllowance int
-	SchoolName     string
-	SchoolCity     string
-	SchoolState    string
+	Name           string `column:"name"`
+	Email          string `column:"email"`
+	EmailConfirmed bool   `column:"emailconfirmed"`
+	EmailAllowance int    `column:"emailallowance"`
+	SchoolName     string `column:"schoolname"`
+	SchoolCity     string `column:"schoolcity"`
+	SchoolState    string `column:"schoolstate"`
+}
+
+const teacherSelectColumns = `
+	t.name, t.email, t.emailconfirmed, t.emailallowance,
+	COALESCE(t.schoolname, ''), COALESCE(t.schoolcity, ''), COALESCE(t.schoolstate, '')
+`
+
+var teacherColumns = []string{"name", "email", "emailconfirmed", "emailallowance", "schoolname", "schoolcity", "schoolstate"}
+var scanTeacherRow = exerrors.Must(dbutil.MakeReflectScanner[Teacher](teacherColumns, dbutil.ReflectScanOptions{StructTag: "column"}))
+
+func (t *Teacher) Scan(row dbutil.Scannable) (*Teacher, error) {
+	return scanTeacherRow(row)
 }
 
 func (d *Database) NewTeacher(ctx context.Context, name, email string) error {
@@ -28,46 +41,12 @@ func (d *Database) SetEmailConfirmed(ctx context.Context, email string) error {
 	return err
 }
 
-func (d *Database) scanTeacher(row dbutil.Scannable) (*Teacher, error) {
-	var schoolName, schoolCity, schoolState sql.NullString
-	var t Teacher
-	if err := row.Scan(&t.Name, &t.Email, &t.EmailConfirmed, &t.EmailAllowance, &schoolName, &schoolCity, &schoolState); err != nil {
-		return nil, err
-	}
-
-	if schoolName.Valid {
-		t.SchoolName = schoolName.String
-	}
-	if schoolCity.Valid {
-		t.SchoolCity = schoolCity.String
-	}
-	if schoolState.Valid {
-		t.SchoolState = schoolState.String
-	}
-
-	return &t, nil
-}
-
 func (d *Database) GetAllTeachers(ctx context.Context) ([]*Teacher, error) {
-	rows, err := d.DB.Query(ctx, `
-		SELECT t.name, t.email, t.emailconfirmed, t.emailallowance, t.schoolname, t.schoolcity, t.schoolstate
+	return d.teacherQH.QueryMany(ctx, `
+		SELECT `+teacherSelectColumns+`
 		FROM teachers t
 		ORDER BY t.name
 	`)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var teachers []*Teacher
-	for rows.Next() {
-		teacher, err := d.scanTeacher(rows)
-		if err != nil {
-			return nil, err
-		}
-		teachers = append(teachers, teacher)
-	}
-	return teachers, rows.Err()
 }
 
 func (d *Database) SetEmailAllowance(ctx context.Context, email string, allowance int) error {
@@ -80,22 +59,28 @@ func (d *Database) SetEmailAllowance(ctx context.Context, email string, allowanc
 }
 
 func (d *Database) GetTeacherByEmail(ctx context.Context, email string) (*Teacher, error) {
-	row := d.DB.QueryRow(ctx, `
-		SELECT t.name, t.email, t.emailconfirmed, t.emailallowance, t.schoolname, t.schoolcity, t.schoolstate
+	t, err := d.teacherQH.QueryOne(ctx, `
+		SELECT `+teacherSelectColumns+`
 		FROM teachers t
 		WHERE t.email = ?
 	`, email)
-	return d.scanTeacher(row)
+	if err == nil && t == nil {
+		return nil, sql.ErrNoRows
+	}
+	return t, err
 }
 
 func (d *Database) GetTeacherForTeam(ctx context.Context, teamID uuid.UUID) (*Teacher, error) {
-	row := d.DB.QueryRow(ctx, `
-		SELECT t.name, t.email, t.emailconfirmed, t.emailallowance, t.schoolname, t.schoolcity, t.schoolstate
+	t, err := d.teacherQH.QueryOne(ctx, `
+		SELECT `+teacherSelectColumns+`
 		FROM teachers t
 		JOIN teams tea ON tea.teacheremail = t.email
 		WHERE tea.id = ?
 	`, teamID)
-	return d.scanTeacher(row)
+	if err == nil && t == nil {
+		return nil, sql.ErrNoRows
+	}
+	return t, err
 }
 
 func (d *Database) SetTeacherSchoolInfo(ctx context.Context, email, schoolName, schoolCity, schoolState string) error {
