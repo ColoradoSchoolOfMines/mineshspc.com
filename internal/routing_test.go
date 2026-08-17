@@ -21,17 +21,14 @@ func newTestAppWithDB(t *testing.T) *Application {
 	t.Helper()
 	log := zerolog.Nop()
 
-	rawDB, err := dbutil.NewFromConfig("mineshspc", dbutil.Config{
+	db := database.NewDatabase(dbutil.ZeroLogger(log), dbutil.Config{
 		PoolConfig: dbutil.PoolConfig{
 			Type:         "sqlite3",
 			URI:          ":memory:",
 			MaxOpenConns: 1,
 			MaxIdleConns: 1,
 		},
-	}, dbutil.ZeroLogger(zerolog.Nop()))
-	require.NoError(t, err)
-
-	db := database.NewDatabase(rawDB)
+	})
 	require.NoError(t, db.DB.Upgrade(context.Background()))
 
 	cfg := config.Configuration{}

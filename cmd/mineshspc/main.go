@@ -49,8 +49,7 @@ func main() {
 	log.Info().Msg("mineshspc.com backend starting...")
 
 	// Open the database
-	rawDB := exerrors.Must(dbutil.NewFromConfig("mineshspc", config.Database, dbutil.ZeroLogger(*log)))
-	db := database.NewDatabase(rawDB)
+	db := database.NewDatabase(dbutil.ZeroLogger(*log), config.Database)
 	if err := db.DB.Upgrade(context.TODO()); err != nil {
 		log.Fatal().Err(err).Msg("failed to upgrade the mineshspc.com database")
 	}
@@ -69,7 +68,7 @@ func main() {
 		for range c { // when the process is killed
 			log.Info().Msg("Cleaning up")
 			healthcheckCancel()
-			db.DB.RawDB.Close()
+			db.DB.Close()
 			os.Exit(0)
 		}
 	}()
