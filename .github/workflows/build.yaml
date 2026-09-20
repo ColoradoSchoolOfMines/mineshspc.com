@@ -27,7 +27,6 @@ jobs:
         uses: pre-commit/action@v3.0.1
 
       - uses: DeterminateSystems/nix-installer-action@v23
-      - uses: DeterminateSystems/magic-nix-cache-action@v14
       - run: nix flake check
 
   build-nix:
