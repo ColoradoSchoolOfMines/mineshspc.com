@@ -35,6 +35,31 @@ type HomepageConfig struct {
 	OpenDivisionURL        string        `yaml:"open_division_url"`
 }
 
+type ArchiveLink struct {
+	URL   string `yaml:"url"`
+	Title string `yaml:"title"`
+}
+
+type ArchiveWinningTeam struct {
+	Place    string `yaml:"place"`
+	Name     string `yaml:"name"`
+	School   string `yaml:"school"`
+	Location string `yaml:"location"`
+}
+
+type ArchiveCompetitionResult struct {
+	Name      string               `yaml:"name"`
+	Shortname string               `yaml:"shortname"`
+	Teams     []ArchiveWinningTeam `yaml:"teams"`
+}
+
+type ArchiveYearInfo struct {
+	Year            int                        `yaml:"year"`
+	RecapParagraphs []string                   `yaml:"recap_paragraphs"`
+	Links           []ArchiveLink              `yaml:"links"`
+	Results         []ArchiveCompetitionResult `yaml:"results"`
+}
+
 type Configuration struct {
 	secretKeyBytes []byte
 
@@ -48,6 +73,8 @@ type Configuration struct {
 	HostedByHTML        template.HTML  `yaml:"hosted_by_html"`
 	RegistrationEnabled bool           `yaml:"registration_enabled"`
 	Homepage            HomepageConfig `yaml:"homepage"`
+
+	Archive []ArchiveYearInfo `yaml:"archive"`
 
 	AdminEmails []string `yaml:"admin_emails"`
 
