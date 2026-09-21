@@ -44,6 +44,8 @@ recaptcha:
   secret_key: RECAPTCHA_SECRET_KEY
 
 homepage:
+  # Date displayed above the homepage schedule.
+  schedule_date: "Saturday, 25 April 2026"
   # Text for the <h2> in the hero. Examples by phase:
   #   Phase 1 (post-comp): "Thanks for a great 2025 competition!"
   #   Phase 2-4:           "The 2026 competition will be held on 25 April."

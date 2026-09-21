@@ -29,6 +29,7 @@ type RecaptchaConfig struct {
 type HomepageConfig struct {
 	H2Text                 string        `yaml:"h2_text"`
 	HeroText               template.HTML `yaml:"hero_text"`
+	ScheduleDate           string        `yaml:"schedule_date"`
 	RegistrationDeadline   string        `yaml:"registration_deadline"`
 	LateRegistration       bool          `yaml:"late_registration"`
 	OpenDivisionComingSoon bool          `yaml:"open_division_coming_soon"`
