@@ -8,15 +8,15 @@
       content="The CS@Mines High School Programming Competition is a competition for high school students to write programs that solve problems."
     />
     <title>{{ block "title" . }}{{ end }} | CS@Mines High School Programming Competition</title>
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
-    <link rel="manifest" href="/static/site.webmanifest">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ staticURL "apple-touch-icon.png" }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ staticURL "favicon-32x32.png" }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ staticURL "favicon-16x16.png" }}">
+    <link rel="manifest" href="{{ staticURL "site.webmanifest" }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="/static/index.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="{{ staticURL "index.css" }}" media="screen" />
     <script>
       window.goatcounter = {
           path: location.pathname || '/',

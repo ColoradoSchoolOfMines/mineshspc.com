@@ -36,6 +36,11 @@ type HomepageConfig struct {
 	OpenDivisionURL        string        `yaml:"open_division_url"`
 }
 
+type ParentFormsConfig struct {
+	LiabilityWaiverURL   string `yaml:"liability_waiver_url"`
+	ComputerUseWaiverURL string `yaml:"computer_use_waiver_url"`
+}
+
 type ArchiveLink struct {
 	URL   string `yaml:"url"`
 	Title string `yaml:"title"`
@@ -68,12 +73,13 @@ type Configuration struct {
 
 	DevMode bool `yaml:"dev_mode"`
 
-	Domain              string         `yaml:"domain"`
-	SendgridAPIKey      string         `yaml:"sendgrid_api_key"`
-	HealthcheckURL      string         `yaml:"healthcheck_url"`
-	HostedByHTML        template.HTML  `yaml:"hosted_by_html"`
-	RegistrationEnabled bool           `yaml:"registration_enabled"`
-	Homepage            HomepageConfig `yaml:"homepage"`
+	Domain              string            `yaml:"domain"`
+	SendgridAPIKey      string            `yaml:"sendgrid_api_key"`
+	HealthcheckURL      string            `yaml:"healthcheck_url"`
+	HostedByHTML        template.HTML     `yaml:"hosted_by_html"`
+	RegistrationEnabled bool              `yaml:"registration_enabled"`
+	Homepage            HomepageConfig    `yaml:"homepage"`
+	ParentForms         ParentFormsConfig `yaml:"parent_forms"`
 
 	Archive []ArchiveYearInfo `yaml:"archive"`
 
