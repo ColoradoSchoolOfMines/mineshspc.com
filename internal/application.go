@@ -55,7 +55,7 @@ func (a *Application) ServeTemplate(logger *zerolog.Logger, templateName string,
 func (a *Application) ServeTemplateExtra(logger *zerolog.Logger, templateName string, generateTemplateData func(r *http.Request) map[string]any) func(w http.ResponseWriter, r *http.Request, extraData map[string]any) {
 	log := logger.With().Str("page_name", templateName).Logger()
 
-	template, err := template.ParseFS(website.TemplateFS, "templates/base.html", "templates/partials/*", fmt.Sprintf("templates/%s", templateName))
+	template, err := template.New("base.html").Funcs(template.FuncMap{"staticURL": staticURL}).ParseFS(website.TemplateFS, "templates/base.html", "templates/partials/*", fmt.Sprintf("templates/%s", templateName))
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to parse template")
 	}
@@ -78,6 +78,7 @@ func (a *Application) ServeTemplateExtra(logger *zerolog.Logger, templateName st
 			"Data":                data,
 			"HostedByHTML":        a.Config.HostedByHTML,
 			"RegistrationEnabled": a.Config.RegistrationEnabled,
+			"ParentForms":         a.Config.ParentForms,
 		}
 		if err := template.ExecuteTemplate(w, "base.html", templateData); err != nil {
 			log.Err(err).Msg("Failed to execute the template")
@@ -118,7 +119,7 @@ func (a *Application) BuildRouter() http.Handler {
 	}
 
 	// Serve static files
-	router.Handle("GET /static/", http.FileServer(http.FS(website.StaticFS)))
+	router.Handle("GET /static/", staticHandler())
 
 	// Redirect pages
 	redirects := map[string]string{

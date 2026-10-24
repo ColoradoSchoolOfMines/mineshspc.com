@@ -69,6 +69,12 @@ homepage:
   # When non-empty, shows the Open Division / Kattis registration link block.
   open_division_url: ""
 
+# URLs for the forms shown to parents/guardians during registration.
+# Host the PDFs elsewhere and replace these example URLs before opening registration.
+parent_forms:
+  liability_waiver_url: "https://example.com/liability-waiver.pdf"
+  computer_use_waiver_url: "https://example.com/computer-use-waiver.pdf"
+
 # ===== Archive Settings =====
 # Data shown on the /archive page.
 archive:
