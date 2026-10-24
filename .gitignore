@@ -5,6 +5,7 @@ token.json
 secret_key
 result
 .claude/settings.local.json
+.direnv
 
 # Executables
 mineshspc.com
