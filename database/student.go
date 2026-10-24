@@ -2,45 +2,15 @@ package database
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 )
 
 func (d *Database) GetStudentByEmail(ctx context.Context, email string) (*Student, error) {
-	var student Student
-	var parentEmail, signatory, dietaryRestrictions sql.NullString
-	var campusTour sql.NullBool
-	err := d.DB.QueryRow(ctx, `
-		SELECT teamid, email, name, age, parentemail, signatory, previouslyparticipated,
-			emailconfirmed, liabilitywaiver, computerusewaiver,
-			campustour, dietaryrestrictions, qrcodesent, checkedin
-		FROM students
-		WHERE email = $1
-	`, email).Scan(&student.TeamID, &student.Email, &student.Name, &student.Age,
-		&parentEmail, &signatory, &student.PreviouslyParticipated, &student.EmailConfirmed,
-		&student.LiabilitySigned, &student.ComputerUseWaiverSigned,
-		&campusTour, &dietaryRestrictions, &student.QRCodeSent, &student.CheckedIn)
-	if err != nil {
-		return nil, err
-	}
-
-	if parentEmail.Valid {
-		student.ParentEmail = parentEmail.String
-	}
-
-	if signatory.Valid {
-		student.Signatory = signatory.String
-	}
-
-	if dietaryRestrictions.Valid {
-		student.DietaryRestrictions = dietaryRestrictions.String
-	}
-
-	if campusTour.Valid {
-		student.CampusTour = campusTour.Bool
-	}
-
-	return &student, err
+	return scanStudentRow(d.DB.QueryRow(ctx, `
+		SELECT `+studentSelectColumns+`
+		FROM students s
+		WHERE s.email = $1
+	`, email))
 }
 
 func (d *Database) ConfirmStudent(ctx context.Context, email string, campusTour bool, dietaryRestrictions, parentEmail string) error {

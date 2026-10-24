@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"go.mau.fi/util/dbutil"
+	"go.mau.fi/util/exerrors"
 )
 
 type Division string
@@ -47,25 +48,42 @@ type TeamWithTeacherName struct {
 }
 
 type Student struct {
-	TeamID                  uuid.UUID
-	Email                   string
-	Name                    string
-	Age                     int
-	ParentEmail             string
-	Signatory               string
-	PreviouslyParticipated  bool
-	EmailConfirmed          bool
-	LiabilitySigned         bool
-	ComputerUseWaiverSigned bool
+	TeamID                  uuid.UUID `column:"teamid"`
+	Email                   string    `column:"email"`
+	Name                    string    `column:"name"`
+	Age                     int       `column:"age"`
+	ParentEmail             string    `column:"parentemail"`
+	Signatory               string    `column:"signatory"`
+	PreviouslyParticipated  bool      `column:"previouslyparticipated"`
+	EmailConfirmed          bool      `column:"emailconfirmed"`
+	LiabilitySigned         bool      `column:"liabilitywaiver"`
+	ComputerUseWaiverSigned bool      `column:"computerusewaiver"`
 
-	CampusTour          bool
-	DietaryRestrictions string
+	CampusTour          bool   `column:"campustour"`
+	DietaryRestrictions string `column:"dietaryrestrictions"`
 
-	QRCodeSent bool
-	CheckedIn  bool
+	QRCodeSent bool `column:"qrcodesent"`
+	CheckedIn  bool `column:"checkedin"`
 }
 
-func (d *Database) scanTeam(row dbutil.Scannable) (*Team, error) {
+const studentSelectColumns = `
+	s.teamid, s.email, s.name, s.age, COALESCE(s.parentemail, ''), COALESCE(s.signatory, ''),
+	s.previouslyparticipated, s.emailconfirmed, s.liabilitywaiver, s.computerusewaiver,
+	COALESCE(s.campustour, false), COALESCE(s.dietaryrestrictions, ''), s.qrcodesent, s.checkedin
+`
+
+var studentColumns = []string{
+	"teamid", "email", "name", "age", "parentemail", "signatory",
+	"previouslyparticipated", "emailconfirmed", "liabilitywaiver", "computerusewaiver",
+	"campustour", "dietaryrestrictions", "qrcodesent", "checkedin",
+}
+var scanStudentRow = exerrors.Must(dbutil.MakeReflectScanner[Student](studentColumns, dbutil.ReflectScanOptions{StructTag: "column"}))
+
+func (s *Student) Scan(row dbutil.Scannable) (*Student, error) {
+	return scanStudentRow(row)
+}
+
+func scanTeamRow(row dbutil.Scannable) (*Team, error) {
 	var team Team
 	var registrationTS int64
 	err := row.Scan(&team.ID, &team.TeacherEmail, &team.Name, &team.Division, &team.InPerson, &team.DivisionExplanation, &team.SchoolName, &registrationTS)
@@ -73,7 +91,11 @@ func (d *Database) scanTeam(row dbutil.Scannable) (*Team, error) {
 	return &team, err
 }
 
-func (d *Database) scanTeamWithTeacherName(row dbutil.Scannable) (*TeamWithTeacherName, error) {
+func (t *Team) Scan(row dbutil.Scannable) (*Team, error) {
+	return scanTeamRow(row)
+}
+
+func scanTeamWithTeacherNameRow(row dbutil.Scannable) (*TeamWithTeacherName, error) {
 	var team Team
 	var teamWithTeacherName TeamWithTeacherName
 	var registrationTS int64
@@ -83,10 +105,13 @@ func (d *Database) scanTeamWithTeacherName(row dbutil.Scannable) (*TeamWithTeach
 	return &teamWithTeacherName, err
 }
 
+func (twtn *TeamWithTeacherName) Scan(row dbutil.Scannable) (*TeamWithTeacherName, error) {
+	return scanTeamWithTeacherNameRow(row)
+}
+
 func (d *Database) scanTeamStudents(ctx context.Context, team *Team) error {
 	studentRows, err := d.DB.Query(ctx, `
-		SELECT s.email, s.name, s.age, s.parentemail, s.signatory, s.previouslyparticipated, s.emailconfirmed,
-			s.liabilitywaiver, s.computerusewaiver, s.campustour, s.dietaryrestrictions, s.qrcodesent, s.checkedin
+		SELECT `+studentSelectColumns+`
 		FROM students s
 		WHERE s.teamid = ?
 	`, team.ID)
@@ -95,63 +120,17 @@ func (d *Database) scanTeamStudents(ctx context.Context, team *Team) error {
 	}
 	defer studentRows.Close()
 	for studentRows.Next() {
-		var s Student
-		var parentEmail, signatory, dietaryRestrictions sql.NullString
-		var campusTour sql.NullBool
-		if err := studentRows.Scan(&s.Email, &s.Name, &s.Age, &parentEmail, &signatory, &s.PreviouslyParticipated, &s.EmailConfirmed,
-			&s.LiabilitySigned, &s.ComputerUseWaiverSigned, &campusTour, &dietaryRestrictions, &s.QRCodeSent, &s.CheckedIn); err != nil {
+		s, err := scanStudentRow(studentRows)
+		if err != nil {
 			return err
 		}
-
-		if parentEmail.Valid {
-			s.ParentEmail = parentEmail.String
-		}
-
-		if signatory.Valid {
-			s.Signatory = signatory.String
-		}
-
-		if dietaryRestrictions.Valid {
-			s.DietaryRestrictions = dietaryRestrictions.String
-		}
-
-		if campusTour.Valid {
-			s.CampusTour = campusTour.Bool
-		}
-
-		team.Members = append(team.Members, s)
+		team.Members = append(team.Members, *s)
 	}
-	return nil
-}
-
-func (d *Database) scanTeamWithStudents(ctx context.Context, row dbutil.Scannable) (*Team, error) {
-	team, err := d.scanTeam(row)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := d.scanTeamStudents(ctx, team); err != nil {
-		return nil, err
-	}
-
-	return team, err
-}
-
-func (d *Database) scanTeamWithStudentsAndTeacherName(ctx context.Context, row dbutil.Scannable) (*TeamWithTeacherName, error) {
-	teamWithTeacherName, err := d.scanTeamWithTeacherName(row)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := d.scanTeamStudents(ctx, teamWithTeacherName.Team); err != nil {
-		return nil, err
-	}
-
-	return teamWithTeacherName, err
+	return studentRows.Err()
 }
 
 func (d *Database) GetTeacherTeams(ctx context.Context, email string) ([]*Team, error) {
-	rows, err := d.DB.Query(ctx, `
+	teams, err := d.teamQH.QueryMany(ctx, `
 		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname, t.registration_ts
 		FROM teams t
 		JOIN teachers tt ON tt.email = t.teacheremail
@@ -160,23 +139,16 @@ func (d *Database) GetTeacherTeams(ctx context.Context, email string) ([]*Team, 
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-
-	var teams []*Team
-
-	for rows.Next() {
-		team, err := d.scanTeamWithStudents(ctx, rows)
-		if err != nil {
+	for _, team := range teams {
+		if err := d.scanTeamStudents(ctx, team); err != nil {
 			return nil, err
 		}
-		teams = append(teams, team)
 	}
-
-	return teams, err
+	return teams, nil
 }
 
 func (d *Database) GetAdminTeamsWithTeacherName(ctx context.Context) ([]*TeamWithTeacherName, error) {
-	rows, err := d.DB.Query(ctx, `
+	teams, err := d.teamWithTeacherNameQH.QueryMany(ctx, `
 		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname, t.registration_ts, tt.name
 		FROM teams t
 		JOIN teachers tt ON tt.email = t.teacheremail
@@ -184,39 +156,44 @@ func (d *Database) GetAdminTeamsWithTeacherName(ctx context.Context) ([]*TeamWit
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-
-	var teams []*TeamWithTeacherName
-
-	for rows.Next() {
-		team, err := d.scanTeamWithStudentsAndTeacherName(ctx, rows)
-		if err != nil {
+	for _, team := range teams {
+		if err := d.scanTeamStudents(ctx, team.Team); err != nil {
 			return nil, err
 		}
-		teams = append(teams, team)
 	}
-
-	return teams, err
+	return teams, nil
 }
 
 func (d *Database) GetTeam(ctx context.Context, email string, teamID uuid.UUID) (*Team, error) {
-	row := d.DB.QueryRow(ctx, `
+	team, err := d.teamQH.QueryOne(ctx, `
 		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname, t.registration_ts
 		FROM teams t
 		JOIN teachers tt ON tt.email = t.teacheremail
 		WHERE tt.email = ?
 		  AND t.id = ?
 	`, email, teamID)
-	return d.scanTeamWithStudents(ctx, row)
+	if err != nil {
+		return nil, err
+	}
+	if team == nil {
+		return nil, sql.ErrNoRows
+	}
+	if err := d.scanTeamStudents(ctx, team); err != nil {
+		return nil, err
+	}
+	return team, nil
 }
 
 func (d *Database) GetTeamNoMembers(ctx context.Context, teamID uuid.UUID) (*Team, error) {
-	row := d.DB.QueryRow(ctx, `
+	team, err := d.teamQH.QueryOne(ctx, `
 		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, '', t.registration_ts
 		FROM teams t
 		WHERE t.id = ?
 	`, teamID)
-	return d.scanTeam(row)
+	if err == nil && team == nil {
+		return nil, sql.ErrNoRows
+	}
+	return team, err
 }
 
 func (d *Database) UpsertTeam(ctx context.Context, teacherEmail string, teamID uuid.UUID, name string, division Division, inPerson bool, divisionExplanation string) error {
