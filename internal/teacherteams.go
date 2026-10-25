@@ -4,8 +4,6 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-
-	"github.com/ColoradoSchoolOfMines/mineshspc.com/database"
 )
 
 func (a *Application) GetTeacherTeamsTemplate(r *http.Request) map[string]any {
@@ -94,17 +92,7 @@ func (a *Application) HandleTeacherTeamEdit(w http.ResponseWriter, r *http.Reque
 
 	teamName := r.FormValue("team-name")
 	// inPerson := r.FormValue("team-location") == "in-person"
-	// teamDivision, err := database.ParseDivision(r.FormValue("team-division"))
-	// if err != nil {
-	// 	log.Warn().Err(err).Msg("Failed to parse team division")
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	return
-	// }
-	// teamDivisionExplanation := r.FormValue("team-division-explanation")
-
 	inPerson := true
-	teamDivision := database.DivisionBeginner
-	teamDivisionExplanation := "only one division"
 
 	teamIDStr := r.URL.Query().Get("team_id")
 	var teamID uuid.UUID
@@ -135,7 +123,7 @@ func (a *Application) HandleTeacherTeamEdit(w http.ResponseWriter, r *http.Reque
 		}
 	}
 
-	if err := a.DB.UpsertTeam(ctx, user.Email, teamID, teamName, teamDivision, inPerson, teamDivisionExplanation); err != nil {
+	if err := a.DB.UpsertTeam(ctx, user.Email, teamID, teamName, inPerson); err != nil {
 		log.Err(err).Msg("Failed to upsert team")
 		// TODO report this error to the user and email admin
 		w.WriteHeader(http.StatusInternalServerError)

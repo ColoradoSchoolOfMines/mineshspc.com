@@ -4,41 +4,20 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 	"go.mau.fi/util/dbutil"
 )
 
-type Division string
-
-const (
-	DivisionBeginner Division = "Beginner"
-	DivisionAdvanced Division = "Advanced"
-)
-
-func ParseDivision(s string) (Division, error) {
-	switch s {
-	case "Beginner":
-		return DivisionBeginner, nil
-	case "Advanced":
-		return DivisionAdvanced, nil
-	default:
-		return "", fmt.Errorf("invalid division: %s", s)
-	}
-}
-
 type Team struct {
-	ID                  uuid.UUID
-	TeacherEmail        string
-	Name                string
-	Division            Division
-	DivisionExplanation string
-	InPerson            bool
-	Members             []Student
-	SchoolName          string
-	RegistrationTS      time.Time
+	ID             uuid.UUID
+	TeacherEmail   string
+	Name           string
+	InPerson       bool
+	Members        []Student
+	SchoolName     string
+	RegistrationTS time.Time
 }
 
 type TeamWithTeacherName struct {
@@ -68,7 +47,7 @@ type Student struct {
 func (d *Database) scanTeam(row dbutil.Scannable) (*Team, error) {
 	var team Team
 	var registrationTS int64
-	err := row.Scan(&team.ID, &team.TeacherEmail, &team.Name, &team.Division, &team.InPerson, &team.DivisionExplanation, &team.SchoolName, &registrationTS)
+	err := row.Scan(&team.ID, &team.TeacherEmail, &team.Name, &team.InPerson, &team.SchoolName, &registrationTS)
 	team.RegistrationTS = time.UnixMilli(registrationTS)
 	return &team, err
 }
@@ -77,7 +56,7 @@ func (d *Database) scanTeamWithTeacherName(row dbutil.Scannable) (*TeamWithTeach
 	var team Team
 	var teamWithTeacherName TeamWithTeacherName
 	var registrationTS int64
-	err := row.Scan(&team.ID, &team.TeacherEmail, &team.Name, &team.Division, &team.InPerson, &team.DivisionExplanation, &team.SchoolName, &registrationTS, &teamWithTeacherName.TeacherName)
+	err := row.Scan(&team.ID, &team.TeacherEmail, &team.Name, &team.InPerson, &team.SchoolName, &registrationTS, &teamWithTeacherName.TeacherName)
 	team.RegistrationTS = time.UnixMilli(registrationTS)
 	teamWithTeacherName.Team = &team
 	return &teamWithTeacherName, err
@@ -152,7 +131,7 @@ func (d *Database) scanTeamWithStudentsAndTeacherName(ctx context.Context, row d
 
 func (d *Database) GetTeacherTeams(ctx context.Context, email string) ([]*Team, error) {
 	rows, err := d.DB.Query(ctx, `
-		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname, t.registration_ts
+		SELECT t.id, t.teacheremail, t.name, t.inperson, tt.schoolname, t.registration_ts
 		FROM teams t
 		JOIN teachers tt ON tt.email = t.teacheremail
 		WHERE tt.email = ?
@@ -177,7 +156,7 @@ func (d *Database) GetTeacherTeams(ctx context.Context, email string) ([]*Team, 
 
 func (d *Database) GetAdminTeamsWithTeacherName(ctx context.Context) ([]*TeamWithTeacherName, error) {
 	rows, err := d.DB.Query(ctx, `
-		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname, t.registration_ts, tt.name
+		SELECT t.id, t.teacheremail, t.name, t.inperson, tt.schoolname, t.registration_ts, tt.name
 		FROM teams t
 		JOIN teachers tt ON tt.email = t.teacheremail
 	`)
@@ -201,7 +180,7 @@ func (d *Database) GetAdminTeamsWithTeacherName(ctx context.Context) ([]*TeamWit
 
 func (d *Database) GetTeam(ctx context.Context, email string, teamID uuid.UUID) (*Team, error) {
 	row := d.DB.QueryRow(ctx, `
-		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, tt.schoolname, t.registration_ts
+		SELECT t.id, t.teacheremail, t.name, t.inperson, tt.schoolname, t.registration_ts
 		FROM teams t
 		JOIN teachers tt ON tt.email = t.teacheremail
 		WHERE tt.email = ?
@@ -212,18 +191,18 @@ func (d *Database) GetTeam(ctx context.Context, email string, teamID uuid.UUID) 
 
 func (d *Database) GetTeamNoMembers(ctx context.Context, teamID uuid.UUID) (*Team, error) {
 	row := d.DB.QueryRow(ctx, `
-		SELECT t.id, t.teacheremail, t.name, t.division, t.inperson, t.divisionexplanation, '', t.registration_ts
+		SELECT t.id, t.teacheremail, t.name, t.inperson, '', t.registration_ts
 		FROM teams t
 		WHERE t.id = ?
 	`, teamID)
 	return d.scanTeam(row)
 }
 
-func (d *Database) UpsertTeam(ctx context.Context, teacherEmail string, teamID uuid.UUID, name string, division Division, inPerson bool, divisionExplanation string) error {
+func (d *Database) UpsertTeam(ctx context.Context, teacherEmail string, teamID uuid.UUID, name string, inPerson bool) error {
 	_, err := d.DB.Exec(ctx, `
-		INSERT OR REPLACE INTO teams (id, teacheremail, name, division, inperson, divisionexplanation, registration_ts)
-		VALUES (?, ?, ?, ?, ?, ?, ?)
-	`, teamID, teacherEmail, name, division, inPerson, divisionExplanation, time.Now().UnixMilli())
+		INSERT OR REPLACE INTO teams (id, teacheremail, name, inperson, registration_ts)
+		VALUES (?, ?, ?, ?, ?)
+	`, teamID, teacherEmail, name, inPerson, time.Now().UnixMilli())
 	return err
 }
 
