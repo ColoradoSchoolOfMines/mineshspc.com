@@ -32,17 +32,11 @@ func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
 	}
 
 	var totalTeams, totalStudents int
-	var inPersonTeams, inPersonStudents int
 	var campusTour, emailConfirmed, formsSigned int
 	var checkedIn int
 	for _, team := range teamsWithTeachers {
 		totalTeams++
 		totalStudents += len(team.Members)
-		if team.InPerson {
-			inPersonStudents += len(team.Members)
-			inPersonTeams++
-		}
-
 		for _, member := range team.Members {
 			if team.InPerson && member.CampusTour {
 				campusTour++
@@ -63,15 +57,7 @@ func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
 	}
 
 	return map[string]any{
-		"Teams": teamsWithTeachers,
-		"TeamStats": map[string]any{
-			"TotalInPerson": inPersonTeams,
-			"TotalRemote":   totalTeams - inPersonTeams,
-		},
-		"StudentStats": map[string]any{
-			"TotalInPerson": inPersonStudents,
-			"TotalRemote":   totalStudents - inPersonStudents,
-		},
+		"Teams":                  teamsWithTeachers,
 		"TotalTeams":             totalTeams,
 		"TotalStudents":          totalStudents,
 		"CampusTourStudents":     campusTour,
@@ -523,13 +509,9 @@ func (a *Application) HandleKattisTeamsExport(w http.ResponseWriter, r *http.Req
 			continue
 		}
 
-		siteName := "Colorado School of Mines"
-		if !team.InPerson {
-			siteName = "Remote"
-		}
 		parts := []string{
 			team.Name,
-			siteName,
+			"Colorado School of Mines",
 		}
 		writer.Write(parts)
 	}
