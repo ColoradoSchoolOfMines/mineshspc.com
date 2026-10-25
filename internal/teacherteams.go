@@ -4,8 +4,6 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-
-	"github.com/ColoradoSchoolOfMines/mineshspc.com/database"
 )
 
 func (a *Application) GetTeacherTeamsTemplate(r *http.Request) map[string]any {
@@ -93,19 +91,6 @@ func (a *Application) HandleTeacherTeamEdit(w http.ResponseWriter, r *http.Reque
 	}
 
 	teamName := r.FormValue("team-name")
-	// inPerson := r.FormValue("team-location") == "in-person"
-	// teamDivision, err := database.ParseDivision(r.FormValue("team-division"))
-	// if err != nil {
-	// 	log.Warn().Err(err).Msg("Failed to parse team division")
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	return
-	// }
-	// teamDivisionExplanation := r.FormValue("team-division-explanation")
-
-	inPerson := true
-	teamDivision := database.DivisionBeginner
-	teamDivisionExplanation := "only one division"
-
 	teamIDStr := r.URL.Query().Get("team_id")
 	var teamID uuid.UUID
 	if teamIDStr == "" {
@@ -120,22 +105,14 @@ func (a *Application) HandleTeacherTeamEdit(w http.ResponseWriter, r *http.Reque
 			return
 		}
 
-		// Verify that the in-person-ness of the team did not change
-		team, err := a.DB.GetTeam(ctx, user.Email, teamID)
-		if err != nil {
+		if _, err := a.DB.GetTeam(ctx, user.Email, teamID); err != nil {
 			log.Err(err).Msg("Failed to get team")
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		if team.InPerson != inPerson {
-			log.Warn().Err(err).Msg("Cannot change in-person status of team")
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 	}
 
-	if err := a.DB.UpsertTeam(ctx, user.Email, teamID, teamName, teamDivision, inPerson, teamDivisionExplanation); err != nil {
+	if err := a.DB.UpsertTeam(ctx, user.Email, teamID, teamName); err != nil {
 		log.Err(err).Msg("Failed to upsert team")
 		// TODO report this error to the user and email admin
 		w.WriteHeader(http.StatusInternalServerError)

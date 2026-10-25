@@ -31,31 +31,14 @@ func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
 		return nil
 	}
 
-	var beginnerTeams, advancedTeams int
-	var beginnerStudents, advancedStudents int
-	var beginnerInPersonTeams, advancedInPersonTeams int
-	var beginnerInPersonStudents, advancedInPersonStudents int
+	var totalTeams, totalStudents int
 	var campusTour, emailConfirmed, formsSigned int
 	var checkedIn int
 	for _, team := range teamsWithTeachers {
-		if team.Division == database.DivisionBeginner {
-			beginnerTeams++
-			beginnerStudents += len(team.Members)
-			if team.InPerson {
-				beginnerInPersonStudents += len(team.Members)
-				beginnerInPersonTeams++
-			}
-		} else {
-			advancedTeams++
-			advancedStudents += len(team.Members)
-			if team.InPerson {
-				advancedInPersonStudents += len(team.Members)
-				advancedInPersonTeams++
-			}
-		}
-
+		totalTeams++
+		totalStudents += len(team.Members)
 		for _, member := range team.Members {
-			if team.InPerson && member.CampusTour {
+			if member.CampusTour {
 				campusTour++
 			}
 
@@ -74,37 +57,9 @@ func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
 	}
 
 	return map[string]any{
-		"Teams": teamsWithTeachers,
-		"TeamStats": map[string]any{
-			"Beginner": map[string]int{
-				"InPerson": beginnerInPersonTeams,
-				"Remote":   beginnerTeams - beginnerInPersonTeams,
-				"Total":    beginnerTeams,
-			},
-			"Advanced": map[string]int{
-				"InPerson": advancedInPersonTeams,
-				"Remote":   advancedTeams - advancedInPersonTeams,
-				"Total":    advancedTeams,
-			},
-			"TotalInPerson": beginnerInPersonTeams + advancedInPersonTeams,
-			"TotalRemote":   (beginnerTeams + advancedTeams) - (beginnerInPersonTeams + advancedInPersonTeams),
-		},
-		"StudentStats": map[string]any{
-			"Beginner": map[string]int{
-				"InPerson": beginnerInPersonStudents,
-				"Remote":   beginnerStudents - beginnerInPersonStudents,
-				"Total":    beginnerStudents,
-			},
-			"Advanced": map[string]int{
-				"InPerson": advancedInPersonStudents,
-				"Remote":   advancedStudents - advancedInPersonStudents,
-				"Total":    advancedStudents,
-			},
-			"TotalInPerson": beginnerInPersonStudents + advancedInPersonStudents,
-			"TotalRemote":   (beginnerStudents + advancedStudents) - (beginnerInPersonStudents + advancedInPersonStudents),
-		},
-		"TotalTeams":             beginnerTeams + advancedTeams,
-		"TotalStudents":          beginnerStudents + advancedStudents,
+		"Teams":                  teamsWithTeachers,
+		"TotalTeams":             totalTeams,
+		"TotalStudents":          totalStudents,
 		"CampusTourStudents":     campusTour,
 		"EmailConfirmedStudents": emailConfirmed,
 		"FormsSignedStudents":    formsSigned,
@@ -145,7 +100,7 @@ func (a *Application) GetAdminPreflightTemplate(r *http.Request) map[string]any 
 				unconfirmedEmail = append(unconfirmedEmail, s)
 				continue
 			}
-			if !student.LiabilitySigned || (team.InPerson && !student.ComputerUseWaiverSigned) {
+			if !student.LiabilitySigned || !student.ComputerUseWaiverSigned {
 				unsignedForms = append(unsignedForms, s)
 				continue
 			}
@@ -153,7 +108,7 @@ func (a *Application) GetAdminPreflightTemplate(r *http.Request) map[string]any 
 				noQRCode = append(noQRCode, s)
 				continue
 			}
-			if team.InPerson && !student.CheckedIn {
+			if !student.CheckedIn {
 				notCheckedIn = append(notCheckedIn, s)
 			}
 		}
@@ -521,19 +476,8 @@ func (a *Application) HandleKattisParticipantsExport(w http.ResponseWriter, r *h
 		return
 	}
 
-	divStr := r.URL.Query().Get("div")
-	division, err := database.ParseDivision(divStr)
-	if err != nil {
-		a.Log.Err(err).Msg("invalid division")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
 	writer := csv.NewWriter(w)
 	for _, team := range teamsWithTeachers {
-		if team.Division != division {
-			continue
-		}
 		for _, member := range team.Members {
 			parts := []string{
 				member.Name,
@@ -559,27 +503,15 @@ func (a *Application) HandleKattisTeamsExport(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	divStr := r.URL.Query().Get("div")
-	division, err := database.ParseDivision(divStr)
-	if err != nil {
-		a.Log.Err(err).Msg("invalid division")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
 	writer := csv.NewWriter(w)
 	for _, team := range teamsWithTeachers {
-		if team.Division != division || len(team.Members) == 0 {
+		if len(team.Members) == 0 {
 			continue
 		}
 
-		siteName := "Colorado School of Mines"
-		if !team.InPerson {
-			siteName = "Remote"
-		}
 		parts := []string{
 			team.Name,
-			siteName,
+			"Colorado School of Mines",
 		}
 		writer.Write(parts)
 	}
@@ -656,7 +588,7 @@ func (a *Application) HandleAdminRemoveVolunteer(w http.ResponseWriter, r *http.
 func (a *Application) HandleManualCheckin(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	email := r.URL.Query().Get("email")
-	a.DB.SignFormsForStudent(ctx, email, "SIGNED IN PERSON", true)
+	a.DB.SignFormsForStudent(ctx, email, "SIGNED BY ADMIN")
 	a.DB.CheckInStudent(ctx, email)
 	http.Redirect(w, r, "/admin/teams", http.StatusSeeOther)
 }

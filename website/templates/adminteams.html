@@ -34,31 +34,9 @@
         </div>
         <div class="card-body">
           <table class="table">
-            <thead>
-              <tr>
-                <th></th>
-                <th>Beginner</th>
-                <th>Advanced</th>
-                <th><b>TOTAL</b></th>
-              </tr>
-            </thead>
             <tbody>
               <tr>
-                <th>In-Person</th>
-                <th>{{ .Data.TeamStats.Beginner.InPerson }}</th>
-                <th>{{ .Data.TeamStats.Advanced.InPerson }}</th>
-                <th>{{ .Data.TeamStats.TotalInPerson }}</th>
-              </tr>
-              <tr>
-                <th>Remote</th>
-                <th>{{ .Data.TeamStats.Beginner.Remote }}</th>
-                <th>{{ .Data.TeamStats.Advanced.Remote }}</th>
-                <th>{{ .Data.TeamStats.TotalRemote }}</th>
-              </tr>
-              <tr>
-                <th><b>TOTAL</b></th>
-                <th>{{ .Data.TeamStats.Beginner.Total }}</th>
-                <th>{{ .Data.TeamStats.Advanced.Total }}</th>
+                <th>Total Teams</th>
                 <th>{{ .Data.TotalTeams }}</th>
               </tr>
             </tbody>
@@ -73,31 +51,9 @@
         </div>
         <div class="card-body">
           <table class="table">
-            <thead>
-              <tr>
-                <th></th>
-                <th>Beginner</th>
-                <th>Advanced</th>
-                <th><b>TOTAL</b></th>
-              </tr>
-            </thead>
             <tbody>
               <tr>
-                <th>In-Person</th>
-                <th>{{ .Data.StudentStats.Beginner.InPerson }}</th>
-                <th>{{ .Data.StudentStats.Advanced.InPerson }}</th>
-                <th>{{ .Data.StudentStats.TotalInPerson }}</th>
-              </tr>
-              <tr>
-                <th>Remote</th>
-                <th>{{ .Data.StudentStats.Beginner.Remote }}</th>
-                <th>{{ .Data.StudentStats.Advanced.Remote }}</th>
-                <th>{{ .Data.StudentStats.TotalRemote }}</th>
-              </tr>
-              <tr>
-                <th><b>TOTAL</b></th>
-                <th>{{ .Data.StudentStats.Beginner.Total }}</th>
-                <th>{{ .Data.StudentStats.Advanced.Total }}</th>
+                <th>Total Students</th>
                 <th>{{ .Data.TotalStudents }}</th>
               </tr>
             </tbody>
@@ -120,17 +76,11 @@
         </div>
         <div class="card-body">
           <p>
-            <a href="/admin/api/kattis/participants?div=Beginner" download="beginner-participants.csv" class="btn btn-outline-primary">
-              Kattis Beginner Participants (CSV)
+            <a href="/admin/api/kattis/participants" download="participants.csv" class="btn btn-outline-primary">
+              Kattis Participants (CSV)
             </a>
-            <a href="/admin/api/kattis/teams?div=Beginner" download="beginner-teams.csv" class="btn btn-outline-primary">
-              Kattis Beginner Teams (CSV)
-            </a>
-            <a href="/admin/api/kattis/participants?div=Advanced" download="advanced-participants.csv" class="btn btn-outline-primary">
-              Kattis Advanced Participants (CSV)
-            </a>
-            <a href="/admin/api/kattis/teams?div=Advanced" download="advanced-teams.csv" class="btn btn-outline-primary">
-              Kattis Advanced Teams (CSV)
+            <a href="/admin/api/kattis/teams" download="teams.csv" class="btn btn-outline-primary">
+              Kattis Teams (CSV)
             </a>
           </p>
         </div>
@@ -203,7 +153,7 @@
       </div>
     </div>
   </div>
-  {{ range $t := .Data.Teams }}
+  {{ range .Data.Teams }}
     <div class="row">
       <div class="col m-4">
         <div class="card">
@@ -218,22 +168,11 @@
               <div class="col-sm-6">
                 <b>Teacher:</b> {{ .TeacherName }}
               </div>
-              <div class="col-sm-3">
-                <b>Division:</b> {{ .Division }}
-              </div>
-              <div class="col-sm-3">
-                <b>In Person:</b> {{ if .InPerson }}Yes{{ else }}No{{ end }}
-              </div>
               {{ if gt .RegistrationTS.UnixMilli 0 }}
                 <div class="col-sm-6">
                   <b>Registration Time:</b> {{ .RegistrationTS.Format "2006-01-02 15:04 MST" }}
                 </div>
               {{ end }}
-            </div>
-            <div class="row my-2">
-              <div class="col">
-                <b>Reason for division:</b> {{ .DivisionExplanation }}
-              </div>
             </div>
             <table class="table">
               <thead>
@@ -323,12 +262,10 @@
                             <div class="step {{ if .LiabilitySigned }}completed{{ end }}">
                               <span><i class="fa {{ if .LiabilitySigned }}fa-check{{ else }}fa-times{{ end }}"></i></span>
                             </div>
-                            {{ if $t.InPerson }}
-                              <span class="line {{ if .ComputerUseWaiverSigned }}completed{{ end }}"></span>
-                              <div class="step {{ if .ComputerUseWaiverSigned }}completed{{ end }}">
-                                <span><i class="fa {{ if .ComputerUseWaiverSigned }}fa-check{{ else }}fa-times{{ end }}"></i></span>
-                              </div>
-                            {{ end }}
+                            <span class="line {{ if .ComputerUseWaiverSigned }}completed{{ end }}"></span>
+                            <div class="step {{ if .ComputerUseWaiverSigned }}completed{{ end }}">
+                              <span><i class="fa {{ if .ComputerUseWaiverSigned }}fa-check{{ else }}fa-times{{ end }}"></i></span>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -338,10 +275,8 @@
                             <div><small class="{{ if not .EmailConfirmed }}text-muted{{ end }}">Email Confirmed</small></div>
                             <span class="line"></span>
                             <div><small class="{{ if not .LiabilitySigned }}text-muted{{ end }}">Liability Waiver</small></div>
-                            {{ if $t.InPerson }}
-                              <span class="line"></span>
-                              <div><small class="{{ if not .ComputerUseWaiverSigned }}text-muted{{ end }}">Computer Use Waiver</small></div>
-                            {{ end }}
+                            <span class="line"></span>
+                            <div><small class="{{ if not .ComputerUseWaiverSigned }}text-muted{{ end }}">Computer Use Waiver</small></div>
                           </div>
                         </div>
                       </div>

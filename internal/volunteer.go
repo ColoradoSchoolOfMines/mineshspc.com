@@ -120,11 +120,6 @@ func (a *Application) GetVolunteerScanTemplate(r *http.Request) map[string]any {
 
 	res["TeamName"] = team.Name
 
-	if !team.InPerson {
-		res["NotInPerson"] = true
-		return res
-	}
-
 	res["AllGood"] = student.EmailConfirmed &&
 		student.LiabilitySigned &&
 		student.ComputerUseWaiverSigned
