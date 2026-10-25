@@ -52,7 +52,7 @@
       </div>
     </div>
   {{ end }}
-  {{ range $t := .Data.Teams }}
+  {{ range .Data.Teams }}
     <div class="row">
       <div class="col m-4">
         <div class="card">
@@ -96,12 +96,10 @@
                             <div class="step {{ if .LiabilitySigned }}completed{{ end }}">
                               <span><i class="fa {{ if .LiabilitySigned }}fa-check{{ else }}fa-times{{ end }}"></i></span>
                             </div>
-                            {{ if $t.InPerson }}
-                              <span class="line {{ if .ComputerUseWaiverSigned }}completed{{ end }}"></span>
-                              <div class="step {{ if .ComputerUseWaiverSigned }}completed{{ end }}">
-                                <span><i class="fa {{ if .ComputerUseWaiverSigned }}fa-check{{ else }}fa-times{{ end }}"></i></span>
-                              </div>
-                            {{ end }}
+                            <span class="line {{ if .ComputerUseWaiverSigned }}completed{{ end }}"></span>
+                            <div class="step {{ if .ComputerUseWaiverSigned }}completed{{ end }}">
+                              <span><i class="fa {{ if .ComputerUseWaiverSigned }}fa-check{{ else }}fa-times{{ end }}"></i></span>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -111,10 +109,8 @@
                             <div><small class="{{ if not .EmailConfirmed }}text-muted{{ end }}">Email Confirmed</small></div>
                             <span class="line"></span>
                             <div><small class="{{ if not .LiabilitySigned }}text-muted{{ end }}">Liability Waiver</small></div>
-                            {{ if $t.InPerson }}
-                              <span class="line"></span>
-                              <div><small class="{{ if not .ComputerUseWaiverSigned }}text-muted{{ end }}">Computer Use Waiver</small></div>
-                            {{ end }}
+                            <span class="line"></span>
+                            <div><small class="{{ if not .ComputerUseWaiverSigned }}text-muted{{ end }}">Computer Use Waiver</small></div>
                           </div>
                         </div>
                       </div>

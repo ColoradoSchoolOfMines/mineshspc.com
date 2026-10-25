@@ -91,9 +91,6 @@ func (a *Application) HandleTeacherTeamEdit(w http.ResponseWriter, r *http.Reque
 	}
 
 	teamName := r.FormValue("team-name")
-	// inPerson := r.FormValue("team-location") == "in-person"
-	inPerson := true
-
 	teamIDStr := r.URL.Query().Get("team_id")
 	var teamID uuid.UUID
 	if teamIDStr == "" {
@@ -108,22 +105,14 @@ func (a *Application) HandleTeacherTeamEdit(w http.ResponseWriter, r *http.Reque
 			return
 		}
 
-		// Verify that the in-person-ness of the team did not change
-		team, err := a.DB.GetTeam(ctx, user.Email, teamID)
-		if err != nil {
+		if _, err := a.DB.GetTeam(ctx, user.Email, teamID); err != nil {
 			log.Err(err).Msg("Failed to get team")
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		if team.InPerson != inPerson {
-			log.Warn().Err(err).Msg("Cannot change in-person status of team")
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 	}
 
-	if err := a.DB.UpsertTeam(ctx, user.Email, teamID, teamName, inPerson); err != nil {
+	if err := a.DB.UpsertTeam(ctx, user.Email, teamID, teamName); err != nil {
 		log.Err(err).Msg("Failed to upsert team")
 		// TODO report this error to the user and email admin
 		w.WriteHeader(http.StatusInternalServerError)

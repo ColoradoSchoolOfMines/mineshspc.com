@@ -3,7 +3,6 @@ package database
 import (
 	"context"
 	"database/sql"
-	"fmt"
 )
 
 func (d *Database) GetStudentByEmail(ctx context.Context, email string) (*Student, error) {
@@ -52,16 +51,12 @@ func (d *Database) ConfirmStudent(ctx context.Context, email string, campusTour 
 	return err
 }
 
-func (d *Database) SignFormsForStudent(ctx context.Context, email, signatory string, computerUse bool) error {
-	computerUseQuery := ""
-	if computerUse {
-		computerUseQuery = "computerusewaiver = true,"
-	}
-	q := fmt.Sprintf(`
+func (d *Database) SignFormsForStudent(ctx context.Context, email, signatory string) error {
+	q := `
 		UPDATE students
-		SET liabilitywaiver = true, %s signatory = $1
+		SET liabilitywaiver = true, computerusewaiver = true, signatory = $1
 		WHERE email = $2
-	`, computerUseQuery)
+	`
 	_, err := d.DB.Exec(ctx, q, signatory, email)
 	return err
 }

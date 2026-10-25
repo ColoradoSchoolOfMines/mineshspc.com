@@ -38,7 +38,7 @@ func (a *Application) GetAdminTeamsTemplate(r *http.Request) map[string]any {
 		totalTeams++
 		totalStudents += len(team.Members)
 		for _, member := range team.Members {
-			if team.InPerson && member.CampusTour {
+			if member.CampusTour {
 				campusTour++
 			}
 
@@ -100,7 +100,7 @@ func (a *Application) GetAdminPreflightTemplate(r *http.Request) map[string]any 
 				unconfirmedEmail = append(unconfirmedEmail, s)
 				continue
 			}
-			if !student.LiabilitySigned || (team.InPerson && !student.ComputerUseWaiverSigned) {
+			if !student.LiabilitySigned || !student.ComputerUseWaiverSigned {
 				unsignedForms = append(unsignedForms, s)
 				continue
 			}
@@ -108,7 +108,7 @@ func (a *Application) GetAdminPreflightTemplate(r *http.Request) map[string]any 
 				noQRCode = append(noQRCode, s)
 				continue
 			}
-			if team.InPerson && !student.CheckedIn {
+			if !student.CheckedIn {
 				notCheckedIn = append(notCheckedIn, s)
 			}
 		}
@@ -588,7 +588,7 @@ func (a *Application) HandleAdminRemoveVolunteer(w http.ResponseWriter, r *http.
 func (a *Application) HandleManualCheckin(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	email := r.URL.Query().Get("email")
-	a.DB.SignFormsForStudent(ctx, email, "SIGNED IN PERSON", true)
+	a.DB.SignFormsForStudent(ctx, email, "SIGNED BY ADMIN")
 	a.DB.CheckInStudent(ctx, email)
 	http.Redirect(w, r, "/admin/teams", http.StatusSeeOther)
 }

@@ -16,8 +16,6 @@ CREATE TABLE IF NOT EXISTS teams (
   id                  TEXT NOT NULL,
   teacheremail        TEXT NOT NULL,
   name                TEXT NOT NULL,
-  inperson            BOOLEAN NOT NULL,
-
   PRIMARY KEY (id, teacheremail)
 );
 
