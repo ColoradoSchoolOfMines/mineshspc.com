@@ -20,15 +20,7 @@
     </div>
   {{ end }}
 
-  {{ if .Data.NotInPerson }}
-    <div class="row">
-      <div class="col m-4 text-center">
-        <p>
-          <b>Something strange happened!</b> We were not expecting this student to be in-person.
-        </p>
-      </div>
-    </div>
-  {{ else if .Data.Student }}
+  {{ if .Data.Student }}
     <div class="row">
       <div class="col m-4 text-center">
         <h2>{{ .Data.Student.Name }}</h2>

@@ -172,10 +172,8 @@ func (a *Application) HandleStudentConfirmEmail(w http.ResponseWriter, r *http.R
 
 	log.Info().Any("send_email", sendEmail).Any("student", student).Msg("done confirming")
 
-	if team.InPerson {
-		student.CampusTour = r.Form.Has("campus-tour")
-		student.DietaryRestrictions = r.FormValue("dietary-restrictions")
-	}
+	student.CampusTour = r.Form.Has("campus-tour")
+	student.DietaryRestrictions = r.FormValue("dietary-restrictions")
 
 	if err = a.DB.ConfirmStudent(ctx, student.Email, student.CampusTour, student.DietaryRestrictions, student.ParentEmail); err != nil {
 		log.Err(err).Msg("failed to confirm student")

@@ -76,23 +76,21 @@
               </div>
             </td>
           </tr>
-          {{ if .Data.NeedsComputerUseWaiver }}
-            <tr>
-              <td>
-                <a href="/static/Sp2026_HSPC_MinesMinorComputerUseWaiver.pdf" target=_blank>Colorado School of Mines Minor's Computer Use Waiver Form</a>
-              </td>
-              <td>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="" id="computer-use-waiver"
-                    name="computer-use-waiver" required
-                    {{ if .Data.Accepted }}checked disabled{{ end }} />
-                  <label class="form-check-label" for="computer-use-waiver">
-                    Accept
-                  </label>
-                </div>
-              </td>
-            </tr>
-          {{ end }}
+          <tr>
+            <td>
+              <a href="/static/Sp2026_HSPC_MinesMinorComputerUseWaiver.pdf" target=_blank>Colorado School of Mines Minor's Computer Use Waiver Form</a>
+            </td>
+            <td>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="computer-use-waiver"
+                  name="computer-use-waiver" required
+                  {{ if .Data.Accepted }}checked disabled{{ end }} />
+                <label class="form-check-label" for="computer-use-waiver">
+                  Accept
+                </label>
+              </div>
+            </td>
+          </tr>
         </tbody>
       </table>
       <div class="row my-4">

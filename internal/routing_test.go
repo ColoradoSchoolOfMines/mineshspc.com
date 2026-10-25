@@ -107,7 +107,6 @@ func TestRouting_Admin_NoCookie(t *testing.T) {
 		"/admin/api/resendstudentemail",
 		"/admin/api/sendqrcodes",
 		"/admin/api/kattis/teams",
-		"/admin/api/zoom/breakout",
 		"/admin/api/team-list",
 	} {
 		assertRedirectsTo(t, doRequest(router, http.MethodGet, path), "/admin/login")
@@ -135,7 +134,6 @@ func TestRouting_Admin_ValidToken(t *testing.T) {
 		"/admin/teams",
 		"/admin/dietaryrestrictions",
 		"/admin/api/kattis/teams",
-		"/admin/api/zoom/breakout",
 		"/admin/api/team-list",
 	} {
 		rec := doRequest(router, http.MethodGet, path,
