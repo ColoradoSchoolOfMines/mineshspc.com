@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/golang-jwt/jwt/v4 v4.5.2
-	github.com/mattn/go-sqlite3 v1.14.52
+	github.com/mattn/go-sqlite3 v1.14.53
 	github.com/rs/zerolog v1.35.1
 	github.com/sendgrid/sendgrid-go v3.16.1+incompatible
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
@@ -20,15 +20,15 @@ require (
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/mattn/go-colorable v0.1.16 // indirect
 	github.com/mattn/go-isatty v0.0.24 // indirect
-	github.com/petermattis/goid v0.0.0-20260918085751-abfca077860b // indirect
+	github.com/petermattis/goid v0.0.0-20261109124353-7cfa343ad0ab // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
-	golang.org/x/exp v0.0.0-20261014143641-f0251eb4aa3e // indirect
+	golang.org/x/exp v0.0.0-20261109185158-a52e3aef5920 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20231108232855-2478ac86f678 // indirect
 	golang.org/x/mod v0.42.0 // indirect
 	golang.org/x/sync v0.24.0 // indirect
 	golang.org/x/telemetry v0.0.0-20261009151841-97e8ea77aa2a // indirect
-	golang.org/x/tools v0.52.0 // indirect
+	golang.org/x/tools v0.52.1-0.20261106145633-d407941a339a // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	honnef.co/go/tools v0.7.0 // indirect
@@ -36,7 +36,7 @@ require (
 
 require (
 	github.com/google/uuid v1.6.0
-	golang.org/x/sys v0.49.0 // indirect
+	golang.org/x/sys v0.50.0 // indirect
 )
 
 tool (

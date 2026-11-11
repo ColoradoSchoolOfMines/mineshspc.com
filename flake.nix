@@ -19,10 +19,10 @@
       rec {
         packages.mineshspc = pkgs.buildGoModule {
           pname = "mineshspc.com";
-          version = "unstable-2026-09-20";
+          version = "unstable-2026-11-11";
           src = self;
           subPackages = [ "cmd/mineshspc" ];
-          vendorHash = "sha256-jB566DkyG51JdwFhESVGqsptBu6dlbjwFzPELnCS3e0=";
+          vendorHash = "sha256-wrvfT67xILCv7/CgSOIlylIagQWX89dqXoS6zySVSdk=";
         };
         packages.default = packages.mineshspc;
 
